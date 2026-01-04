@@ -1684,9 +1684,15 @@ body:not([data-theme]) {
     word-wrap: break-word;
 }
 
+.map-node-buttons {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+    margin-left: 5px;
+}
+
+.map-node-edit,
 .map-node-delete {
-    background: var(--neon-red);
-    color: white;
     border: none;
     border-radius: 50%;
     width: 24px;
@@ -1698,7 +1704,21 @@ body:not([data-theme]) {
     justify-content: center;
     transition: all 0.2s ease;
     flex-shrink: 0;
-    margin-left: 5px;
+}
+
+.map-node-edit {
+    background: var(--neon-cyan);
+    color: white;
+}
+
+.map-node-edit:hover {
+    background: var(--neon-blue);
+    transform: scale(1.1);
+}
+
+.map-node-delete {
+    background: var(--neon-red);
+    color: white;
 }
 
 .map-node-delete:hover {
@@ -1811,6 +1831,7 @@ body:not([data-theme]) {
         padding: 12px;
     }
     
+    .map-node-edit,
     .map-node-delete {
         width: 28px;
         height: 28px;
@@ -1859,6 +1880,7 @@ body:not([data-theme]) {
         font-size: 0.85rem;
     }
     
+    .map-node-edit,
     .map-node-delete {
         width: 30px;
         height: 30px;

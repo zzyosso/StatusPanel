@@ -1219,7 +1219,10 @@ function createNodeElement(node) {
     nodeEl.innerHTML = `
         <div class="map-node-header">
             <div class="map-node-title">${node.title}</div>
-            <button class="map-node-delete" onclick="deleteMapNode(${node.id})">✕</button>
+            <div class="map-node-buttons">
+                <button class="map-node-edit" onclick="editMapNode(${node.id}); event.stopPropagation();">✏️</button>
+                <button class="map-node-delete" onclick="deleteMapNode(${node.id})">✕</button>
+            </div>
         </div>
         <div class="map-node-content">${node.content}</div>
     `;
@@ -1232,22 +1235,24 @@ function createNodeElement(node) {
         }
     });
     
-    // 双击编辑
+    // 双击编辑（桌面端）
     nodeEl.addEventListener('dblclick', (e) => {
-        e.stopPropagation();
-        editMapNode(node.id);
+        if (e.target.closest('.map-node-buttons') === null) {
+            e.stopPropagation();
+            editMapNode(node.id);
+        }
     });
     
     // 鼠标按下开始拖拽
     nodeEl.addEventListener('mousedown', (e) => {
-        if (!mapState.connectMode && e.target.closest('.map-node-delete') === null) {
+        if (!mapState.connectMode && e.target.closest('.map-node-buttons') === null) {
             startDragging(node.id, e);
         }
     });
     
     // 触摸开始拖拽（移动端）
     nodeEl.addEventListener('touchstart', (e) => {
-        if (!mapState.connectMode && e.target.closest('.map-node-delete') === null) {
+        if (!mapState.connectMode && e.target.closest('.map-node-buttons') === null) {
             const touch = e.touches[0];
             startDragging(node.id, touch);
             e.preventDefault();
