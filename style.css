@@ -336,7 +336,6 @@ body:not([data-theme]) {
     border: 1px solid var(--accent-secondary);
     border-radius: 15px;
     padding: 25px;
-    box-shadow: 
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     animation: fadeIn 0.5s ease;
     backdrop-filter: blur(10px);
