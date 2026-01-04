@@ -2023,6 +2023,88 @@ body:not([data-theme]) {
 }
 
 /* ==================== 技能树样式 ==================== */
+.skill-status-bar {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--accent-primary);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.skill-level-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.skill-level-badge {
+    background: var(--btn-gradient);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.skill-exp-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.skill-exp-bar {
+    flex: 1;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+.skill-exp-fill {
+    height: 100%;
+    background: var(--accent-primary);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px var(--accent-primary);
+}
+
+.skill-exp-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: 'Orbitron', sans-serif;
+    min-width: 60px;
+}
+
+.skill-fragments-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 8px 15px;
+    border-radius: 10px;
+}
+
+.fragment-icon {
+    font-size: 1.2rem;
+}
+
+.fragment-count {
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-right: 5px;
+}
+
 .skills-container {
     display: flex;
     flex-direction: column;

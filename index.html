@@ -203,8 +203,26 @@
         <section id="skills" class="panel">
             <div class="panel-header">
                 <h2>技能树</h2>
-                <button class="cyber-btn" onclick="showAddSkillModal()">+ 添加技能</button>
+                <button class="cyber-btn" id="add-skill-btn" onclick="showAddSkillModal()">+ 添加技能</button>
             </div>
+            
+            <div class="skill-status-bar">
+                <div class="skill-level-info">
+                    <span class="skill-level-badge">Lv.<span id="skill-level">0</span></span>
+                    <div class="skill-exp-container">
+                        <div class="skill-exp-bar">
+                            <div class="skill-exp-fill" id="skill-exp-fill" style="width: 0%"></div>
+                        </div>
+                        <span class="skill-exp-text"><span id="skill-exp">0</span>/<span id="skill-max-exp">100</span></span>
+                    </div>
+                </div>
+                <div class="skill-fragments-display">
+                    <span class="fragment-icon">🧩</span>
+                    <span class="fragment-count">碎片: <span id="skill-fragments">0</span></span>
+                    <button class="cyber-btn-small" onclick="synthesizeSkill()">合成技能</button>
+                </div>
+            </div>
+
             <div id="skills-container" class="skills-container">
                 <!-- 技能树内容 -->
             </div>

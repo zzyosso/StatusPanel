@@ -5,6 +5,10 @@ let gameData = {
     storage: [],
     shop: [],
     skills: [],
+    skillFragments: 0,
+    skillLevel: 0,
+    skillExp: 0,
+    skillMaxExp: 100,
     gold: 100,
     food: 0,
     pet: {
@@ -148,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderStorage();
     renderShop();
     renderSkills(); // 初始化技能树
+    renderSkillStatus(); // 初始化技能状态栏
     updateGoldDisplay();
     addDefaultStats();
     initPet(); // 初始化宠物系统
@@ -713,6 +718,12 @@ function submitMathAnswers() {
     if (foodReward > 0) {
         rewardFood(foodReward);
     }
+    
+    // 奖励技能经验和碎片
+    if (correct >= 6) {
+        addSkillExp(correct * 2); // 每题2点经验
+        gainSkillFragment(); // 随机获得碎片
+    }
 }
 
 // 生成识字题
@@ -788,9 +799,10 @@ function checkPinyin(index, selected, correct) {
         resultDiv.innerHTML = `得分: ${literacyScore}/2 (${(literacyScore / 2) * 100}%)`;
         resultDiv.className = 'result-display ' + (literacyScore === 2 ? 'success' : 'fail');
         
-        // 奖励食物：答对1题得1个食物
-        if (literacyScore > 0) {
-            rewardFood(literacyScore);
+        if (literacyScore === 2) {
+            rewardFood(1);
+            addSkillExp(20); // 全对奖励20经验
+            gainSkillFragment(); // 随机获得碎片
         }
     }
 }
@@ -1566,8 +1578,99 @@ function clearMap() {
 
 // ==================== 技能树系统 ====================
 
+// 渲染技能树状态
+function renderSkillStatus() {
+    const levelEl = document.getElementById('skill-level');
+    const expEl = document.getElementById('skill-exp');
+    const maxExpEl = document.getElementById('skill-max-exp');
+    const expFillEl = document.getElementById('skill-exp-fill');
+    const fragmentsEl = document.getElementById('skill-fragments');
+    const addBtn = document.getElementById('add-skill-btn');
+    
+    if (levelEl) levelEl.textContent = gameData.skillLevel || 0;
+    if (expEl) expEl.textContent = gameData.skillExp || 0;
+    if (maxExpEl) maxExpEl.textContent = gameData.skillMaxExp || 100;
+    if (fragmentsEl) fragmentsEl.textContent = gameData.skillFragments || 0;
+    
+    if (expFillEl) {
+        const percentage = Math.min(100, ((gameData.skillExp || 0) / (gameData.skillMaxExp || 100)) * 100);
+        expFillEl.style.width = `${percentage}%`;
+    }
+    
+    // 只有拥有至少一个技能或者等级大于0时，才允许添加技能
+    // 或者有足够的碎片合成第一个技能
+    if (addBtn) {
+        if ((gameData.skills && gameData.skills.length > 0) || (gameData.skillLevel > 0)) {
+            addBtn.disabled = false;
+            addBtn.title = "添加新技能";
+        } else {
+            addBtn.disabled = true;
+            addBtn.title = "请先合成技能开启技能树";
+        }
+    }
+}
+
+// 合成技能
+function synthesizeSkill() {
+    const cost = 3; // 3个碎片合成一个技能点/开启技能树
+    
+    if ((gameData.skillFragments || 0) < cost) {
+        showNotification(`碎片不足！需要${cost}个碎片合成。`, 'error');
+        return;
+    }
+    
+    gameData.skillFragments -= cost;
+    
+    // 如果是第一次合成，开启技能树（升到1级）
+    if (gameData.skillLevel === 0) {
+        gameData.skillLevel = 1;
+        showNotification('恭喜！技能树已开启！现在可以添加技能了。');
+    } else {
+        // 否则获得经验值
+        addSkillExp(50);
+        showNotification('合成成功！获得50点技能经验。');
+    }
+    
+    renderSkillStatus();
+    saveData();
+}
+
+// 增加技能经验
+function addSkillExp(amount) {
+    gameData.skillExp = (gameData.skillExp || 0) + amount;
+    
+    // 升级逻辑
+    while (gameData.skillExp >= (gameData.skillMaxExp || 100)) {
+        gameData.skillExp -= (gameData.skillMaxExp || 100);
+        gameData.skillLevel++;
+        gameData.skillMaxExp = Math.floor((gameData.skillMaxExp || 100) * 1.2);
+        showNotification(`技能树升级了！当前等级：Lv.${gameData.skillLevel}`);
+    }
+    
+    renderSkillStatus();
+    saveData();
+}
+
+// 获得技能碎片
+function gainSkillFragment() {
+    // 随机获得0-3个碎片
+    const amount = Math.floor(Math.random() * 4);
+    if (amount > 0) {
+        gameData.skillFragments = (gameData.skillFragments || 0) + amount;
+        showNotification(`获得了 ${amount} 个技能碎片！🧩`);
+        renderSkillStatus();
+        saveData();
+    }
+}
+
 // 显示添加技能模态框
 function showAddSkillModal(parentId = null) {
+    // 检查是否开启了技能树
+    if (gameData.skillLevel === 0 && (!gameData.skills || gameData.skills.length === 0)) {
+        showNotification('请先收集碎片合成技能以开启技能树！', 'error');
+        return;
+    }
+
     document.getElementById('skill-modal-title').textContent = parentId ? '添加子技能' : '添加技能';
     document.getElementById('skill-edit-id').value = '';
     document.getElementById('skill-name').value = '';
@@ -1898,6 +2001,10 @@ function confirmReset() {
         storage: [],
         shop: [],
         skills: [],
+        skillFragments: 0,
+        skillLevel: 0,
+        skillExp: 0,
+        skillMaxExp: 100,
         gold: 100,
         food: 0,
         pet: {
@@ -1964,6 +2071,10 @@ function loadData() {
             ...gameData,
             ...loadedData,
             skills: loadedData.skills || [],
+            skillFragments: loadedData.skillFragments || 0,
+            skillLevel: loadedData.skillLevel || 0,
+            skillExp: loadedData.skillExp || 0,
+            skillMaxExp: loadedData.skillMaxExp || 100,
             skillNextId: loadedData.skillNextId || 1,
             map: loadedData.map || {
                 nodes: [],
