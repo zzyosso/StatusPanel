@@ -4,7 +4,18 @@ let gameData = {
     backpack: [],
     storage: [],
     shop: [],
-    gold: 100
+    gold: 100,
+    food: 0,
+    pet: {
+        selected: false,
+        type: '',
+        name: '',
+        level: 1,
+        exp: 0,
+        maxExp: 100,
+        hunger: 100,
+        lastFeedTime: Date.now()
+    }
 };
 
 // 常用汉字库及拼音
@@ -131,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderShop();
     updateGoldDisplay();
     addDefaultStats();
+    initPet(); // 初始化宠物系统
 });
 
 // 初始化主题切换器
@@ -685,6 +697,12 @@ function submitMathAnswers() {
     const percentage = (correct / 10) * 100;
     resultDiv.innerHTML = `得分: ${correct}/10 (${percentage}%)`;
     resultDiv.className = 'result-display ' + (correct >= 6 ? 'success' : 'fail');
+    
+    // 奖励食物：每5题对的奖励1个食物
+    const foodReward = Math.floor(correct / 5);
+    if (foodReward > 0) {
+        rewardFood(foodReward);
+    }
 }
 
 // 生成识字题
@@ -754,11 +772,16 @@ function checkPinyin(index, selected, correct) {
     }
     literacyAnswered++;
     
-    // 如果两道题都答完了，显示结果
+    // 如果两道题都答完了，显示结果并奖励食物
     if (literacyAnswered === 2) {
         const resultDiv = document.getElementById('literacy-result');
         resultDiv.innerHTML = `得分: ${literacyScore}/2 (${(literacyScore / 2) * 100}%)`;
         resultDiv.className = 'result-display ' + (literacyScore === 2 ? 'success' : 'fail');
+        
+        // 奖励食物：答对1题得1个食物
+        if (literacyScore > 0) {
+            rewardFood(literacyScore);
+        }
     }
 }
 
@@ -815,6 +838,312 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// 宠物系统
+const petEmojis = {
+    'cat': '🐱',
+    'dog': '🐶',
+    'rabbit': '🐰',
+    'bear': '🐻',
+    'panda': '🐼',
+    'fox': '🦊'
+};
+
+const encouragingMessages = [
+    '你真棒！继续加油！',
+    '太厉害了！',
+    '你是最棒的！',
+    '好样的，继续努力！',
+    '我相信你！',
+    '你可以做得更好！',
+    '再接再厉！',
+    '很有进步哦！',
+    '你真聪明！',
+    '我为你骄傲！'
+];
+
+const hungryMessages = [
+    '咕咕咕，我饿了...',
+    '主人，我想吃东西~',
+    '给我一些食物好不好？',
+    '我的肚子好饿...',
+    '有好吃的吗？'
+];
+
+const happyMessages = [
+    '谢谢你喂我！',
+    '好好吃呀！',
+    '我吃饱了，真开心！',
+    '主人最好啦！',
+    '真美味！'
+];
+
+// 选择宠物
+function selectPet(type) {
+    gameData.pet.selected = true;
+    gameData.pet.type = type;
+    gameData.pet.name = getPetDefaultName(type);
+    gameData.pet.lastFeedTime = Date.now();
+    
+    document.getElementById('pet-select-screen').style.display = 'none';
+    document.getElementById('pet-main-screen').style.display = 'block';
+    
+    updatePetDisplay();
+    saveData();
+    showNotification(`选择了${gameData.pet.name}作为你的宠物伙伴！`);
+    speakPetMessage('你好！很高兴认识你！');
+}
+
+function getPetDefaultName(type) {
+    const names = {
+        'cat': '小猫咪',
+        'dog': '小狗狗',
+        'rabbit': '小兔子',
+        'bear': '小熊熊',
+        'panda': '小熊猫',
+        'fox': '小狐狸'
+    };
+    return names[type] || '小宠物';
+}
+
+// 更新宠物显示
+function updatePetDisplay() {
+    if (!gameData.pet.selected) return;
+    
+    // 更新宠物emoji和名字
+    document.getElementById('pet-emoji').textContent = petEmojis[gameData.pet.type];
+    document.getElementById('pet-name-display').textContent = gameData.pet.name;
+    
+    // 更新等级和经验
+    document.getElementById('pet-level').textContent = gameData.pet.level;
+    const expPercent = (gameData.pet.exp / gameData.pet.maxExp) * 100;
+    document.getElementById('pet-exp-fill').style.width = expPercent + '%';
+    document.getElementById('pet-exp-text').textContent = `${gameData.pet.exp}/${gameData.pet.maxExp}`;
+    
+    // 更新饥饿度
+    updateHunger();
+    document.getElementById('pet-hunger-fill').style.width = gameData.pet.hunger + '%';
+    
+    // 更新等级样式
+    const petEmojiEl = document.getElementById('pet-emoji');
+    petEmojiEl.className = 'pet-emoji level-' + gameData.pet.level;
+    
+    // 根据饥饿度更新表情
+    if (gameData.pet.hunger < 30) {
+        petEmojiEl.classList.add('hungry');
+    } else {
+        petEmojiEl.classList.remove('hungry');
+    }
+    
+    // 更新食物显示
+    updateFoodDisplay();
+}
+
+// 更新食物显示
+function updateFoodDisplay() {
+    const foodAmountEl = document.getElementById('pet-food-amount');
+    if (foodAmountEl) {
+        foodAmountEl.textContent = gameData.food;
+    }
+}
+
+// 更新饥饿度
+function updateHunger() {
+    const now = Date.now();
+    const timePassed = now - gameData.pet.lastFeedTime;
+    const hoursPassed = timePassed / (1000 * 60 * 60);
+    
+    // 每小时减少5点饥饿度
+    const hungerDecrease = Math.floor(hoursPassed * 5);
+    gameData.pet.hunger = Math.max(0, 100 - hungerDecrease);
+    gameData.pet.lastFeedTime = now;
+    
+    // 如果太饿了，说话
+    if (gameData.pet.hunger < 30 && Math.random() < 0.3) {
+        speakPetMessage(hungryMessages[Math.floor(Math.random() * hungryMessages.length)]);
+    }
+}
+
+// 喂食宠物
+function feedPet() {
+    if (gameData.food <= 0) {
+        showNotification('没有食物了！完成题目可以获得食物哦');
+        speakPetMessage('完成题目就有食物啦！');
+        return;
+    }
+    
+    gameData.food--;
+    gameData.pet.hunger = Math.min(100, gameData.pet.hunger + 20);
+    gameData.pet.exp += 10;
+    gameData.pet.lastFeedTime = Date.now();
+    
+    // 检查升级
+    if (gameData.pet.exp >= gameData.pet.maxExp) {
+        levelUpPet();
+    }
+    
+    // 动画效果
+    const petEmoji = document.getElementById('pet-emoji');
+    petEmoji.classList.add('happy');
+    setTimeout(() => petEmoji.classList.remove('happy'), 500);
+    
+    speakPetMessage(happyMessages[Math.floor(Math.random() * happyMessages.length)]);
+    updatePetDisplay();
+    saveData();
+}
+
+// 宠物升级
+function levelUpPet() {
+    gameData.pet.level++;
+    gameData.pet.exp = 0;
+    gameData.pet.maxExp = Math.floor(gameData.pet.maxExp * 1.5);
+    
+    // 升级动画
+    const petEmoji = document.getElementById('pet-emoji');
+    petEmoji.style.animation = 'none';
+    setTimeout(() => {
+        petEmoji.style.animation = '';
+    }, 10);
+    
+    showNotification(`🎉 ${gameData.pet.name}升级了！现在是${gameData.pet.level}级！`);
+    speakPetMessage(`太棒了！我升到${gameData.pet.level}级了！`);
+}
+
+// 和宠物玩耍
+function playWithPet() {
+    if (gameData.pet.hunger < 20) {
+        speakPetMessage('我太饿了，没力气玩...');
+        showNotification('宠物太饿了，先喂食吧');
+        return;
+    }
+    
+    gameData.pet.hunger = Math.max(0, gameData.pet.hunger - 5);
+    gameData.pet.exp += 5;
+    
+    // 检查升级
+    if (gameData.pet.exp >= gameData.pet.maxExp) {
+        levelUpPet();
+    }
+    
+    const petEmoji = document.getElementById('pet-emoji');
+    petEmoji.classList.add('happy');
+    setTimeout(() => petEmoji.classList.remove('happy'), 500);
+    
+    const playMessages = [
+        '好开心呀！',
+        '和你玩真有趣！',
+        '我们再玩一次吧！',
+        '太好玩了！',
+        '我喜欢和你玩！'
+    ];
+    speakPetMessage(playMessages[Math.floor(Math.random() * playMessages.length)]);
+    updatePetDisplay();
+    saveData();
+}
+
+// 重命名宠物
+function renamePet() {
+    const newName = prompt('给宠物取个新名字：', gameData.pet.name);
+    if (newName && newName.trim()) {
+        gameData.pet.name = newName.trim();
+        updatePetDisplay();
+        saveData();
+        showNotification(`改名成功！现在叫${gameData.pet.name}`);
+        speakPetMessage('我喜欢我的新名字！');
+    }
+}
+
+// 重置宠物
+function resetPet() {
+    if (confirm('确定要重新选择宠物吗？当前宠物的进度将会丢失。')) {
+        gameData.pet = {
+            selected: false,
+            type: '',
+            name: '',
+            level: 1,
+            exp: 0,
+            maxExp: 100,
+            hunger: 100,
+            lastFeedTime: Date.now()
+        };
+        
+        document.getElementById('pet-select-screen').style.display = 'block';
+        document.getElementById('pet-main-screen').style.display = 'none';
+        saveData();
+        showNotification('已重置宠物，请重新选择');
+    }
+}
+
+// 宠物说话
+function speakPetMessage(message) {
+    const bubble = document.getElementById('pet-speech-bubble');
+    bubble.textContent = message;
+    bubble.style.animation = 'none';
+    setTimeout(() => {
+        bubble.style.animation = 'speechAppear 0.3s ease';
+    }, 10);
+}
+
+// 奖励食物
+function rewardFood(amount) {
+    gameData.food += amount;
+    updateFoodDisplay();
+    
+    // 显示食物获得动画
+    const foodIcon = document.createElement('div');
+    foodIcon.className = 'food-reward-animation';
+    foodIcon.textContent = '🍖';
+    document.body.appendChild(foodIcon);
+    setTimeout(() => foodIcon.remove(), 1000);
+    
+    showNotification(`获得${amount}个食物！`);
+    
+    // 宠物鼓励
+    if (gameData.pet.selected) {
+        speakPetMessage(encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)]);
+    }
+}
+
+// 初始化宠物系统
+function initPet() {
+    // 更新食物显示
+    updateFoodDisplay();
+    
+    if (gameData.pet.selected) {
+        document.getElementById('pet-select-screen').style.display = 'none';
+        document.getElementById('pet-main-screen').style.display = 'block';
+        updatePetDisplay();
+        
+        // 随机说一句鼓励的话
+        if (Math.random() < 0.5) {
+            setTimeout(() => {
+                speakPetMessage(encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)]);
+            }, 1000);
+        }
+    } else {
+        // 确保显示选择界面
+        document.getElementById('pet-select-screen').style.display = 'block';
+        document.getElementById('pet-main-screen').style.display = 'none';
+    }
+    
+    // 定时更新饥饿度
+    setInterval(() => {
+        if (gameData.pet.selected) {
+            updateHunger();
+            document.getElementById('pet-hunger-fill').style.width = gameData.pet.hunger + '%';
+            
+            // 如果宠物太饿，显示hungry状态
+            const petEmojiEl = document.getElementById('pet-emoji');
+            if (gameData.pet.hunger < 30) {
+                petEmojiEl.classList.add('hungry');
+            } else {
+                petEmojiEl.classList.remove('hungry');
+            }
+            
+            saveData();
+        }
+    }, 60000); // 每分钟检查一次
+}
 
 // 数据持久化
 function saveData() {

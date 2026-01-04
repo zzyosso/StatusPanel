@@ -15,6 +15,7 @@
 
         <nav class="cyber-nav">
             <button class="nav-btn active" data-tab="status">状态栏</button>
+            <button class="nav-btn" data-tab="pet">我的宠物</button>
             <button class="nav-btn" data-tab="backpack">背包</button>
             <button class="nav-btn" data-tab="storage">仓库</button>
             <button class="nav-btn" data-tab="shop">商店</button>
@@ -36,6 +37,94 @@
             </div>
             <div id="stats-container" class="stats-container">
                 <!-- 默认属性 -->
+            </div>
+        </section>
+
+        <!-- 宠物 -->
+        <section id="pet" class="panel">
+            <div class="panel-header">
+                <h2>我的宠物</h2>
+                <div class="pet-food-display">🍖 × <span id="pet-food-amount">0</span></div>
+            </div>
+            
+            <div id="pet-select-screen" class="pet-select-screen">
+                <h3>选择你的宠物伙伴</h3>
+                <div class="pet-options">
+                    <div class="pet-option" onclick="selectPet('cat')">
+                        <div class="pet-icon">🐱</div>
+                        <div class="pet-option-name">小猫咪</div>
+                    </div>
+                    <div class="pet-option" onclick="selectPet('dog')">
+                        <div class="pet-icon">🐶</div>
+                        <div class="pet-option-name">小狗狗</div>
+                    </div>
+                    <div class="pet-option" onclick="selectPet('rabbit')">
+                        <div class="pet-icon">🐰</div>
+                        <div class="pet-option-name">小兔子</div>
+                    </div>
+                    <div class="pet-option" onclick="selectPet('bear')">
+                        <div class="pet-icon">🐻</div>
+                        <div class="pet-option-name">小熊熊</div>
+                    </div>
+                    <div class="pet-option" onclick="selectPet('panda')">
+                        <div class="pet-icon">🐼</div>
+                        <div class="pet-option-name">小熊猫</div>
+                    </div>
+                    <div class="pet-option" onclick="selectPet('fox')">
+                        <div class="pet-icon">🦊</div>
+                        <div class="pet-option-name">小狐狸</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pet-main-screen" class="pet-main-screen" style="display:none;">
+                <div class="pet-info-bar">
+                    <div class="pet-stat">
+                        <span class="pet-stat-label">等级</span>
+                        <span class="pet-stat-value" id="pet-level">1</span>
+                    </div>
+                    <div class="pet-stat">
+                        <span class="pet-stat-label">经验</span>
+                        <div class="pet-exp-bar">
+                            <div class="pet-exp-fill" id="pet-exp-fill"></div>
+                            <span class="pet-exp-text" id="pet-exp-text">0/10</span>
+                        </div>
+                    </div>
+                    <div class="pet-stat">
+                        <span class="pet-stat-label">饥饿度</span>
+                        <div class="pet-hunger-bar">
+                            <div class="pet-hunger-fill" id="pet-hunger-fill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pet-display-area">
+                    <div class="pet-character" id="pet-character">
+                        <div class="pet-emoji" id="pet-emoji">🐱</div>
+                        <div class="pet-name" id="pet-name-display">小猫咪</div>
+                    </div>
+                    <div class="pet-speech-bubble" id="pet-speech-bubble">
+                        欢迎来看我呀！一起学习吧~ 📚
+                    </div>
+                </div>
+
+                <div class="pet-actions">
+                    <button class="cyber-btn" onclick="feedPet()">🍖 喂食 (消耗1个食物)</button>
+                    <button class="cyber-btn" onclick="playWithPet()">🎾 互动</button>
+                    <button class="cyber-btn" onclick="renamePet()">✏️ 改名</button>
+                    <button class="cyber-btn" onclick="resetPet()" style="background: var(--neon-red);">🔄 更换宠物</button>
+                </div>
+
+                <div class="pet-tips">
+                    <h4>💡 小贴士</h4>
+                    <ul>
+                        <li>完成学习任务（做题、识字）可以获得食物</li>
+                        <li>每做对5道题获得1个食物</li>
+                        <li>喂食可以增加宠物经验值</li>
+                        <li>宠物升级后会变得更大更可爱</li>
+                        <li>记得定期喂养，宠物饿了会不开心哦</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
