@@ -1605,9 +1605,10 @@ body:not([data-theme]) {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 245, 255, 0.95));
     border: 3px solid var(--accent-primary);
     border-radius: 15px;
-    overflow: hidden;
+    overflow: auto;
     margin-bottom: 20px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    -webkit-overflow-scrolling: touch;
 }
 
 .map-svg {
@@ -1641,6 +1642,7 @@ body:not([data-theme]) {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
     user-select: none;
+    touch-action: none;
 }
 
 .map-node:hover {
@@ -1789,7 +1791,18 @@ body:not([data-theme]) {
 /* 响应式 - 地图 */
 @media (max-width: 768px) {
     .map-container {
-        height: 500px;
+        height: 70vh;
+        max-height: 500px;
+    }
+    
+    .map-nodes {
+        min-width: 800px;
+        min-height: 800px;
+    }
+    
+    .map-svg {
+        min-width: 800px;
+        min-height: 800px;
     }
     
     .map-node {
@@ -1798,33 +1811,58 @@ body:not([data-theme]) {
         padding: 12px;
     }
     
+    .map-node-delete {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+    }
+    
     .map-controls {
         flex-direction: column;
     }
     
     .map-controls .cyber-btn {
         width: 100%;
+        padding: 12px;
+        font-size: 1rem;
     }
 }
 
 @media (max-width: 480px) {
     .map-container {
-        height: 400px;
+        height: 60vh;
+        max-height: 400px;
+    }
+    
+    .map-nodes {
+        min-width: 600px;
+        min-height: 600px;
+    }
+    
+    .map-svg {
+        min-width: 600px;
+        min-height: 600px;
     }
     
     .map-node {
-        min-width: 80px;
-        max-width: 120px;
+        min-width: 90px;
+        max-width: 130px;
         padding: 10px;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
     }
     
     .map-node-title {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
     }
     
     .map-node-content {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
+    }
+    
+    .map-node-delete {
+        width: 30px;
+        height: 30px;
+        font-size: 1.1rem;
     }
 }
 

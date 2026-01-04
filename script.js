@@ -1184,6 +1184,9 @@ function initMap() {
     // 添加容器事件监听
     container.addEventListener('mousemove', handleMapMouseMove);
     container.addEventListener('mouseup', handleMapMouseUp);
+    container.addEventListener('touchmove', handleMapTouchMove, { passive: false });
+    container.addEventListener('touchend', handleMapMouseUp);
+    container.addEventListener('touchcancel', handleMapMouseUp);
 }
 
 // 添加节点
@@ -1242,6 +1245,15 @@ function createNodeElement(node) {
         }
     });
     
+    // 触摸开始拖拽（移动端）
+    nodeEl.addEventListener('touchstart', (e) => {
+        if (!mapState.connectMode && e.target.closest('.map-node-delete') === null) {
+            const touch = e.touches[0];
+            startDragging(node.id, touch);
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
     nodesContainer.appendChild(nodeEl);
 }
 
@@ -1287,6 +1299,15 @@ function handleMapMouseMove(e) {
         nodeEl.style.top = newY + 'px';
         
         renderConnections();
+    }
+}
+
+// 处理触摸移动（移动端）
+function handleMapTouchMove(e) {
+    if (mapState.draggingNode) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        handleMapMouseMove(touch);
     }
 }
 
