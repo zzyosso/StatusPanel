@@ -1250,18 +1250,25 @@ function createNodeElement(node) {
         if (!mapState.connectMode) {
             startDragging(node.id, e);
             e.stopPropagation();
+            e.preventDefault();
         }
     });
     
     // 触摸开始拖拽（移动端，只在拖拽手柄上）
     dragHandle.addEventListener('touchstart', (e) => {
         if (!mapState.connectMode) {
+            e.preventDefault(); // 阻止默认行为（如长按菜单）
+            e.stopPropagation();
             const touch = e.touches[0];
             startDragging(node.id, touch);
-            e.preventDefault();
-            e.stopPropagation();
         }
     }, { passive: false });
+    
+    // 阻止长按菜单
+    dragHandle.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        return false;
+    });
     
     nodesContainer.appendChild(nodeEl);
 }
