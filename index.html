@@ -173,29 +173,27 @@
         <section id="map" class="panel">
             <div class="panel-header">
                 <h2>思维地图</h2>
-                <div class="map-controls">
-                    <button class="cyber-btn" onclick="addMapNode()">📍 添加节点</button>
-                    <button class="cyber-btn" onclick="clearMap()">🗑️ 清空地图</button>
-                    <button class="cyber-btn" onclick="toggleConnectMode()">🔗 <span id="connect-mode-text">连接模式</span></button>
-                </div>
+            </div>
+            <div class="map-toolbar">
+                <button class="map-tool-btn" onclick="addMapNode()">
+                    <span class="tool-icon">➕</span>
+                    <span class="tool-text">添加</span>
+                </button>
+                <button class="map-tool-btn" id="connectModeBtn" onclick="toggleConnectMode()">
+                    <span class="tool-icon">🔗</span>
+                    <span class="tool-text">连线</span>
+                </button>
+                <button class="map-tool-btn danger" onclick="clearMap()">
+                    <span class="tool-icon">🗑️</span>
+                    <span class="tool-text">清空</span>
+                </button>
             </div>
             <div class="map-container" id="mapContainer">
-                <svg id="mapSvg" class="map-svg">
-                    <!-- 连接线将在这里绘制 -->
-                </svg>
-                <div id="mapNodes" class="map-nodes">
-                    <!-- 节点将在这里添加 -->
-                </div>
+                <svg id="mapSvg" class="map-svg"></svg>
+                <div id="mapNodes" class="map-nodes"></div>
             </div>
-            <div class="map-tips">
-                <h4>💡 使用提示</h4>
-                <ul>
-                    <li>点击"添加节点"创建新节点</li>
-                    <li>拖动节点可以移动位置</li>
-                    <li>双击节点可以编辑内容</li>
-                    <li>点击"连接模式"，然后点击两个节点建立连接</li>
-                    <li>点击节点上的 ❌ 可以删除节点</li>
-                </ul>
+            <div class="map-hint" id="mapHint">
+                <span>📱 提示：长按节点可拖动，点击标题展开详情</span>
             </div>
         </section>
 
