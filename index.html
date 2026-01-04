@@ -19,6 +19,7 @@
             <button class="nav-btn" data-tab="backpack">背包</button>
             <button class="nav-btn" data-tab="storage">仓库</button>
             <button class="nav-btn" data-tab="shop">商店</button>
+            <button class="nav-btn" data-tab="map">思维地图</button>
             <button class="nav-btn" data-tab="challenge">考验</button>
             <div class="theme-switcher">
                 <span class="theme-label">主题:</span>
@@ -165,6 +166,36 @@
             </div>
             <div id="shop-items" class="items-grid">
                 <!-- 商店物品 -->
+            </div>
+        </section>
+
+        <!-- 思维地图 -->
+        <section id="map" class="panel">
+            <div class="panel-header">
+                <h2>思维地图</h2>
+                <div class="map-controls">
+                    <button class="cyber-btn" onclick="addMapNode()">📍 添加节点</button>
+                    <button class="cyber-btn" onclick="clearMap()">🗑️ 清空地图</button>
+                    <button class="cyber-btn" onclick="toggleConnectMode()">🔗 <span id="connect-mode-text">连接模式</span></button>
+                </div>
+            </div>
+            <div class="map-container" id="mapContainer">
+                <svg id="mapSvg" class="map-svg">
+                    <!-- 连接线将在这里绘制 -->
+                </svg>
+                <div id="mapNodes" class="map-nodes">
+                    <!-- 节点将在这里添加 -->
+                </div>
+            </div>
+            <div class="map-tips">
+                <h4>💡 使用提示</h4>
+                <ul>
+                    <li>点击"添加节点"创建新节点</li>
+                    <li>拖动节点可以移动位置</li>
+                    <li>双击节点可以编辑内容</li>
+                    <li>点击"连接模式"，然后点击两个节点建立连接</li>
+                    <li>点击节点上的 ❌ 可以删除节点</li>
+                </ul>
             </div>
         </section>
 

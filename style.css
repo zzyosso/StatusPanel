@@ -1590,3 +1590,241 @@ body:not([data-theme]) {
         font-size: 0.95rem;
     }
 }
+
+/* 思维地图样式 */
+.map-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.map-container {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 245, 255, 0.95));
+    border: 3px solid var(--accent-primary);
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.map-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.map-nodes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+.map-node {
+    position: absolute;
+    min-width: 120px;
+    max-width: 200px;
+    padding: 15px;
+    background: white;
+    border: 3px solid var(--accent-primary);
+    border-radius: 12px;
+    cursor: move;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.map-node:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+    z-index: 100;
+}
+
+.map-node.dragging {
+    opacity: 0.8;
+    cursor: grabbing;
+    z-index: 1000;
+}
+
+.map-node.selected {
+    border-color: var(--accent-secondary);
+    background: linear-gradient(135deg, white, rgba(255, 240, 245, 0.5));
+    box-shadow: 0 0 20px var(--accent-secondary);
+}
+
+.map-node.connect-mode {
+    cursor: pointer;
+}
+
+.map-node-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--accent-primary);
+}
+
+.map-node-title {
+    font-weight: 700;
+    color: var(--accent-primary);
+    font-size: 0.95rem;
+    flex: 1;
+    word-wrap: break-word;
+}
+
+.map-node-delete {
+    background: var(--neon-red);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    margin-left: 5px;
+}
+
+.map-node-delete:hover {
+    background: #ff0040;
+    transform: scale(1.1);
+}
+
+.map-node-content {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.map-node-content:empty::before {
+    content: '双击编辑内容';
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.map-connection {
+    stroke: var(--accent-primary);
+    stroke-width: 2;
+    fill: none;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.map-connection:hover {
+    stroke-width: 3;
+    opacity: 1;
+    cursor: pointer;
+}
+
+.map-connection.selected {
+    stroke: var(--accent-secondary);
+    stroke-width: 3;
+    opacity: 1;
+}
+
+.map-tips {
+    background: rgba(255, 255, 255, 0.7);
+    border: 2px solid var(--accent-primary);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.map-tips h4 {
+    color: var(--accent-primary);
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.map-tips ul {
+    list-style: none;
+    padding: 0;
+}
+
+.map-tips li {
+    padding: 6px 0;
+    padding-left: 25px;
+    position: relative;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.map-tips li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    color: var(--accent-primary);
+    font-weight: bold;
+}
+
+/* 连接模式提示 */
+.connect-mode-active {
+    background: var(--accent-secondary) !important;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* 响应式 - 地图 */
+@media (max-width: 768px) {
+    .map-container {
+        height: 500px;
+    }
+    
+    .map-node {
+        min-width: 100px;
+        max-width: 150px;
+        padding: 12px;
+    }
+    
+    .map-controls {
+        flex-direction: column;
+    }
+    
+    .map-controls .cyber-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .map-container {
+        height: 400px;
+    }
+    
+    .map-node {
+        min-width: 80px;
+        max-width: 120px;
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+    
+    .map-node-title {
+        font-size: 0.85rem;
+    }
+    
+    .map-node-content {
+        font-size: 0.8rem;
+    }
+}
+

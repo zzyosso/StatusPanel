@@ -15,6 +15,11 @@ let gameData = {
         maxExp: 100,
         hunger: 100,
         lastFeedTime: Date.now()
+    },
+    map: {
+        nodes: [],
+        connections: [],
+        nextId: 1
     }
 };
 
@@ -143,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateGoldDisplay();
     addDefaultStats();
     initPet(); // 初始化宠物系统
+    initMap(); // 初始化地图系统
 });
 
 // 初始化主题切换器
@@ -1145,6 +1151,318 @@ function initPet() {
     }, 60000); // 每分钟检查一次
 }
 
+// 思维地图系统
+let mapState = {
+    connectMode: false,
+    selectedNode: null,
+    draggingNode: null,
+    dragOffset: { x: 0, y: 0 }
+};
+
+// 初始化地图
+function initMap() {
+    const container = document.getElementById('mapContainer');
+    if (!container) return; // 容器不存在则返回
+    
+    // 确保gameData.map存在
+    if (!gameData.map) {
+        gameData.map = {
+            nodes: [],
+            connections: [],
+            nextId: 1
+        };
+    }
+    
+    // 渲染已保存的节点
+    gameData.map.nodes.forEach(node => {
+        createNodeElement(node);
+    });
+    
+    // 渲染连接线
+    renderConnections();
+    
+    // 添加容器事件监听
+    container.addEventListener('mousemove', handleMapMouseMove);
+    container.addEventListener('mouseup', handleMapMouseUp);
+}
+
+// 添加节点
+function addMapNode() {
+    const node = {
+        id: gameData.map.nextId++,
+        title: `节点 ${gameData.map.nextId - 1}`,
+        content: '',
+        x: Math.random() * 400 + 100,
+        y: Math.random() * 300 + 100
+    };
+    
+    gameData.map.nodes.push(node);
+    createNodeElement(node);
+    saveData();
+    showNotification('节点已添加');
+}
+
+// 创建节点元素
+function createNodeElement(node) {
+    const nodesContainer = document.getElementById('mapNodes');
+    
+    const nodeEl = document.createElement('div');
+    nodeEl.className = 'map-node';
+    nodeEl.id = `map-node-${node.id}`;
+    nodeEl.style.left = node.x + 'px';
+    nodeEl.style.top = node.y + 'px';
+    nodeEl.dataset.nodeId = node.id;
+    
+    nodeEl.innerHTML = `
+        <div class="map-node-header">
+            <div class="map-node-title">${node.title}</div>
+            <button class="map-node-delete" onclick="deleteMapNode(${node.id})">✕</button>
+        </div>
+        <div class="map-node-content">${node.content}</div>
+    `;
+    
+    // 单击选择节点（用于连接模式）
+    nodeEl.addEventListener('click', (e) => {
+        if (mapState.connectMode) {
+            e.stopPropagation();
+            handleNodeClickForConnection(node.id);
+        }
+    });
+    
+    // 双击编辑
+    nodeEl.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        editMapNode(node.id);
+    });
+    
+    // 鼠标按下开始拖拽
+    nodeEl.addEventListener('mousedown', (e) => {
+        if (!mapState.connectMode && e.target.closest('.map-node-delete') === null) {
+            startDragging(node.id, e);
+        }
+    });
+    
+    nodesContainer.appendChild(nodeEl);
+}
+
+// 开始拖拽
+function startDragging(nodeId, e) {
+    const node = gameData.map.nodes.find(n => n.id === nodeId);
+    const nodeEl = document.getElementById(`map-node-${nodeId}`);
+    const container = document.getElementById('mapContainer');
+    const rect = container.getBoundingClientRect();
+    
+    mapState.draggingNode = nodeId;
+    // 计算鼠标在节点内的相对位置
+    mapState.dragOffset = {
+        x: e.clientX - rect.left - node.x,
+        y: e.clientY - rect.top - node.y
+    };
+    
+    nodeEl.classList.add('dragging');
+    e.preventDefault();
+}
+
+// 处理鼠标移动
+function handleMapMouseMove(e) {
+    if (mapState.draggingNode) {
+        const container = document.getElementById('mapContainer');
+        const rect = container.getBoundingClientRect();
+        
+        const node = gameData.map.nodes.find(n => n.id === mapState.draggingNode);
+        const nodeEl = document.getElementById(`map-node-${mapState.draggingNode}`);
+        
+        // 计算新位置：鼠标位置 - 容器位置 - 拖拽偏移
+        let newX = e.clientX - rect.left - mapState.dragOffset.x;
+        let newY = e.clientY - rect.top - mapState.dragOffset.y;
+        
+        // 限制在容器内
+        newX = Math.max(0, Math.min(newX, rect.width - nodeEl.offsetWidth));
+        newY = Math.max(0, Math.min(newY, rect.height - nodeEl.offsetHeight));
+        
+        node.x = newX;
+        node.y = newY;
+        
+        nodeEl.style.left = newX + 'px';
+        nodeEl.style.top = newY + 'px';
+        
+        renderConnections();
+    }
+}
+
+// 处理鼠标释放
+function handleMapMouseUp() {
+    if (mapState.draggingNode) {
+        const nodeEl = document.getElementById(`map-node-${mapState.draggingNode}`);
+        nodeEl.classList.remove('dragging');
+        mapState.draggingNode = null;
+        saveData();
+    }
+}
+
+// 编辑节点
+function editMapNode(nodeId) {
+    const node = gameData.map.nodes.find(n => n.id === nodeId);
+    if (!node) return;
+    
+    const newTitle = prompt('节点标题:', node.title);
+    if (newTitle !== null && newTitle.trim()) {
+        node.title = newTitle.trim();
+    }
+    
+    const newContent = prompt('节点内容:', node.content);
+    if (newContent !== null) {
+        node.content = newContent.trim();
+    }
+    
+    // 更新显示
+    const nodeEl = document.getElementById(`map-node-${nodeId}`);
+    nodeEl.querySelector('.map-node-title').textContent = node.title;
+    nodeEl.querySelector('.map-node-content').textContent = node.content;
+    
+    saveData();
+}
+
+// 删除节点
+function deleteMapNode(nodeId) {
+    if (!confirm('确定要删除这个节点吗？相关连接也会被删除。')) return;
+    
+    // 删除节点
+    gameData.map.nodes = gameData.map.nodes.filter(n => n.id !== nodeId);
+    
+    // 删除相关连接
+    gameData.map.connections = gameData.map.connections.filter(
+        c => c.from !== nodeId && c.to !== nodeId
+    );
+    
+    // 删除DOM元素
+    const nodeEl = document.getElementById(`map-node-${nodeId}`);
+    if (nodeEl) nodeEl.remove();
+    
+    renderConnections();
+    saveData();
+    showNotification('节点已删除');
+}
+
+// 切换连接模式
+function toggleConnectMode() {
+    mapState.connectMode = !mapState.connectMode;
+    mapState.selectedNode = null;
+    
+    const modeText = document.getElementById('connect-mode-text');
+    const btn = modeText.parentElement;
+    
+    if (mapState.connectMode) {
+        modeText.textContent = '连接模式(开)';
+        btn.classList.add('connect-mode-active');
+        
+        // 给所有节点添加连接模式样式
+        document.querySelectorAll('.map-node').forEach(el => {
+            el.classList.add('connect-mode');
+        });
+    } else {
+        modeText.textContent = '连接模式';
+        btn.classList.remove('connect-mode-active');
+        
+        // 移除连接模式样式
+        document.querySelectorAll('.map-node').forEach(el => {
+            el.classList.remove('connect-mode', 'selected');
+        });
+    }
+}
+
+// 处理节点点击（连接模式）
+function handleNodeClickForConnection(nodeId) {
+    if (!mapState.selectedNode) {
+        // 选择第一个节点
+        mapState.selectedNode = nodeId;
+        document.getElementById(`map-node-${nodeId}`).classList.add('selected');
+    } else if (mapState.selectedNode === nodeId) {
+        // 取消选择
+        document.getElementById(`map-node-${nodeId}`).classList.remove('selected');
+        mapState.selectedNode = null;
+    } else {
+        // 创建连接
+        const from = mapState.selectedNode;
+        const to = nodeId;
+        
+        // 检查连接是否已存在
+        const exists = gameData.map.connections.some(
+            c => (c.from === from && c.to === to) || (c.from === to && c.to === from)
+        );
+        
+        if (!exists) {
+            gameData.map.connections.push({ from, to });
+            renderConnections();
+            saveData();
+            showNotification('连接已创建');
+        } else {
+            showNotification('连接已存在');
+        }
+        
+        // 重置选择
+        document.getElementById(`map-node-${mapState.selectedNode}`).classList.remove('selected');
+        mapState.selectedNode = null;
+    }
+}
+
+// 渲染连接线
+function renderConnections() {
+    const svg = document.getElementById('mapSvg');
+    svg.innerHTML = '';
+    
+    gameData.map.connections.forEach((conn, index) => {
+        const fromNode = gameData.map.nodes.find(n => n.id === conn.from);
+        const toNode = gameData.map.nodes.find(n => n.id === conn.to);
+        
+        if (!fromNode || !toNode) return;
+        
+        const fromEl = document.getElementById(`map-node-${conn.from}`);
+        const toEl = document.getElementById(`map-node-${conn.to}`);
+        
+        if (!fromEl || !toEl) return;
+        
+        const x1 = fromNode.x + fromEl.offsetWidth / 2;
+        const y1 = fromNode.y + fromEl.offsetHeight / 2;
+        const x2 = toNode.x + toEl.offsetWidth / 2;
+        const y2 = toNode.y + toEl.offsetHeight / 2;
+        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('class', 'map-connection');
+        line.style.pointerEvents = 'all';
+        
+        // 点击删除连接
+        line.addEventListener('click', () => {
+            if (confirm('删除这条连接？')) {
+                gameData.map.connections.splice(index, 1);
+                renderConnections();
+                saveData();
+            }
+        });
+        
+        svg.appendChild(line);
+    });
+}
+
+// 清空地图
+function clearMap() {
+    if (!confirm('确定要清空整个地图吗？所有节点和连接都会被删除。')) return;
+    
+    gameData.map.nodes = [];
+    gameData.map.connections = [];
+    gameData.map.nextId = 1;
+    
+    document.getElementById('mapNodes').innerHTML = '';
+    document.getElementById('mapSvg').innerHTML = '';
+    
+    saveData();
+    showNotification('地图已清空');
+}
+
 // 数据持久化
 function saveData() {
     localStorage.setItem('cyberGameData', JSON.stringify(gameData));
@@ -1153,6 +1471,16 @@ function saveData() {
 function loadData() {
     const saved = localStorage.getItem('cyberGameData');
     if (saved) {
-        gameData = JSON.parse(saved);
+        const loadedData = JSON.parse(saved);
+        // 合并数据，确保新属性存在
+        gameData = {
+            ...gameData,
+            ...loadedData,
+            map: loadedData.map || {
+                nodes: [],
+                connections: [],
+                nextId: 1
+            }
+        };
     }
 }
