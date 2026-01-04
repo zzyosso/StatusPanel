@@ -4,6 +4,7 @@ let gameData = {
     backpack: [],
     storage: [],
     shop: [],
+    skills: [],
     gold: 100,
     food: 0,
     pet: {
@@ -20,7 +21,8 @@ let gameData = {
         nodes: [],
         connections: [],
         nextId: 1
-    }
+    },
+    skillNextId: 1
 };
 
 // 常用汉字库及拼音
@@ -145,10 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
     renderBackpack();
     renderStorage();
     renderShop();
+    renderSkills(); // 初始化技能树
     updateGoldDisplay();
     addDefaultStats();
     initPet(); // 初始化宠物系统
     initMap(); // 初始化地图系统
+    updateDataStats(); // 更新数据统计
 });
 
 // 初始化主题切换器
@@ -1560,6 +1564,392 @@ function clearMap() {
     showNotification('地图已清空');
 }
 
+// ==================== 技能树系统 ====================
+
+// 显示添加技能模态框
+function showAddSkillModal(parentId = null) {
+    document.getElementById('skill-modal-title').textContent = parentId ? '添加子技能' : '添加技能';
+    document.getElementById('skill-edit-id').value = '';
+    document.getElementById('skill-name').value = '';
+    document.getElementById('skill-description').value = '';
+    document.getElementById('skill-icon').value = '⭐';
+    document.getElementById('skill-cost-value').value = '0';
+    document.getElementById('skill-gain-value').value = '0';
+    
+    // 更新父技能选项
+    updateSkillParentOptions(parentId);
+    
+    // 更新属性选项
+    updateSkillStatOptions();
+    
+    // 确保父技能选择器可见（编辑时会隐藏）
+    document.getElementById('skill-parent').parentElement.style.display = '';
+    
+    openModal('skill-modal');
+}
+
+// 更新父技能选项
+function updateSkillParentOptions(preselectedId = null) {
+    const select = document.getElementById('skill-parent');
+    select.innerHTML = '<option value="">无（根技能）</option>';
+    
+    function addSkillOptions(skills, prefix = '') {
+        skills.forEach(skill => {
+            const option = document.createElement('option');
+            option.value = skill.id;
+            option.textContent = prefix + skill.name;
+            if (preselectedId && skill.id == preselectedId) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+            
+            if (skill.children && skill.children.length > 0) {
+                addSkillOptions(skill.children, prefix + '　');
+            }
+        });
+    }
+    
+    addSkillOptions(gameData.skills);
+}
+
+// 更新技能属性选项
+function updateSkillStatOptions() {
+    const costSelect = document.getElementById('skill-cost-stat');
+    const gainSelect = document.getElementById('skill-gain-stat');
+    
+    costSelect.innerHTML = '<option value="">无消耗</option>';
+    gainSelect.innerHTML = '<option value="">无获得</option>';
+    
+    gameData.stats.forEach(stat => {
+        costSelect.innerHTML += `<option value="${stat.id}">${stat.name}</option>`;
+        gainSelect.innerHTML += `<option value="${stat.id}">${stat.name}</option>`;
+    });
+}
+
+// 确认添加/编辑技能
+function confirmAddSkill() {
+    const editId = document.getElementById('skill-edit-id').value;
+    const name = document.getElementById('skill-name').value.trim();
+    const description = document.getElementById('skill-description').value.trim();
+    const parentId = document.getElementById('skill-parent').value;
+    const icon = document.getElementById('skill-icon').value || '⭐';
+    const costStat = document.getElementById('skill-cost-stat').value;
+    const costValue = parseInt(document.getElementById('skill-cost-value').value) || 0;
+    const gainStat = document.getElementById('skill-gain-stat').value;
+    const gainValue = parseInt(document.getElementById('skill-gain-value').value) || 0;
+    
+    if (!name) {
+        showNotification('请输入技能名称', 'error');
+        return;
+    }
+    
+    const skillData = {
+        name,
+        description,
+        icon,
+        costStat: costStat || null,
+        costValue,
+        gainStat: gainStat || null,
+        gainValue,
+        children: []
+    };
+    
+    if (editId) {
+        // 编辑模式
+        const skill = findSkillById(parseInt(editId));
+        if (skill) {
+            Object.assign(skill, skillData);
+            skill.children = skill.children || [];
+        }
+        showNotification('技能已更新');
+    } else {
+        // 添加模式
+        skillData.id = gameData.skillNextId++;
+        
+        if (parentId) {
+            const parent = findSkillById(parseInt(parentId));
+            if (parent) {
+                if (!parent.children) parent.children = [];
+                parent.children.push(skillData);
+            }
+        } else {
+            gameData.skills.push(skillData);
+        }
+        showNotification('技能已添加');
+    }
+    
+    closeModal('skill-modal');
+    renderSkills();
+    saveData();
+}
+
+// 根据ID查找技能
+function findSkillById(id, skills = gameData.skills) {
+    for (const skill of skills) {
+        if (skill.id === id) return skill;
+        if (skill.children && skill.children.length > 0) {
+            const found = findSkillById(id, skill.children);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+// 从技能树中删除技能
+function removeSkillById(id, skills = gameData.skills) {
+    for (let i = 0; i < skills.length; i++) {
+        if (skills[i].id === id) {
+            skills.splice(i, 1);
+            return true;
+        }
+        if (skills[i].children && skills[i].children.length > 0) {
+            if (removeSkillById(id, skills[i].children)) return true;
+        }
+    }
+    return false;
+}
+
+// 渲染技能树
+function renderSkills() {
+    const container = document.getElementById('skills-container');
+    if (!container) return;
+    
+    if (!gameData.skills || gameData.skills.length === 0) {
+        container.innerHTML = `
+            <div class="skills-empty">
+                <div class="skills-empty-icon">🌟</div>
+                <h3>还没有技能</h3>
+                <p>点击上方"添加技能"按钮创建你的第一个技能吧！</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = '<div class="skill-tree-root"></div>';
+    const root = container.querySelector('.skill-tree-root');
+    
+    gameData.skills.forEach(skill => {
+        root.appendChild(createSkillNode(skill));
+    });
+    
+    updateDataStats();
+}
+
+// 创建技能节点元素
+function createSkillNode(skill) {
+    const node = document.createElement('div');
+    node.className = 'skill-node';
+    node.dataset.skillId = skill.id;
+    
+    // 构建效果标签
+    let effectsHtml = '';
+    if (skill.costStat) {
+        const costStatName = gameData.stats.find(s => s.id == skill.costStat)?.name || '未知';
+        effectsHtml += `<span class="skill-effect-tag cost">-${skill.costValue} ${costStatName}</span>`;
+    }
+    if (skill.gainStat) {
+        const gainStatName = gameData.stats.find(s => s.id == skill.gainStat)?.name || '未知';
+        effectsHtml += `<span class="skill-effect-tag gain">+${skill.gainValue} ${gainStatName}</span>`;
+    }
+    
+    // 检查是否可以使用（消耗足够）
+    let canUse = true;
+    if (skill.costStat) {
+        const stat = gameData.stats.find(s => s.id == skill.costStat);
+        if (!stat || stat.current < skill.costValue) {
+            canUse = false;
+        }
+    }
+    
+    node.innerHTML = `
+        <div class="skill-node-main">
+            <div class="skill-icon">${skill.icon}</div>
+            <div class="skill-info">
+                <div class="skill-name">${skill.name}</div>
+                ${skill.description ? `<div class="skill-desc">${skill.description}</div>` : ''}
+                ${effectsHtml ? `<div class="skill-effects">${effectsHtml}</div>` : ''}
+            </div>
+            <div class="skill-actions">
+                ${(skill.costStat || skill.gainStat) ? `
+                    <button class="skill-action-btn use" onclick="useSkill(${skill.id})" ${canUse ? '' : 'disabled'} title="使用技能">▶</button>
+                ` : ''}
+                <button class="skill-action-btn edit" onclick="editSkill(${skill.id})" title="编辑">✎</button>
+                <button class="skill-action-btn delete" onclick="deleteSkill(${skill.id})" title="删除">×</button>
+            </div>
+        </div>
+    `;
+    
+    // 添加子技能
+    if (skill.children && skill.children.length > 0) {
+        const childrenContainer = document.createElement('div');
+        childrenContainer.className = 'skill-children';
+        
+        skill.children.forEach(child => {
+            childrenContainer.appendChild(createSkillNode(child));
+        });
+        
+        // 添加"添加子技能"按钮
+        const addChildBtn = document.createElement('div');
+        addChildBtn.className = 'skill-add-child-btn';
+        addChildBtn.innerHTML = '+ 添加子技能';
+        addChildBtn.onclick = () => showAddSkillModal(skill.id);
+        childrenContainer.appendChild(addChildBtn);
+        
+        node.appendChild(childrenContainer);
+    } else {
+        // 无子技能时也显示添加按钮
+        const addChildContainer = document.createElement('div');
+        addChildContainer.className = 'skill-children';
+        const addChildBtn = document.createElement('div');
+        addChildBtn.className = 'skill-add-child-btn';
+        addChildBtn.innerHTML = '+ 添加子技能';
+        addChildBtn.onclick = () => showAddSkillModal(skill.id);
+        addChildContainer.appendChild(addChildBtn);
+        node.appendChild(addChildContainer);
+    }
+    
+    return node;
+}
+
+// 使用技能
+function useSkill(skillId) {
+    const skill = findSkillById(skillId);
+    if (!skill) return;
+    
+    // 检查消耗
+    if (skill.costStat) {
+        const costStat = gameData.stats.find(s => s.id == skill.costStat);
+        if (!costStat || costStat.current < skill.costValue) {
+            showNotification(`${costStat?.name || '属性'}不足，无法使用技能`, 'error');
+            return;
+        }
+        // 扣除消耗
+        costStat.current -= skill.costValue;
+    }
+    
+    // 获得效果
+    if (skill.gainStat) {
+        const gainStat = gameData.stats.find(s => s.id == skill.gainStat);
+        if (gainStat) {
+            gainStat.current = Math.min(gainStat.max, gainStat.current + skill.gainValue);
+        }
+    }
+    
+    renderStats();
+    renderSkills();
+    saveData();
+    showNotification(`使用了技能：${skill.name}`);
+}
+
+// 编辑技能
+function editSkill(skillId) {
+    const skill = findSkillById(skillId);
+    if (!skill) return;
+    
+    document.getElementById('skill-modal-title').textContent = '编辑技能';
+    document.getElementById('skill-edit-id').value = skill.id;
+    document.getElementById('skill-name').value = skill.name;
+    document.getElementById('skill-description').value = skill.description || '';
+    document.getElementById('skill-icon').value = skill.icon || '⭐';
+    
+    // 更新属性选项
+    updateSkillStatOptions();
+    
+    // 设置消耗和获得
+    setTimeout(() => {
+        document.getElementById('skill-cost-stat').value = skill.costStat || '';
+        document.getElementById('skill-cost-value').value = skill.costValue || 0;
+        document.getElementById('skill-gain-stat').value = skill.gainStat || '';
+        document.getElementById('skill-gain-value').value = skill.gainValue || 0;
+    }, 50);
+    
+    // 隐藏父技能选择（编辑时不能改变层级）
+    document.getElementById('skill-parent').parentElement.style.display = 'none';
+    
+    openModal('skill-modal');
+}
+
+// 删除技能
+function deleteSkill(skillId) {
+    if (!confirm('确定要删除这个技能吗？子技能也会被删除。')) return;
+    
+    removeSkillById(skillId);
+    renderSkills();
+    saveData();
+    showNotification('技能已删除');
+}
+
+// ==================== 设置和重置 ====================
+
+// 显示重置确认模态框
+function showResetConfirmModal() {
+    openModal('reset-modal');
+}
+
+// 确认重置
+function confirmReset() {
+    // 清除localStorage
+    localStorage.removeItem('cyberGameData');
+    
+    // 重置gameData
+    gameData = {
+        stats: [],
+        backpack: [],
+        storage: [],
+        shop: [],
+        skills: [],
+        gold: 100,
+        food: 0,
+        pet: {
+            selected: false,
+            type: '',
+            name: '',
+            level: 1,
+            exp: 0,
+            maxExp: 100,
+            hunger: 100,
+            lastFeedTime: Date.now()
+        },
+        map: {
+            nodes: [],
+            connections: [],
+            nextId: 1
+        },
+        skillNextId: 1
+    };
+    
+    closeModal('reset-modal');
+    showNotification('所有数据已重置');
+    
+    // 刷新页面
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+// 更新设置页数据统计
+function updateDataStats() {
+    const statsCount = document.getElementById('stats-count');
+    const skillsCount = document.getElementById('skills-count');
+    const backpackCount = document.getElementById('backpack-count');
+    const mapCount = document.getElementById('map-count');
+    
+    if (statsCount) statsCount.textContent = gameData.stats.length;
+    if (skillsCount) {
+        let count = 0;
+        function countSkills(skills) {
+            skills.forEach(s => {
+                count++;
+                if (s.children) countSkills(s.children);
+            });
+        }
+        countSkills(gameData.skills);
+        skillsCount.textContent = count;
+    }
+    if (backpackCount) backpackCount.textContent = gameData.backpack.length;
+    if (mapCount) mapCount.textContent = gameData.map?.nodes?.length || 0;
+}
+
 // 数据持久化
 function saveData() {
     localStorage.setItem('cyberGameData', JSON.stringify(gameData));
@@ -1573,6 +1963,8 @@ function loadData() {
         gameData = {
             ...gameData,
             ...loadedData,
+            skills: loadedData.skills || [],
+            skillNextId: loadedData.skillNextId || 1,
             map: loadedData.map || {
                 nodes: [],
                 connections: [],

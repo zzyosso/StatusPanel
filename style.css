@@ -2022,3 +2022,425 @@ body:not([data-theme]) {
     }
 }
 
+/* ==================== 技能树样式 ==================== */
+.skills-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.skill-tree-root {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skill-node {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--accent-primary);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.skill-node:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.skill-node-main {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    gap: 15px;
+    cursor: pointer;
+}
+
+.skill-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--btn-gradient);
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.skill-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.skill-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.skill-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.skill-effects {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.skill-effect-tag {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.skill-effect-tag.cost {
+    background: rgba(230, 0, 51, 0.15);
+    color: var(--neon-red);
+    border: 1px solid var(--neon-red);
+}
+
+.skill-effect-tag.gain {
+    background: rgba(0, 204, 54, 0.15);
+    color: var(--neon-green);
+    border: 1px solid var(--neon-green);
+}
+
+.skill-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.skill-action-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.skill-action-btn.use {
+    background: var(--btn-gradient);
+    color: white;
+}
+
+.skill-action-btn.use:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.skill-action-btn.use:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.skill-action-btn.edit {
+    background: rgba(0, 184, 184, 0.15);
+    color: var(--accent-primary);
+    border: 1px solid var(--accent-primary);
+}
+
+.skill-action-btn.delete {
+    background: rgba(230, 0, 51, 0.15);
+    color: var(--neon-red);
+    border: 1px solid var(--neon-red);
+}
+
+.skill-action-btn:hover {
+    transform: scale(1.1);
+}
+
+/* 子技能 */
+.skill-children {
+    padding-left: 30px;
+    border-left: 3px dashed var(--accent-primary);
+    margin-left: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.skill-children .skill-node {
+    border-color: var(--accent-secondary);
+}
+
+.skill-children .skill-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+}
+
+.skill-add-child-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: rgba(0, 184, 184, 0.1);
+    border: 2px dashed var(--accent-primary);
+    border-radius: 12px;
+    color: var(--accent-primary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.skill-add-child-btn:hover {
+    background: rgba(0, 184, 184, 0.2);
+    transform: translateY(-2px);
+}
+
+/* 技能模态框额外样式 */
+.skill-effects-section {
+    background: rgba(0, 0, 0, 0.03);
+    padding: 15px;
+    border-radius: 12px;
+    margin: 15px 0;
+}
+
+.skill-effects-section h4 {
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.skill-effect-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.skill-effect-row label {
+    width: 80px;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.skill-effect-row select {
+    flex: 1;
+    padding: 8px 12px;
+    border: 2px solid var(--accent-primary);
+    border-radius: 8px;
+    background: white;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.skill-effect-row input {
+    width: 80px;
+    padding: 8px 12px;
+    border: 2px solid var(--accent-primary);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* 空技能提示 */
+.skills-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.skills-empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.skills-empty h3 {
+    margin: 0 0 10px;
+    color: var(--text-primary);
+}
+
+/* ==================== 设置页面样式 ==================== */
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.settings-section {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--accent-primary);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.settings-section h3 {
+    margin: 0 0 15px 0;
+    color: var(--accent-primary);
+    font-size: 1.2rem;
+}
+
+.settings-desc {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.danger-btn {
+    background: linear-gradient(135deg, #e60033, #cc0029) !important;
+    color: white !important;
+}
+
+.danger-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(230, 0, 51, 0.4);
+}
+
+.data-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.data-stat-item {
+    background: rgba(0, 184, 184, 0.1);
+    border: 1px solid var(--accent-primary);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+}
+
+.data-stat-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.data-stat-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* 导航设置按钮 */
+.nav-btn.settings-btn {
+    padding: 10px 15px;
+    font-size: 1.2rem;
+}
+
+/* 重置确认模态框 */
+.reset-modal {
+    max-width: 420px;
+}
+
+.reset-warning {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.reset-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+.reset-warning h3 {
+    margin: 0 0 15px 0;
+    color: var(--neon-red);
+    font-size: 1.3rem;
+}
+
+.reset-warning p {
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+}
+
+.reset-list {
+    text-align: left;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    background: rgba(230, 0, 51, 0.08);
+    border-radius: 12px;
+    padding: 15px 20px;
+}
+
+.reset-list li {
+    padding: 6px 0;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.reset-warning-text {
+    color: var(--neon-red) !important;
+    font-weight: 700;
+    font-size: 1rem !important;
+}
+
+.reset-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+.cancel-btn {
+    background: rgba(100, 100, 100, 0.2) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 响应式 - 技能树 */
+@media (max-width: 768px) {
+    .skill-node-main {
+        flex-wrap: wrap;
+    }
+    
+    .skill-actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .skill-children {
+        padding-left: 20px;
+        margin-left: 15px;
+    }
+    
+    .skill-effect-row {
+        flex-wrap: wrap;
+    }
+    
+    .skill-effect-row label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .skill-effect-row select {
+        flex: 1;
+    }
+    
+    .skill-effect-row input {
+        width: 70px;
+    }
+}
+

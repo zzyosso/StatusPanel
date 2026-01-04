@@ -19,8 +19,10 @@
             <button class="nav-btn" data-tab="backpack">背包</button>
             <button class="nav-btn" data-tab="storage">仓库</button>
             <button class="nav-btn" data-tab="shop">商店</button>
+            <button class="nav-btn" data-tab="skills">技能树</button>
             <button class="nav-btn" data-tab="map">思维地图</button>
             <button class="nav-btn" data-tab="challenge">考验</button>
+            <button class="nav-btn settings-btn" data-tab="settings">⚙️</button>
             <div class="theme-switcher">
                 <span class="theme-label">主题:</span>
                 <button class="theme-btn active" data-theme="cyber" title="赛博朋克">🌃</button>
@@ -197,6 +199,17 @@
             </div>
         </section>
 
+        <!-- 技能树 -->
+        <section id="skills" class="panel">
+            <div class="panel-header">
+                <h2>技能树</h2>
+                <button class="cyber-btn" onclick="showAddSkillModal()">+ 添加技能</button>
+            </div>
+            <div id="skills-container" class="skills-container">
+                <!-- 技能树内容 -->
+            </div>
+        </section>
+
         <!-- 考验 -->
         <section id="challenge" class="panel">
             <div class="panel-header">
@@ -220,6 +233,41 @@
                 <button class="cyber-btn generate-btn" onclick="generateLiteracyQuestion()">生成题目</button>
                 <div id="literacy-question" class="literacy-container"></div>
                 <div id="literacy-result" class="result-display"></div>
+            </div>
+        </section>
+
+        <!-- 设置 -->
+        <section id="settings" class="panel">
+            <div class="panel-header">
+                <h2>设置</h2>
+            </div>
+            <div class="settings-container">
+                <div class="settings-section">
+                    <h3>🗑️ 数据管理</h3>
+                    <p class="settings-desc">清除所有本地缓存数据，重置游戏进度。此操作不可撤销！</p>
+                    <button class="cyber-btn danger-btn" onclick="showResetConfirmModal()">🔄 重置所有数据</button>
+                </div>
+                <div class="settings-section">
+                    <h3>📊 数据统计</h3>
+                    <div class="data-stats">
+                        <div class="data-stat-item">
+                            <span class="data-stat-label">属性数量</span>
+                            <span class="data-stat-value" id="stats-count">0</span>
+                        </div>
+                        <div class="data-stat-item">
+                            <span class="data-stat-label">技能数量</span>
+                            <span class="data-stat-value" id="skills-count">0</span>
+                        </div>
+                        <div class="data-stat-item">
+                            <span class="data-stat-label">背包物品</span>
+                            <span class="data-stat-value" id="backpack-count">0</span>
+                        </div>
+                        <div class="data-stat-item">
+                            <span class="data-stat-label">地图节点</span>
+                            <span class="data-stat-value" id="map-count">0</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -334,6 +382,77 @@
                 <input type="number" id="edit-stat-max">
             </div>
             <button class="cyber-btn" onclick="confirmEditStat()">确认修改</button>
+        </div>
+    </div>
+
+    <!-- 添加技能模态框 -->
+    <div id="skill-modal" class="modal">
+        <div class="modal-content cyber-modal">
+            <span class="close-btn" onclick="closeModal('skill-modal')">&times;</span>
+            <h3 id="skill-modal-title">添加技能</h3>
+            <input type="hidden" id="skill-edit-id">
+            <div class="form-group">
+                <label>技能名称 *</label>
+                <input type="text" id="skill-name" placeholder="如：火球术">
+            </div>
+            <div class="form-group">
+                <label>技能描述</label>
+                <textarea id="skill-description" placeholder="技能的描述..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>父技能（可选）</label>
+                <select id="skill-parent">
+                    <option value="">无（根技能）</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>技能图标</label>
+                <input type="text" id="skill-icon" placeholder="如：⚔️ 🔥 ⭐" value="⭐">
+            </div>
+            <div class="skill-effects-section">
+                <h4>使用效果</h4>
+                <div class="skill-effect-row">
+                    <label>消耗属性</label>
+                    <select id="skill-cost-stat">
+                        <option value="">无消耗</option>
+                    </select>
+                    <input type="number" id="skill-cost-value" placeholder="消耗数值" value="0">
+                </div>
+                <div class="skill-effect-row">
+                    <label>获得属性</label>
+                    <select id="skill-gain-stat">
+                        <option value="">无获得</option>
+                    </select>
+                    <input type="number" id="skill-gain-value" placeholder="获得数值" value="0">
+                </div>
+            </div>
+            <button class="cyber-btn" onclick="confirmAddSkill()">确认</button>
+        </div>
+    </div>
+
+    <!-- 重置确认模态框 -->
+    <div id="reset-modal" class="modal">
+        <div class="modal-content cyber-modal reset-modal">
+            <span class="close-btn" onclick="closeModal('reset-modal')">&times;</span>
+            <div class="reset-warning">
+                <div class="reset-icon">⚠️</div>
+                <h3>确定要重置所有数据吗？</h3>
+                <p>此操作将清除所有本地缓存数据，包括：</p>
+                <ul class="reset-list">
+                    <li>✦ 所有属性数值</li>
+                    <li>✦ 宠物数据</li>
+                    <li>✦ 背包和仓库物品</li>
+                    <li>✦ 商店商品</li>
+                    <li>✦ 技能树</li>
+                    <li>✦ 思维地图</li>
+                    <li>✦ 金币和食物</li>
+                </ul>
+                <p class="reset-warning-text">⚠️ 此操作不可撤销！</p>
+            </div>
+            <div class="reset-buttons">
+                <button class="cyber-btn cancel-btn" onclick="closeModal('reset-modal')">取消</button>
+                <button class="cyber-btn danger-btn" onclick="confirmReset()">确认重置</button>
+            </div>
         </div>
     </div>
 
