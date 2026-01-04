@@ -1674,6 +1674,32 @@ body:not([data-theme]) {
     margin-bottom: 8px;
     padding-bottom: 5px;
     border-bottom: 2px solid var(--accent-primary);
+    gap: 8px;
+}
+
+.map-node-drag-handle {
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    cursor: grab;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.map-node-drag-handle:active {
+    cursor: grabbing;
+    background: var(--accent-secondary);
+}
+
+.map-node-drag-handle:hover {
+    transform: scale(1.1);
 }
 
 .map-node-title {
@@ -1682,6 +1708,12 @@ body:not([data-theme]) {
     font-size: 0.95rem;
     flex: 1;
     word-wrap: break-word;
+    cursor: pointer;
+    user-select: none;
+}
+
+.map-node-title:hover {
+    color: var(--accent-secondary);
 }
 
 .map-node-buttons {
@@ -1733,10 +1765,23 @@ body:not([data-theme]) {
     word-wrap: break-word;
     max-height: 150px;
     overflow-y: auto;
+    padding-top: 8px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 150px;
+    }
 }
 
 .map-node-content:empty::before {
-    content: '双击编辑内容';
+    content: '点击标题查看详情';
     color: var(--text-secondary);
     font-style: italic;
 }
@@ -1831,6 +1876,12 @@ body:not([data-theme]) {
         padding: 12px;
     }
     
+    .map-node-drag-handle {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+    }
+    
     .map-node-edit,
     .map-node-delete {
         width: 28px;
@@ -1870,6 +1921,12 @@ body:not([data-theme]) {
         max-width: 130px;
         padding: 10px;
         font-size: 0.9rem;
+    }
+    
+    .map-node-drag-handle {
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
     }
     
     .map-node-title {

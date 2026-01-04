@@ -1218,13 +1218,14 @@ function createNodeElement(node) {
     
     nodeEl.innerHTML = `
         <div class="map-node-header">
-            <div class="map-node-title">${node.title}</div>
+            <button class="map-node-drag-handle" title="按住拖拽">☰</button>
+            <div class="map-node-title" onclick="toggleNodeContent(${node.id}); event.stopPropagation();">${node.title}</div>
             <div class="map-node-buttons">
                 <button class="map-node-edit" onclick="editMapNode(${node.id}); event.stopPropagation();">✏️</button>
                 <button class="map-node-delete" onclick="deleteMapNode(${node.id})">✕</button>
             </div>
         </div>
-        <div class="map-node-content">${node.content}</div>
+        <div class="map-node-content" style="display: none;">${node.content || '点击标题查看详情'}</div>
     `;
     
     // 单击选择节点（用于连接模式）
@@ -1243,19 +1244,22 @@ function createNodeElement(node) {
         }
     });
     
-    // 鼠标按下开始拖拽
-    nodeEl.addEventListener('mousedown', (e) => {
-        if (!mapState.connectMode && e.target.closest('.map-node-buttons') === null) {
+    // 鼠标按下开始拖拽（只在拖拽手柄上）
+    const dragHandle = nodeEl.querySelector('.map-node-drag-handle');
+    dragHandle.addEventListener('mousedown', (e) => {
+        if (!mapState.connectMode) {
             startDragging(node.id, e);
+            e.stopPropagation();
         }
     });
     
-    // 触摸开始拖拽（移动端）
-    nodeEl.addEventListener('touchstart', (e) => {
-        if (!mapState.connectMode && e.target.closest('.map-node-buttons') === null) {
+    // 触摸开始拖拽（移动端，只在拖拽手柄上）
+    dragHandle.addEventListener('touchstart', (e) => {
+        if (!mapState.connectMode) {
             const touch = e.touches[0];
             startDragging(node.id, touch);
             e.preventDefault();
+            e.stopPropagation();
         }
     }, { passive: false });
     
@@ -1326,6 +1330,19 @@ function handleMapMouseUp() {
     }
 }
 
+// 切换节点内容显示
+function toggleNodeContent(nodeId) {
+    const nodeEl = document.getElementById(`map-node-${nodeId}`);
+    if (!nodeEl) return;
+    
+    const contentEl = nodeEl.querySelector('.map-node-content');
+    if (contentEl.style.display === 'none') {
+        contentEl.style.display = 'block';
+    } else {
+        contentEl.style.display = 'none';
+    }
+}
+
 // 编辑节点
 function editMapNode(nodeId) {
     const node = gameData.map.nodes.find(n => n.id === nodeId);
@@ -1343,8 +1360,12 @@ function editMapNode(nodeId) {
     
     // 更新显示
     const nodeEl = document.getElementById(`map-node-${nodeId}`);
-    nodeEl.querySelector('.map-node-title').textContent = node.title;
-    nodeEl.querySelector('.map-node-content').textContent = node.content;
+    const titleEl = nodeEl.querySelector('.map-node-title');
+    const contentEl = nodeEl.querySelector('.map-node-content');
+    
+    // 移除onclick属性并重新设置
+    titleEl.outerHTML = `<div class="map-node-title" onclick="toggleNodeContent(${nodeId}); event.stopPropagation();">${node.title}</div>`;
+    contentEl.textContent = node.content || '点击标题查看详情';
     
     saveData();
 }
