@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赛博朋克状态面板</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="cyber-header">
+            <h1 class="glitch" data-text="状态面板">状态面板</h1>
+            <div class="scan-line"></div>
+        </header>
+
+        <nav class="cyber-nav">
+            <button class="nav-btn active" data-tab="status">状态栏</button>
+            <button class="nav-btn" data-tab="backpack">背包</button>
+            <button class="nav-btn" data-tab="storage">仓库</button>
+            <button class="nav-btn" data-tab="shop">商店</button>
+            <button class="nav-btn" data-tab="challenge">考验</button>
+            <div class="theme-switcher">
+                <span class="theme-label">主题:</span>
+                <button class="theme-btn active" data-theme="cyber" title="赛博朋克">🌃</button>
+                <button class="theme-btn" data-theme="strawberry" title="草莓粉">🍓</button>
+                <button class="theme-btn" data-theme="matcha" title="抹茶绿">🍵</button>
+                <button class="theme-btn" data-theme="glass" title="透明玻璃">💎</button>
+            </div>
+        </nav>
+
+        <!-- 状态栏 -->
+        <section id="status" class="panel active">
+            <div class="panel-header">
+                <h2>角色状态</h2>
+                <button class="cyber-btn" onclick="addNewStat()">+ 添加属性</button>
+            </div>
+            <div id="stats-container" class="stats-container">
+                <!-- 默认属性 -->
+            </div>
+        </section>
+
+        <!-- 背包 -->
+        <section id="backpack" class="panel">
+            <div class="panel-header">
+                <h2>背包</h2>
+                <button class="cyber-btn" onclick="showAddItemModal('backpack')">+ 添加物品</button>
+            </div>
+            <div id="backpack-items" class="items-grid">
+                <!-- 背包物品 -->
+            </div>
+        </section>
+
+        <!-- 仓库 -->
+        <section id="storage" class="panel">
+            <div class="panel-header">
+                <h2>仓库</h2>
+                <button class="cyber-btn" onclick="showAddItemModal('storage')">+ 添加物品</button>
+            </div>
+            <div id="storage-items" class="items-grid">
+                <!-- 仓库物品 -->
+            </div>
+        </section>
+
+        <!-- 商店 -->
+        <section id="shop" class="panel">
+            <div class="panel-header">
+                <h2>商店</h2>
+                <div class="gold-display">
+                    <span class="gold-icon">💰</span>
+                    <span id="gold-amount">100</span>
+                    <button class="cyber-btn-small" onclick="editGold()">编辑</button>
+                </div>
+            </div>
+            <div class="shop-controls">
+                <button class="cyber-btn" onclick="showAddShopItemModal()">+ 添加商品</button>
+            </div>
+            <div id="shop-items" class="items-grid">
+                <!-- 商店物品 -->
+            </div>
+        </section>
+
+        <!-- 考验 -->
+        <section id="challenge" class="panel">
+            <div class="panel-header">
+                <h2>考验</h2>
+            </div>
+            <div class="challenge-tabs">
+                <button class="challenge-tab active" data-challenge="math">算术题</button>
+                <button class="challenge-tab" data-challenge="literacy">识字</button>
+            </div>
+
+            <!-- 算术题 -->
+            <div id="math-challenge" class="challenge-content active">
+                <button class="cyber-btn generate-btn" onclick="generateMathQuestions()">生成题目</button>
+                <div id="math-questions" class="questions-container"></div>
+                <button id="submit-math" class="cyber-btn submit-btn" style="display:none;" onclick="submitMathAnswers()">提交答案</button>
+                <div id="math-result" class="result-display"></div>
+            </div>
+
+            <!-- 识字 -->
+            <div id="literacy-challenge" class="challenge-content">
+                <button class="cyber-btn generate-btn" onclick="generateLiteracyQuestion()">生成题目</button>
+                <div id="literacy-question" class="literacy-container"></div>
+                <div id="literacy-result" class="result-display"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 添加属性模态框 -->
+    <div id="stat-modal" class="modal">
+        <div class="modal-content cyber-modal">
+            <span class="close-btn" onclick="closeModal('stat-modal')">&times;</span>
+            <h3>添加新属性</h3>
+            <div class="form-group">
+                <label>属性名称</label>
+                <input type="text" id="stat-name" placeholder="如：生命值">
+            </div>
+            <div class="form-group">
+                <label>当前值</label>
+                <input type="number" id="stat-current" value="100">
+            </div>
+            <div class="form-group">
+                <label>最大值</label>
+                <input type="number" id="stat-max" value="100">
+            </div>
+            <div class="form-group">
+                <label>颜色</label>
+                <select id="stat-color">
+                    <option value="red">红色</option>
+                    <option value="blue">蓝色</option>
+                    <option value="green">绿色</option>
+                    <option value="yellow">黄色</option>
+                    <option value="purple">紫色</option>
+                    <option value="cyan">青色</option>
+                </select>
+            </div>
+            <button class="cyber-btn" onclick="confirmAddStat()">确认添加</button>
+        </div>
+    </div>
+
+    <!-- 添加物品模态框 -->
+    <div id="item-modal" class="modal">
+        <div class="modal-content cyber-modal">
+            <span class="close-btn" onclick="closeModal('item-modal')">&times;</span>
+            <h3>添加物品</h3>
+            <input type="hidden" id="item-target">
+            <div class="form-group">
+                <label>物品名称</label>
+                <input type="text" id="item-name" placeholder="如：治疗药水">
+            </div>
+            <div class="form-group">
+                <label>数量</label>
+                <input type="number" id="item-quantity" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>效果属性（可选）</label>
+                <select id="item-effect-stat">
+                    <option value="">无效果</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>效果数值</label>
+                <input type="number" id="item-effect-value" value="0">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea id="item-description" placeholder="物品描述..."></textarea>
+            </div>
+            <button class="cyber-btn" onclick="confirmAddItem()">确认添加</button>
+        </div>
+    </div>
+
+    <!-- 添加商品模态框 -->
+    <div id="shop-modal" class="modal">
+        <div class="modal-content cyber-modal">
+            <span class="close-btn" onclick="closeModal('shop-modal')">&times;</span>
+            <h3>添加商品</h3>
+            <div class="form-group">
+                <label>商品名称</label>
+                <input type="text" id="shop-item-name" placeholder="如：能量饮料">
+            </div>
+            <div class="form-group">
+                <label>价格（金币）</label>
+                <input type="number" id="shop-item-price" value="10" min="1">
+            </div>
+            <div class="form-group">
+                <label>效果属性（可选）</label>
+                <select id="shop-item-effect-stat">
+                    <option value="">无效果</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>效果数值</label>
+                <input type="number" id="shop-item-effect-value" value="0">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea id="shop-item-description" placeholder="商品描述..."></textarea>
+            </div>
+            <button class="cyber-btn" onclick="confirmAddShopItem()">确认添加</button>
+        </div>
+    </div>
+
+    <!-- 编辑属性模态框 -->
+    <div id="edit-stat-modal" class="modal">
+        <div class="modal-content cyber-modal">
+            <span class="close-btn" onclick="closeModal('edit-stat-modal')">&times;</span>
+            <h3>编辑属性</h3>
+            <input type="hidden" id="edit-stat-id">
+            <div class="form-group">
+                <label>当前值</label>
+                <input type="number" id="edit-stat-current">
+            </div>
+            <div class="form-group">
+                <label>最大值</label>
+                <input type="number" id="edit-stat-max">
+            </div>
+            <button class="cyber-btn" onclick="confirmEditStat()">确认修改</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
