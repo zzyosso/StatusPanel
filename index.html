@@ -3,13 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>状态面板</title>
+    <title>System</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- 伪装模式开关提示 (仅桌面端) -->
+    <div class="boss-key-hint" id="boss-key-hint">按 Ctrl+B 切换伪装模式</div>
+    
+    <!-- VSCode 风格伪装界面 -->
+    <div id="disguise-mode" class="vscode-container" style="display: none;">
+        <!-- 顶部菜单栏 -->
+        <div class="vscode-menubar">
+            <div class="vscode-logo">
+                <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M95 25L70 5L30 40L10 25L5 30L30 55L5 80L10 85L30 70L70 105L95 85V25Z" fill="#007ACC"/>
+                </svg>
+            </div>
+            <div class="vscode-menu">
+                <span class="menu-item">文件</span>
+                <span class="menu-item">编辑</span>
+                <span class="menu-item">选择</span>
+                <span class="menu-item">查看</span>
+                <span class="menu-item">转到</span>
+                <span class="menu-item">运行</span>
+                <span class="menu-item">终端</span>
+                <span class="menu-item">帮助</span>
+            </div>
+            <div class="vscode-title">algorithms.js - 数据结构与算法学习</div>
+            <div class="vscode-controls">
+                <span>―</span>
+                <span>□</span>
+                <span>✕</span>
+            </div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="vscode-main">
+            <!-- 侧边栏 -->
+            <div class="vscode-sidebar">
+                <div class="sidebar-icons">
+                    <div class="icon active" title="资源管理器">📁</div>
+                    <div class="icon" title="搜索">🔍</div>
+                    <div class="icon" title="源代码管理">🌿</div>
+                    <div class="icon" title="运行和调试">▶️</div>
+                    <div class="icon" title="扩展">⚡</div>
+                </div>
+                <div class="sidebar-content">
+                    <div class="sidebar-header">资源管理器</div>
+                    <div class="file-tree">
+                        <div class="folder open">
+                            <span>📂 algorithm-learning</span>
+                            <div class="folder-content">
+                                <div class="file active">📄 algorithms.js</div>
+                                <div class="file">📄 dataStructures.js</div>
+                                <div class="file">📄 practice.js</div>
+                            </div>
+                        </div>
+                        <div class="folder">
+                            <span>📂 notes</span>
+                        </div>
+                        <div class="file">📄 README.md</div>
+                        <div class="file">📄 progress.json</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 编辑器区域 -->
+            <div class="vscode-editor">
+                <!-- 标签栏 -->
+                <div class="vscode-tabs">
+                    <div class="tab active">
+                        <span class="tab-icon">JS</span>
+                        <span class="tab-name">algorithms.js</span>
+                        <span class="tab-close">×</span>
+                    </div>
+                </div>
+                
+                <!-- 代码编辑区 - 左右分屏 -->
+                <div class="code-editor-split">
+                    <!-- 左侧：参考代码 -->
+                    <div class="code-reference-panel">
+                        <div class="panel-label">📚 参考代码</div>
+                        <div class="code-editor">
+                            <div class="line-numbers" id="ref-line-numbers"></div>
+                            <div class="code-content">
+                                <pre id="reference-code"></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 分隔线 -->
+                    <div class="split-divider"></div>
+                    
+                    <!-- 右侧：练习区 -->
+                    <div class="code-practice-panel">
+                        <div class="panel-label">✍️ 练习区 (开始打字)</div>
+                        <div class="code-editor">
+                            <div class="line-numbers" id="practice-line-numbers"></div>
+                            <div class="code-content">
+                                <pre id="practice-code"></pre>
+                                <div class="cursor" id="cursor"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部状态栏 -->
+        <div class="vscode-statusbar">
+            <div class="statusbar-left">
+                <span class="status-item">🌿 main</span>
+                <span class="status-item">⚠ 0 ✖ 0</span>
+            </div>
+            <div class="statusbar-right">
+                <span class="status-item">UTF-8</span>
+                <span class="status-item">LF</span>
+                <span class="status-item">JavaScript</span>
+                <span class="status-item" id="cursor-position">Ln 1, Col 1</span>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <header class="cyber-header">
-            <h1 class="glitch" data-text="状态面板">状态面板</h1>
+            <h1 class="glitch" data-text="System"></h1>
             <div class="scan-line"></div>
         </header>
 

@@ -848,18 +848,21 @@ function showNotification(message) {
 }
 
 // 添加动画样式
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes fadeOut {
-        from { opacity: 1; }
-        to { opacity: 0; }
-    }
-`;
-document.head.appendChild(style);
+if (!document.getElementById('animation-styles')) {
+    const animationStyle = document.createElement('style');
+    animationStyle.id = 'animation-styles';
+    animationStyle.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    `;
+    document.head.appendChild(animationStyle);
+}
 
 // 宠物系统
 const petEmojis = {
@@ -2084,3 +2087,661 @@ function loadData() {
         };
     }
 }
+
+// ========== 伪装模式功能 - VSCode风格 ==========
+let disguiseMode = false;
+let codeLines = [];
+let currentLine = 0;
+let currentCol = 0;
+let userTypedCode = '';
+
+// 性能优化：缓存DOM元素
+let cachedElements = {};
+
+// 打字统计
+let typingStats = {
+    startTime: null,
+    totalChars: 0,
+    correctChars: 0,
+    errors: 0
+};
+
+// 防止重复触发
+let isToggling = false;
+
+// 示例代码库 - 数据结构与算法学习
+const sampleCode = `/**
+ * 数据结构与算法 - 学习笔记
+ * 主题：数组、链表、二叉树、递归与动态规划
+ */
+
+// ==================== 数组相关算法 ====================
+
+// 1. 前缀和算法 - 快速计算区间和
+class PrefixSum {
+    constructor(nums) {
+        this.prefix = new Array(nums.length + 1).fill(0);
+        // 构建前缀和数组
+        for (let i = 0; i < nums.length; i++) {
+            this.prefix[i + 1] = this.prefix[i] + nums[i];
+        }
+    }
+    
+    // 查询区间 [left, right] 的和
+    query(left, right) {
+        return this.prefix[right + 1] - this.prefix[left];
+    }
+}
+
+// 2. 差分数组 - 区间修改
+class Difference {
+    constructor(nums) {
+        this.diff = new Array(nums.length);
+        this.diff[0] = nums[0];
+        for (let i = 1; i < nums.length; i++) {
+            this.diff[i] = nums[i] - nums[i - 1];
+        }
+    }
+    
+    // 给区间 [i, j] 增加 val
+    increment(i, j, val) {
+        this.diff[i] += val;
+        if (j + 1 < this.diff.length) {
+            this.diff[j + 1] -= val;
+        }
+    }
+}
+
+// 3. 双指针技巧 - 两数之和
+function twoSum(nums, target) {
+    let left = 0, right = nums.length - 1;
+    while (left < right) {
+        const sum = nums[left] + nums[right];
+        if (sum === target) {
+            return [left, right];
+        } else if (sum < target) {
+            left++;
+        } else {
+            right--;
+        }
+    }
+    return [-1, -1];
+}
+
+// 4. 滑动窗口 - 最小覆盖子串
+function minWindow(s, t) {
+    const need = new Map();
+    const window = new Map();
+    
+    for (let c of t) {
+        need.set(c, (need.get(c) || 0) + 1);
+    }
+    
+    let left = 0, right = 0;
+    let valid = 0;
+    let start = 0, len = Infinity;
+    
+    while (right < s.length) {
+        const c = s[right];
+        right++;
+        
+        if (need.has(c)) {
+            window.set(c, (window.get(c) || 0) + 1);
+            if (window.get(c) === need.get(c)) {
+                valid++;
+            }
+        }
+        
+        while (valid === need.size) {
+            if (right - left < len) {
+                start = left;
+                len = right - left;
+            }
+            
+            const d = s[left];
+            left++;
+            if (need.has(d)) {
+                if (window.get(d) === need.get(d)) {
+                    valid--;
+                }
+                window.set(d, window.get(d) - 1);
+            }
+        }
+    }
+    
+    return len === Infinity ? "" : s.substr(start, len);
+}
+
+// 5. 二分搜索 - 标准模板
+function binarySearch(nums, target) {
+    let left = 0, right = nums.length - 1;
+    
+    while (left <= right) {
+        const mid = Math.floor(left + (right - left) / 2);
+        if (nums[mid] === target) {
+            return mid;
+        } else if (nums[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    return -1;
+}
+
+// ==================== 链表相关算法 ====================
+
+class ListNode {
+    constructor(val, next = null) {
+        this.val = val;
+        this.next = next;
+    }
+}
+
+// 6. 链表双指针 - 找中点
+function findMiddle(head) {
+    let slow = head, fast = head;
+    while (fast && fast.next) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    return slow;
+}
+
+// 7. 反转链表 - 递归实现
+function reverseList(head) {
+    if (!head || !head.next) return head;
+    const last = reverseList(head.next);
+    head.next.next = head;
+    head.next = null;
+    return last;
+}
+
+// ==================== 二叉树相关算法 ====================
+
+class TreeNode {
+    constructor(val, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+    }
+}
+
+// 8. 二叉树遍历 - 前序遍历（递归）
+function preorderTraversal(root) {
+    const result = [];
+    function traverse(node) {
+        if (!node) return;
+        result.push(node.val);  // 前序位置
+        traverse(node.left);
+        traverse(node.right);
+    }
+    traverse(root);
+    return result;
+}
+
+// 9. 层序遍历 - BFS
+function levelOrder(root) {
+    if (!root) return [];
+    const result = [];
+    const queue = [root];
+    
+    while (queue.length > 0) {
+        const levelSize = queue.length;
+        const currentLevel = [];
+        
+        for (let i = 0; i < levelSize; i++) {
+            const node = queue.shift();
+            currentLevel.push(node.val);
+            
+            if (node.left) queue.push(node.left);
+            if (node.right) queue.push(node.right);
+        }
+        result.push(currentLevel);
+    }
+    return result;
+}
+
+// 10. 回溯算法 - 全排列
+function permute(nums) {
+    const result = [];
+    const track = [];
+    const used = new Array(nums.length).fill(false);
+    
+    function backtrack() {
+        if (track.length === nums.length) {
+            result.push([...track]);
+            return;
+        }
+        
+        for (let i = 0; i < nums.length; i++) {
+            if (used[i]) continue;
+            
+            track.push(nums[i]);
+            used[i] = true;
+            backtrack();
+            track.pop();
+            used[i] = false;
+        }
+    }
+    
+    backtrack();
+    return result;
+}
+
+// 11. 动态规划 - 零钱兑换
+function coinChange(coins, amount) {
+    const dp = new Array(amount + 1).fill(Infinity);
+    dp[0] = 0;
+    
+    for (let i = 1; i <= amount; i++) {
+        for (let coin of coins) {
+            if (i - coin >= 0) {
+                dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+            }
+        }
+    }
+    
+    return dp[amount] === Infinity ? -1 : dp[amount];
+}
+
+// 12. 分治算法 - 归并排序
+function mergeSort(nums) {
+    if (nums.length <= 1) return nums;
+    
+    const mid = Math.floor(nums.length / 2);
+    const left = mergeSort(nums.slice(0, mid));
+    const right = mergeSort(nums.slice(mid));
+    
+    return merge(left, right);
+}
+
+function merge(left, right) {
+    const result = [];
+    let i = 0, j = 0;
+    
+    while (i < left.length && j < right.length) {
+        if (left[i] < right[j]) {
+            result.push(left[i++]);
+        } else {
+            result.push(right[j++]);
+        }
+    }
+    
+    return result.concat(left.slice(i)).concat(right.slice(j));
+}
+
+// 13. 广度优先搜索 - 最短路径
+function shortestPath(graph, start, end) {
+    const queue = [[start, 0]];
+    const visited = new Set([start]);
+    
+    while (queue.length > 0) {
+        const [node, dist] = queue.shift();
+        
+        if (node === end) return dist;
+        
+        for (let neighbor of graph[node] || []) {
+            if (!visited.has(neighbor)) {
+                visited.add(neighbor);
+                queue.push([neighbor, dist + 1]);
+            }
+        }
+    }
+    
+    return -1;
+}
+
+console.log('算法模块加载完成！');`;
+
+// 检测是否为桌面端
+function isDesktop() {
+    return window.innerWidth > 768;
+}
+
+// 只在桌面端显示老板键提示
+window.addEventListener('load', function() {
+    const hint = document.getElementById('boss-key-hint');
+    if (hint && !isDesktop()) {
+        hint.style.display = 'none';
+    }
+    
+    // 确保快捷键可以工作 - 添加到window和document上
+    console.log('Boss key listener ready. Press Ctrl+B to toggle disguise mode.');
+});
+
+// 监听老板键 Ctrl+B (仅桌面端) - 在 document 上
+document.addEventListener('keydown', function(e) {
+    // 使用 keyCode 66 (B) 或 key 属性进行兼容性检测
+    const isBKey = e.keyCode === 66 || e.key === 'b' || e.key === 'B';
+    
+    // Ctrl+B 切换伪装模式
+    if (e.ctrlKey && isBKey && isDesktop()) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!isToggling) {
+            isToggling = true;
+            toggleDisguiseMode();
+            setTimeout(() => isToggling = false, 100);
+        }
+        return;
+    }
+    
+    // ESC键退出伪装模式
+    if (e.key === 'Escape' && disguiseMode) {
+        e.preventDefault();
+        toggleDisguiseMode();
+        return;
+    }
+    
+    // 在伪装模式下处理打字
+    if (disguiseMode && isDesktop() && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        handleTyping(e);
+    }
+}, true); // 使用捕获阶段
+
+// 备用方案：在 window 上也添加监听器
+window.addEventListener('keydown', function(e) {
+    const isBKey = e.keyCode === 66 || e.key === 'b' || e.key === 'B';
+    if (e.ctrlKey && isBKey && isDesktop() && !isToggling) {
+        e.preventDefault();
+        isToggling = true;
+        toggleDisguiseMode();
+        setTimeout(() => isToggling = false, 100);
+    }
+});
+
+function toggleDisguiseMode() {
+    disguiseMode = !disguiseMode;
+    const disguiseContainer = document.getElementById('disguise-mode');
+    const mainContainer = document.querySelector('.container');
+    
+    if (disguiseMode) {
+        disguiseContainer.style.display = 'flex';
+        mainContainer.style.display = 'none';
+        startDisguiseMode();
+    } else {
+        disguiseContainer.style.display = 'none';
+        mainContainer.style.display = 'block';
+        stopDisguiseMode();
+    }
+}
+
+function startDisguiseMode() {
+    // 缓存DOM元素
+    cachedElements = {
+        refCode: document.getElementById('reference-code'),
+        refLineNumbers: document.getElementById('ref-line-numbers'),
+        practiceCode: document.getElementById('practice-code'),
+        practiceLineNumbers: document.getElementById('practice-line-numbers'),
+        cursor: document.getElementById('cursor'),
+        cursorPosition: document.getElementById('cursor-position'),
+        refPanel: document.querySelector('.code-reference-panel .code-editor'),
+        practicePanel: document.querySelector('.code-practice-panel .code-editor')
+    };
+    
+    // 初始化代码显示
+    codeLines = sampleCode.split('\n');
+    currentLine = 0;
+    currentCol = 0;
+    userTypedCode = '';
+    
+    // 重置统计
+    typingStats = {
+        startTime: null,
+        totalChars: 0,
+        correctChars: 0,
+        errors: 0
+    };
+    
+    // 显示参考代码（左侧）
+    updateReferenceCode();
+    
+    // 初始化练习区（右侧）
+    updatePracticeCode();
+    updatePracticeLineNumbers();
+    updateCursorPosition();
+    
+    // 添加同步滚动
+    setupSyncScroll();
+}
+
+function stopDisguiseMode() {
+    // 清理缓存
+    cachedElements = {};
+    
+    // 输出统计信息（可选）
+    if (typingStats.totalChars > 0) {
+        const accuracy = Math.round((typingStats.correctChars / typingStats.totalChars) * 100);
+        console.log(`打字统计: 总字数 ${typingStats.totalChars}, 正确率 ${accuracy}%`);
+    }
+}
+
+// 显示参考代码（左侧 - 完整彩色代码）
+function updateReferenceCode() {
+    const refCode = cachedElements.refCode || document.getElementById('reference-code');
+    const refLineNumbers = cachedElements.refLineNumbers || document.getElementById('ref-line-numbers');
+    if (!refCode || !refLineNumbers) return;
+    
+    // 使用数组join优化字符串拼接
+    const displayLines = codeLines.map(line => highlightCodeAdvanced(line));
+    refCode.innerHTML = displayLines.join('\n');
+    
+    // 行号
+    const lineNums = [];
+    for (let i = 1; i <= codeLines.length; i++) {
+        lineNums.push(i);
+    }
+    refLineNumbers.textContent = lineNums.join('\n');
+}
+
+// 更新练习区代码（右侧 - 用户输入）
+function updatePracticeCode() {
+    const practiceCode = cachedElements.practiceCode || document.getElementById('practice-code');
+    if (!practiceCode) return;
+    
+    if (userTypedCode === '') {
+        practiceCode.innerHTML = '';
+        return;
+    }
+    
+    // 使用数组优化拼接
+    const inputLines = userTypedCode.split('\n');
+    const displayLines = inputLines.map(line => highlightCodeAdvanced(line));
+    practiceCode.innerHTML = displayLines.join('\n');
+}
+
+// 更新练习区行号
+function updatePracticeLineNumbers() {
+    const lineNumbers = cachedElements.practiceLineNumbers || document.getElementById('practice-line-numbers');
+    if (!lineNumbers) return;
+    
+    const lineCount = Math.max(userTypedCode.split('\n').length, 1);
+    const nums = [];
+    for (let i = 1; i <= lineCount; i++) {
+        nums.push(i);
+    }
+    lineNumbers.textContent = nums.join('\n');
+}
+
+// 增强版语法高亮
+function highlightCodeAdvanced(code) {
+    if (!code) return '';
+    
+    let result = escapeHtml(code);
+    
+    // 注释（最高优先级，先处理）
+    result = result.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="comment">$1</span>');
+    result = result.replace(/(\/\/.*$)/gm, '<span class="comment">$1</span>');
+    
+    // 字符串
+    result = result.replace(/(&quot;(?:[^&quot;\\]|\\.)*&quot;)/g, '<span class="string">$1</span>');
+    result = result.replace(/(&#39;(?:[^&#39;\\]|\\.)*&#39;)/g, '<span class="string">$1</span>');
+    result = result.replace(/(`(?:[^`\\]|\\.)*`)/g, '<span class="string">$1</span>');
+    
+    // 数字
+    result = result.replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>');
+    
+    // 类名（大写开头）
+    result = result.replace(/\b([A-Z][a-zA-Z0-9]*)\b/g, '<span class="class-name">$1</span>');
+    
+    // 关键字
+    const keywords = 'const|let|var|function|async|await|if|else|for|while|return|try|catch|new|import|require|export|class|extends|this|super|static|typeof|instanceof|delete|in|of|break|continue|switch|case|default|throw|finally';
+    result = result.replace(new RegExp(`\\b(${keywords})\\b`, 'g'), '<span class="keyword">$1</span>');
+    
+    // 布尔值和null
+    result = result.replace(/\b(true|false)\b/g, '<span class="boolean">$1</span>');
+    result = result.replace(/\b(null|undefined)\b/g, '<span class="null-keyword">$1</span>');
+    
+    // 函数名（后面跟着括号）
+    result = result.replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g, '<span class="function">$1</span>(');
+    
+    // 对象属性和方法
+    result = result.replace(/\.([a-zA-Z_$][a-zA-Z0-9_$]*)/g, '.<span class="property">$1</span>');
+    
+    return result;
+}
+
+function escapeHtml(text) {
+    // 性能优化：使用字符串替换而不是创建DOM元素
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function updateCodeDisplay() {
+    // 保留这个函数以兼容，但实际使用新的函数
+    updatePracticeCode();
+}
+
+function updateLineNumbers() {
+    // 兼容旧的调用，现在使用新函数
+    updatePracticeLineNumbers();
+}
+
+function updateCursorPosition() {
+    const cursor = cachedElements.cursor || document.getElementById('cursor');
+    if (!cursor) return;
+    
+    // 计算光标位置
+    const lines = userTypedCode.split('\n');
+    const lineNumber = lines.length;
+    const colNumber = lines[lines.length - 1].length;
+    
+    // 更新状态栏
+    const posDisplay = cachedElements.cursorPosition || document.getElementById('cursor-position');
+    if (posDisplay) {
+        posDisplay.textContent = `Ln ${lineNumber}, Col ${colNumber + 1}`;
+    }
+    
+    // 定位光标
+    cursor.style.top = ((lineNumber - 1) * 20 + 10) + 'px';
+    cursor.style.left = (colNumber * 8.4 + 10) + 'px';
+}
+
+function handleTyping(e) {
+    // 忽略功能键
+    const ignoredKeys = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Escape', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'Insert', 'Home', 'End', 'PageUp', 'PageDown', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    if (ignoredKeys.includes(e.key)) return;
+    
+    // 阻止默认行为
+    if (e.key.length === 1 || e.key === 'Enter' || e.key === 'Backspace' || e.key === 'Tab') {
+        e.preventDefault();
+    }
+    
+    // 开始计时
+    if (!typingStats.startTime && e.key.length === 1) {
+        typingStats.startTime = Date.now();
+    }
+    
+    if (e.key === 'Enter') {
+        userTypedCode += '\n';
+        typingStats.totalChars++;
+    } else if (e.key === 'Backspace') {
+        if (userTypedCode.length > 0) {
+            userTypedCode = userTypedCode.slice(0, -1);
+        }
+    } else if (e.key === 'Tab') {
+        userTypedCode += '    ';
+        typingStats.totalChars += 4;
+    } else if (e.key === 'Delete') {
+        // 删除光标后的字符（当前简化处理）
+    } else if (e.key.length === 1) {
+        userTypedCode += e.key;
+        typingStats.totalChars++;
+        
+        // 检查是否与参考代码匹配
+        const expectedChar = sampleCode[userTypedCode.length - 1];
+        if (e.key === expectedChar) {
+            typingStats.correctChars++;
+        } else {
+            typingStats.errors++;
+        }
+    }
+    
+    updatePracticeCode();
+    updatePracticeLineNumbers();
+    updateCursorPosition();
+    updateTypingStats();
+}
+
+// 同步滚动功能
+function setupSyncScroll() {
+    const refPanel = cachedElements.refPanel;
+    const practicePanel = cachedElements.practicePanel;
+    
+    if (refPanel && practicePanel) {
+        refPanel.addEventListener('scroll', function() {
+            practicePanel.scrollTop = refPanel.scrollTop;
+        });
+        
+        practicePanel.addEventListener('scroll', function() {
+            refPanel.scrollTop = practicePanel.scrollTop;
+        });
+    }
+}
+
+// 更新打字统计
+function updateTypingStats() {
+    const posDisplay = cachedElements.cursorPosition || document.getElementById('cursor-position');
+    if (!posDisplay) return;
+    
+    const lines = userTypedCode.split('\n');
+    const lineNumber = lines.length;
+    const colNumber = lines[lines.length - 1].length;
+    
+    let statsText = `Ln ${lineNumber}, Col ${colNumber + 1}`;
+    
+    // 显示打字速度和准确率
+    if (typingStats.startTime && typingStats.totalChars > 10) {
+        const elapsedMinutes = (Date.now() - typingStats.startTime) / 60000;
+        const wpm = Math.round((typingStats.totalChars / 5) / elapsedMinutes);
+        const accuracy = Math.round((typingStats.correctChars / typingStats.totalChars) * 100);
+        statsText += ` | ${wpm} WPM | ${accuracy}%`;
+    }
+    
+    posDisplay.textContent = statsText;
+}
+
+// 添加滑出动画（避免重复声明style变量）
+if (!document.getElementById('slideout-animation-style')) {
+    const slideOutStyle = document.createElement('style');
+    slideOutStyle.id = 'slideout-animation-style';
+    slideOutStyle.textContent = `
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    `;
+    document.head.appendChild(slideOutStyle);
+}
+

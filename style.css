@@ -2526,3 +2526,443 @@ body:not([data-theme]) {
     }
 }
 
+/* ========== 伪装模式样式 - VSCode风格 ========== */
+.boss-key-hint {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #4ec9b0;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    z-index: 9999;
+    animation: fadeInOut 4s ease-in-out;
+    border: 1px solid #3c3c3c;
+}
+
+/* 手机端隐藏老板键提示 */
+@media (max-width: 768px) {
+    .boss-key-hint {
+        display: none;
+    }
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    10%, 90% { opacity: 1; }
+}
+
+/* VSCode 容器 */
+.vscode-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1e1e1e;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    color: #d4d4d4;
+    overflow: hidden;
+}
+
+/* 菜单栏 */
+.vscode-menubar {
+    display: flex;
+    align-items: center;
+    background: #323233;
+    height: 35px;
+    padding: 0 10px;
+    border-bottom: 1px solid #252526;
+    user-select: none;
+}
+
+.vscode-logo {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.vscode-menu {
+    display: flex;
+    gap: 15px;
+    flex: 1;
+}
+
+.menu-item {
+    font-size: 13px;
+    padding: 0 8px;
+    cursor: pointer;
+    color: #cccccc;
+}
+
+.menu-item:hover {
+    background: #3c3c3c;
+}
+
+.vscode-title {
+    flex: 1;
+    text-align: center;
+    font-size: 13px;
+    color: #cccccc;
+}
+
+.vscode-controls {
+    display: flex;
+    gap: 12px;
+    font-size: 16px;
+    color: #cccccc;
+}
+
+.vscode-controls span {
+    cursor: pointer;
+    padding: 0 8px;
+}
+
+.vscode-controls span:hover {
+    background: #3c3c3c;
+}
+
+/* 主内容区 */
+.vscode-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* 侧边栏 */
+.vscode-sidebar {
+    display: flex;
+    background: #252526;
+    border-right: 1px solid #1e1e1e;
+}
+
+.sidebar-icons {
+    width: 48px;
+    background: #333333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+    gap: 20px;
+}
+
+.sidebar-icons .icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    opacity: 0.6;
+}
+
+.sidebar-icons .icon:hover,
+.sidebar-icons .icon.active {
+    opacity: 1;
+}
+
+.sidebar-icons .icon.active {
+    border-left: 2px solid #007acc;
+}
+
+.sidebar-content {
+    width: 250px;
+    padding: 10px;
+}
+
+.sidebar-header {
+    font-size: 11px;
+    color: #cccccc;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.file-tree {
+    font-size: 13px;
+}
+
+.folder, .file {
+    padding: 3px 8px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.folder:hover, .file:hover {
+    background: #2a2d2e;
+}
+
+.file.active {
+    background: #37373d;
+}
+
+.folder-content {
+    padding-left: 16px;
+}
+
+/* 编辑器区域 */
+.vscode-editor {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+}
+
+/* 标签栏 */
+.vscode-tabs {
+    display: flex;
+    background: #252526;
+    border-bottom: 1px solid #1e1e1e;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #2d2d2d;
+    border-right: 1px solid #1e1e1e;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.tab.active {
+    background: #1e1e1e;
+    color: #ffffff;
+}
+
+.tab-icon {
+    font-size: 11px;
+    font-weight: bold;
+    color: #f1fa8c;
+}
+
+.tab-close {
+    opacity: 0;
+    font-size: 16px;
+    color: #858585;
+}
+
+.tab:hover .tab-close {
+    opacity: 1;
+}
+
+/* 代码编辑器分屏布局 */
+.code-editor-split {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.code-reference-panel,
+.code-practice-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.code-reference-panel {
+    border-right: 1px solid #3c3c3c;
+}
+
+.panel-label {
+    background: #2d2d30;
+    color: #cccccc;
+    padding: 6px 15px;
+    font-size: 12px;
+    border-bottom: 1px solid #3c3c3c;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+
+.code-reference-panel .panel-label {
+    background: #252526;
+    color: #9cdcfe;
+}
+
+.code-practice-panel .panel-label {
+    background: #1e3a1e;
+    color: #4ec9b0;
+}
+
+.split-divider {
+    width: 4px;
+    background: #3c3c3c;
+    cursor: col-resize;
+    transition: background 0.2s;
+}
+
+.split-divider:hover {
+    background: #007acc;
+}
+
+/* 代码编辑器 */
+.code-editor {
+    flex: 1;
+    display: flex;
+    overflow: auto;
+    position: relative;
+    padding: 10px 0;
+    background: #1e1e1e;
+}
+
+/* 滚动条样式 */
+.code-editor::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+}
+
+.code-editor::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+.code-editor::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 7px;
+    border: 3px solid #1e1e1e;
+}
+
+.code-editor::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+}
+
+.line-numbers {
+    color: #858585;
+    text-align: right;
+    padding: 0 10px;
+    user-select: none;
+    min-width: 50px;
+    background: #1e1e1e;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.code-content {
+    flex: 1;
+    position: relative;
+    padding-left: 10px;
+}
+
+#reference-code,
+#practice-code {
+    margin: 0;
+    padding: 0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 20px;
+    color: #d4d4d4;
+    white-space: pre;
+    tab-size: 4;
+}
+
+/* VSCode 真实语法高亮颜色 */
+.keyword { color: #569cd6; font-weight: normal; }  /* 蓝色 - 关键字 */
+.function { color: #dcdcaa; }  /* 黄色 - 函数名 */
+.string { color: #ce9178; }  /* 橙红色 - 字符串 */
+.comment { color: #6a9955; font-style: italic; }  /* 绿色 - 注释 */
+.number { color: #b5cea8; }  /* 浅绿色 - 数字 */
+.operator { color: #d4d4d4; }  /* 白色 - 操作符 */
+.variable { color: #9cdcfe; }  /* 浅蓝色 - 变量 */
+.property { color: #9cdcfe; }  /* 浅蓝色 - 属性 */
+.class-name { color: #4ec9b0; }  /* 青色 - 类名 */
+.method { color: #dcdcaa; }  /* 黄色 - 方法 */
+.param { color: #9cdcfe; }  /* 浅蓝色 - 参数 */
+.punctuation { color: #d4d4d4; }  /* 白色 - 标点 */
+.type { color: #4ec9b0; }  /* 青色 - 类型 */
+.this-keyword { color: #569cd6; }  /* 蓝色 - this */
+.boolean { color: #569cd6; }  /* 蓝色 - true/false */
+.null-keyword { color: #569cd6; }  /* 蓝色 - null */
+
+/* 光标 */
+.cursor {
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: #ffffff;
+    animation: blink 1s infinite;
+    z-index: 10;
+}
+
+@keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+}
+
+/* 盲打提示 */
+.typing-hint {
+    position: absolute;
+    bottom: 50px;
+    right: 30px;
+    background: rgba(0, 122, 204, 0.9);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 12px;
+    animation: slideIn 0.5s ease-out;
+    z-index: 100;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 状态栏 */
+.vscode-statusbar {
+    display: flex;
+    justify-content: space-between;
+    background: #007acc;
+    color: #ffffff;
+    height: 22px;
+    font-size: 12px;
+    padding: 0 10px;
+    align-items: center;
+}
+
+.statusbar-left,
+.statusbar-right {
+    display: flex;
+    gap: 15px;
+}
+
+.status-item {
+    cursor: pointer;
+}
+
+.status-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 手机端样式调整 */
+@media (max-width: 768px) {
+    .sidebar-content {
+        width: 0;
+        overflow: hidden;
+    }
+    
+    .vscode-menu {
+        display: none;
+    }
+    
+    .vscode-title {
+        font-size: 11px;
+    }
+}
+
