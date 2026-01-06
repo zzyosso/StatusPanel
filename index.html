@@ -205,6 +205,10 @@
                         <span class="pet-stat-value" id="pet-level">1</span>
                     </div>
                     <div class="pet-stat">
+                        <span class="pet-stat-label">阶段</span>
+                        <span class="pet-stage stage-0" id="pet-stage">基础形态</span>
+                    </div>
+                    <div class="pet-stat">
                         <span class="pet-stat-label">经验</span>
                         <div class="pet-exp-bar">
                             <div class="pet-exp-fill" id="pet-exp-fill"></div>
@@ -236,6 +240,37 @@
                     <button class="cyber-btn" onclick="resetPet()" style="background: var(--neon-red);">🔄 更换宠物</button>
                 </div>
 
+                <!-- 宠物收集展示 -->
+                <div class="pet-collection-section">
+                    <h4>📦 宠物收藏</h4>
+                    <div id="pet-collection" class="pet-collection">
+                        <!-- 动态生成的宠物收集 -->
+                    </div>
+                    <p class="collection-hint">完成番茄钟和挑战可获得新宠物！</p>
+                </div>
+
+                <div class="pet-evolution-info">
+                    <h4>🌟 进化阶段</h4>
+                    <div class="evolution-stages">
+                        <div class="evolution-stage">
+                            <span class="stage-level">Lv.1-5</span>
+                            <span class="stage-name">基础形态</span>
+                        </div>
+                        <div class="evolution-stage">
+                            <span class="stage-level">Lv.6-10</span>
+                            <span class="stage-name">成长形态</span>
+                        </div>
+                        <div class="evolution-stage">
+                            <span class="stage-level">Lv.11-20</span>
+                            <span class="stage-name">成熟形态</span>
+                        </div>
+                        <div class="evolution-stage">
+                            <span class="stage-level">Lv.21+</span>
+                            <span class="stage-name">究极形态</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="pet-tips">
                     <h4>💡 小贴士</h4>
                     <ul>
@@ -244,6 +279,7 @@
                         <li>喂食可以增加宠物经验值</li>
                         <li>宠物升级后会变得更大更可爱</li>
                         <li>记得定期喂养，宠物饿了会不开心哦</li>
+                        <li>🌟 宠物达到一定等级会进化变形！</li>
                     </ul>
                 </div>
             </div>
@@ -378,6 +414,81 @@
                 <h2>设置</h2>
             </div>
             <div class="settings-container">
+                <!-- 番茄钟设置 -->
+                <div class="settings-section pomodoro-section">
+                    <h3>🍅 番茄钟</h3>
+                    <div class="pomodoro-display">
+                        <div class="pomodoro-timer">
+                            <span id="pomodoro-time" class="pomodoro-time">25:00</span>
+                            <span id="pomodoro-status" class="pomodoro-status work">专注中</span>
+                        </div>
+                        <div class="pomodoro-controls">
+                            <button id="pomodoro-toggle-btn" class="cyber-btn" onclick="togglePomodoro()">▶️ 开始</button>
+                            <button class="cyber-btn" onclick="resetPomodoro()">🔄 重置</button>
+                        </div>
+                        <div class="pomodoro-stats">
+                            <span>今日完成: <strong id="pomodoro-count">0</strong> 个番茄</span>
+                        </div>
+                    </div>
+                    <div class="pomodoro-settings">
+                        <div class="setting-row">
+                            <label>工作时间 (分钟)</label>
+                            <input type="number" id="work-time" value="25" min="1" max="60" 
+                                   onchange="gameData.pomodoro.workTime=this.value;resetPomodoro();">
+                        </div>
+                        <div class="setting-row">
+                            <label>休息时间 (分钟)</label>
+                            <input type="number" id="break-time" value="5" min="1" max="30"
+                                   onchange="gameData.pomodoro.breakTime=this.value;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 提醒设置 -->
+                <div class="settings-section reminder-section">
+                    <h3>⏰ 健康提醒</h3>
+                    <div class="reminder-list">
+                        <div class="reminder-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="reminder-drinkWater" checked onchange="toggleReminder('drinkWater')">
+                                <span class="toggle-slider"></span>
+                                💧 喝水提醒
+                            </label>
+                            <input type="number" class="interval-input" value="30" min="5" max="120" 
+                                   onchange="setReminderInterval('drinkWater', this.value)"> 分钟
+                        </div>
+                        <div class="reminder-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="reminder-rest" checked onchange="toggleReminder('rest')">
+                                <span class="toggle-slider"></span>
+                                👀 休息眼睛提醒
+                            </label>
+                            <input type="number" class="interval-input" value="45" min="5" max="120"
+                                   onchange="setReminderInterval('rest', this.value)"> 分钟
+                        </div>
+                        <div class="reminder-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="reminder-stretch" checked onchange="toggleReminder('stretch')">
+                                <span class="toggle-slider"></span>
+                                🧘 伸展活动提醒
+                            </label>
+                            <input type="number" class="interval-input" value="60" min="5" max="180"
+                                   onchange="setReminderInterval('stretch', this.value)"> 分钟
+                        </div>
+                        <div class="reminder-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="reminder-petHunger" checked onchange="toggleReminder('petHunger')">
+                                <span class="toggle-slider"></span>
+                                🐾 宠物饥饿提醒
+                            </label>
+                            <span class="hint-text">(饥饿度低于30%时通知)</span>
+                        </div>
+                    </div>
+                    <button class="cyber-btn" onclick="Notification.requestPermission().then(p=>showNotification('通知权限: '+p))">
+                        🔔 启用桌面通知
+                    </button>
+                </div>
+
                 <div class="settings-section">
                     <h3>🗑️ 数据管理</h3>
                     <p class="settings-desc">清除所有本地缓存数据，重置游戏进度。此操作不可撤销！</p>

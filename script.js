@@ -21,13 +21,35 @@ let gameData = {
         hunger: 100,
         lastFeedTime: Date.now()
     },
+    pets: [], // 多宠物收集
     map: {
         nodes: [],
         connections: [],
         nextId: 1
     },
-    skillNextId: 1
+    skillNextId: 1,
+    // 番茄钟设置
+    pomodoro: {
+        workTime: 25,  // 工作时间（分钟）
+        breakTime: 5,   // 休息时间（分钟）
+        longBreakTime: 15, // 长休息时间
+        sessions: 0,    // 完成的番茄数
+        isRunning: false,
+        isBreak: false,
+        remainingTime: 25 * 60 // 剩余秒数
+    },
+    // 提醒设置
+    reminders: {
+        drinkWater: { enabled: true, interval: 30 }, // 喝水提醒（分钟）
+        rest: { enabled: true, interval: 45 },       // 休息提醒
+        stretch: { enabled: true, interval: 60 },    // 伸展提醒
+        petHunger: { enabled: true }                 // 宠物饥饿提醒
+    }
 };
+
+// 番茄钟相关变量
+let pomodoroTimer = null;
+let reminderTimers = {};
 
 // 常用汉字库及拼音
 const chineseCharacters = [
@@ -865,6 +887,40 @@ if (!document.getElementById('animation-styles')) {
 }
 
 // 宠物系统
+// 宠物进化阶段：基础(1-5级) -> 成长(6-10级) -> 成熟(11-20级) -> 究极(21+级)
+const petEvolutionStages = {
+    'cat': ['🐱', '😺', '😸', '🦁'],      // 小猫 -> 开心猫 -> 笑猫 -> 狮子
+    'dog': ['🐶', '🐕', '🦮', '🐺'],      // 小狗 -> 狗 -> 导盲犬 -> 狼
+    'rabbit': ['🐰', '🐇', '🐾', '🦄'],   // 小兔 -> 兔子 -> 爪印 -> 独角兽
+    'bear': ['🐻', '🧸', '🐻‍❄️', '🦊'],   // 小熊 -> 玩具熊 -> 北极熊 -> 狐狸神
+    'panda': ['🐼', '🐨', '🦝', '🐉'],    // 小熊猫 -> 考拉 -> 浣熊 -> 龙
+    'fox': ['🦊', '🐺', '🦁', '🐲']       // 小狐狸 -> 狼 -> 狮子 -> 龙
+};
+
+const petEvolutionNames = {
+    'cat': ['小猫咪', '开心猫', '微笑猫', '狮子王'],
+    'dog': ['小狗狗', '忠诚犬', '守护犬', '狼神'],
+    'rabbit': ['小兔子', '奔跑兔', '神速兔', '独角兽'],
+    'bear': ['小熊熊', '抱抱熊', '极地熊', '熊神'],
+    'panda': ['小熊猫', '萌萌达', '功夫熊猫', '神龙'],
+    'fox': ['小狐狸', '灵狐', '狮王', '神龙']
+};
+
+// 获取进化阶段（0-3）
+function getEvolutionStage(level) {
+    if (level <= 5) return 0;
+    if (level <= 10) return 1;
+    if (level <= 20) return 2;
+    return 3;
+}
+
+// 获取当前进化的emoji
+function getPetEmoji(type, level) {
+    const stage = getEvolutionStage(level);
+    return petEvolutionStages[type]?.[stage] || petEvolutionStages[type]?.[0] || '🐱';
+}
+
+// 旧版兼容
 const petEmojis = {
     'cat': '🐱',
     'dog': '🐶',
@@ -935,9 +991,21 @@ function getPetDefaultName(type) {
 function updatePetDisplay() {
     if (!gameData.pet.selected) return;
     
+    // 获取进化阶段的emoji
+    const currentStage = getEvolutionStage(gameData.pet.level);
+    const petEmojiChar = getPetEmoji(gameData.pet.type, gameData.pet.level);
+    
     // 更新宠物emoji和名字
-    document.getElementById('pet-emoji').textContent = petEmojis[gameData.pet.type];
+    document.getElementById('pet-emoji').textContent = petEmojiChar;
     document.getElementById('pet-name-display').textContent = gameData.pet.name;
+    
+    // 更新进化阶段显示
+    const stageNames = ['基础形态', '成长形态', '成熟形态', '究极形态'];
+    const stageEl = document.getElementById('pet-stage');
+    if (stageEl) {
+        stageEl.textContent = stageNames[currentStage];
+        stageEl.className = 'pet-stage stage-' + currentStage;
+    }
     
     // 更新等级和经验
     document.getElementById('pet-level').textContent = gameData.pet.level;
@@ -951,7 +1019,7 @@ function updatePetDisplay() {
     
     // 更新等级样式
     const petEmojiEl = document.getElementById('pet-emoji');
-    petEmojiEl.className = 'pet-emoji level-' + gameData.pet.level;
+    petEmojiEl.className = 'pet-emoji level-' + gameData.pet.level + ' stage-' + currentStage;
     
     // 根据饥饿度更新表情
     if (gameData.pet.hunger < 30) {
@@ -1019,9 +1087,13 @@ function feedPet() {
 
 // 宠物升级
 function levelUpPet() {
+    const oldStage = getEvolutionStage(gameData.pet.level);
+    
     gameData.pet.level++;
     gameData.pet.exp = 0;
     gameData.pet.maxExp = Math.floor(gameData.pet.maxExp * 1.5);
+    
+    const newStage = getEvolutionStage(gameData.pet.level);
     
     // 升级动画
     const petEmoji = document.getElementById('pet-emoji');
@@ -1030,8 +1102,20 @@ function levelUpPet() {
         petEmoji.style.animation = '';
     }, 10);
     
-    showNotification(`🎉 ${gameData.pet.name}升级了！现在是${gameData.pet.level}级！`);
-    speakPetMessage(`太棒了！我升到${gameData.pet.level}级了！`);
+    // 检查是否进化
+    if (newStage > oldStage) {
+        const stageNames = ['基础形态', '成长形态', '成熟形态', '究极形态'];
+        const newEmoji = getPetEmoji(gameData.pet.type, gameData.pet.level);
+        showNotification(`🌟 ${gameData.pet.name}进化了！变成了${stageNames[newStage]}！${newEmoji}`);
+        speakPetMessage(`哇！我进化了！我变得更强了！`);
+        
+        // 进化特效
+        petEmoji.classList.add('evolving');
+        setTimeout(() => petEmoji.classList.remove('evolving'), 2000);
+    } else {
+        showNotification(`🎉 ${gameData.pet.name}升级了！现在是${gameData.pet.level}级！`);
+        speakPetMessage(`太棒了！我升到${gameData.pet.level}级了！`);
+    }
 }
 
 // 和宠物玩耍
@@ -2744,4 +2828,345 @@ if (!document.getElementById('slideout-animation-style')) {
     `;
     document.head.appendChild(slideOutStyle);
 }
+
+// ==================== 番茄钟系统 ====================
+
+// 初始化番茄钟
+function initPomodoro() {
+    updatePomodoroDisplay();
+    // 请求通知权限
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+}
+
+// 开始/暂停番茄钟
+function togglePomodoro() {
+    if (gameData.pomodoro.isRunning) {
+        pausePomodoro();
+    } else {
+        startPomodoro();
+    }
+}
+
+// 开始番茄钟
+function startPomodoro() {
+    gameData.pomodoro.isRunning = true;
+    updatePomodoroButton();
+    
+    pomodoroTimer = setInterval(() => {
+        gameData.pomodoro.remainingTime--;
+        updatePomodoroDisplay();
+        
+        if (gameData.pomodoro.remainingTime <= 0) {
+            pomodoroComplete();
+        }
+    }, 1000);
+    
+    showNotification(gameData.pomodoro.isBreak ? '🌴 休息开始！' : '🍅 番茄钟开始！专注工作！');
+}
+
+// 暂停番茄钟
+function pausePomodoro() {
+    gameData.pomodoro.isRunning = false;
+    clearInterval(pomodoroTimer);
+    pomodoroTimer = null;
+    updatePomodoroButton();
+    showNotification('⏸️ 番茄钟已暂停');
+}
+
+// 重置番茄钟
+function resetPomodoro() {
+    gameData.pomodoro.isRunning = false;
+    gameData.pomodoro.isBreak = false;
+    gameData.pomodoro.remainingTime = gameData.pomodoro.workTime * 60;
+    clearInterval(pomodoroTimer);
+    pomodoroTimer = null;
+    updatePomodoroDisplay();
+    updatePomodoroButton();
+}
+
+// 番茄钟完成
+function pomodoroComplete() {
+    clearInterval(pomodoroTimer);
+    pomodoroTimer = null;
+    gameData.pomodoro.isRunning = false;
+    
+    if (gameData.pomodoro.isBreak) {
+        // 休息结束，开始新的工作
+        gameData.pomodoro.isBreak = false;
+        gameData.pomodoro.remainingTime = gameData.pomodoro.workTime * 60;
+        showNotification('☕ 休息结束！准备开始新的番茄吧！');
+        sendDesktopNotification('休息结束', '准备开始新的番茄钟吧！');
+    } else {
+        // 工作结束，奖励并开始休息
+        gameData.pomodoro.sessions++;
+        gameData.pomodoro.isBreak = true;
+        
+        // 每4个番茄一个长休息
+        const breakTime = gameData.pomodoro.sessions % 4 === 0 
+            ? gameData.pomodoro.longBreakTime 
+            : gameData.pomodoro.breakTime;
+        gameData.pomodoro.remainingTime = breakTime * 60;
+        
+        // 奖励食物
+        gameData.food += 2;
+        updateFoodDisplay();
+        
+        showNotification(`🎉 完成一个番茄！获得2个食物！已完成${gameData.pomodoro.sessions}个番茄`);
+        sendDesktopNotification('番茄钟完成！', `太棒了！完成第${gameData.pomodoro.sessions}个番茄，休息一下吧！`);
+        
+        if (gameData.pet.selected) {
+            speakPetMessage('主人好厉害！休息一下吧~');
+        }
+    }
+    
+    updatePomodoroDisplay();
+    updatePomodoroButton();
+    saveData();
+}
+
+// 更新番茄钟显示
+function updatePomodoroDisplay() {
+    const display = document.getElementById('pomodoro-time');
+    if (!display) return;
+    
+    const minutes = Math.floor(gameData.pomodoro.remainingTime / 60);
+    const seconds = gameData.pomodoro.remainingTime % 60;
+    display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    // 更新状态标签
+    const statusEl = document.getElementById('pomodoro-status');
+    if (statusEl) {
+        statusEl.textContent = gameData.pomodoro.isBreak ? '休息中' : '专注中';
+        statusEl.className = 'pomodoro-status ' + (gameData.pomodoro.isBreak ? 'break' : 'work');
+    }
+    
+    // 更新完成数
+    const countEl = document.getElementById('pomodoro-count');
+    if (countEl) {
+        countEl.textContent = gameData.pomodoro.sessions;
+    }
+}
+
+// 更新番茄钟按钮
+function updatePomodoroButton() {
+    const btn = document.getElementById('pomodoro-toggle-btn');
+    if (btn) {
+        btn.textContent = gameData.pomodoro.isRunning ? '⏸️ 暂停' : '▶️ 开始';
+    }
+}
+
+// ==================== 提醒系统 ====================
+
+// 初始化提醒
+function initReminders() {
+    // 喝水提醒
+    if (gameData.reminders.drinkWater.enabled) {
+        reminderTimers.drinkWater = setInterval(() => {
+            showReminder('💧', '该喝水啦！', '保持水分摄入，身体更健康！');
+        }, gameData.reminders.drinkWater.interval * 60 * 1000);
+    }
+    
+    // 休息提醒
+    if (gameData.reminders.rest.enabled) {
+        reminderTimers.rest = setInterval(() => {
+            showReminder('👀', '该休息眼睛啦！', '看看远处，让眼睛放松一下~');
+        }, gameData.reminders.rest.interval * 60 * 1000);
+    }
+    
+    // 伸展提醒
+    if (gameData.reminders.stretch.enabled) {
+        reminderTimers.stretch = setInterval(() => {
+            showReminder('🧘', '该活动一下啦！', '站起来伸展一下，活动筋骨！');
+        }, gameData.reminders.stretch.interval * 60 * 1000);
+    }
+    
+    // 宠物饥饿检测
+    if (gameData.reminders.petHunger.enabled) {
+        reminderTimers.petHunger = setInterval(() => {
+            checkPetHunger();
+        }, 5 * 60 * 1000); // 每5分钟检查一次
+    }
+}
+
+// 显示提醒
+function showReminder(emoji, title, message) {
+    showNotification(`${emoji} ${title} - ${message}`);
+    sendDesktopNotification(title, message);
+    
+    if (gameData.pet.selected) {
+        speakPetMessage(`${emoji} ${title}`);
+    }
+}
+
+// 检查宠物饥饿
+function checkPetHunger() {
+    if (!gameData.pet.selected) return;
+    
+    updateHunger();
+    
+    if (gameData.pet.hunger < 30 && gameData.reminders.petHunger.enabled) {
+        sendDesktopNotification(
+            `${gameData.pet.name}饿了！`,
+            `宠物饥饿度只有${gameData.pet.hunger}%了，快去喂食吧！`
+        );
+        showNotification(`🐾 ${gameData.pet.name}饿了！饥饿度：${gameData.pet.hunger}%`);
+    }
+}
+
+// 发送桌面通知
+function sendDesktopNotification(title, body) {
+    if (!('Notification' in window)) return;
+    
+    if (Notification.permission === 'granted') {
+        new Notification(title, {
+            body: body,
+            icon: '🍅',
+            tag: 'status-panel-notification'
+        });
+    } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                new Notification(title, { body: body });
+            }
+        });
+    }
+}
+
+// 切换提醒
+function toggleReminder(type) {
+    if (gameData.reminders[type]) {
+        gameData.reminders[type].enabled = !gameData.reminders[type].enabled;
+        
+        // 清除或重启计时器
+        if (reminderTimers[type]) {
+            clearInterval(reminderTimers[type]);
+            reminderTimers[type] = null;
+        }
+        
+        if (gameData.reminders[type].enabled) {
+            initReminders();
+        }
+        
+        updateReminderUI();
+        saveData();
+    }
+}
+
+// 更新提醒UI
+function updateReminderUI() {
+    const types = ['drinkWater', 'rest', 'stretch', 'petHunger'];
+    types.forEach(type => {
+        const toggle = document.getElementById(`reminder-${type}`);
+        if (toggle) {
+            toggle.checked = gameData.reminders[type]?.enabled || false;
+        }
+    });
+}
+
+// 设置提醒间隔
+function setReminderInterval(type, minutes) {
+    if (gameData.reminders[type]) {
+        gameData.reminders[type].interval = parseInt(minutes);
+        
+        // 重启计时器
+        if (reminderTimers[type]) {
+            clearInterval(reminderTimers[type]);
+        }
+        initReminders();
+        saveData();
+    }
+}
+
+// ==================== 多宠物系统 ====================
+
+// 添加宠物到收集
+function addPetToCollection(type) {
+    const newPet = {
+        id: Date.now(),
+        type: type,
+        name: getPetDefaultName(type),
+        level: 1,
+        exp: 0,
+        maxExp: 100,
+        hunger: 100,
+        lastFeedTime: Date.now(),
+        isActive: false
+    };
+    
+    gameData.pets.push(newPet);
+    saveData();
+    updatePetCollectionUI();
+    showNotification(`🎉 获得了新宠物：${newPet.name}！`);
+}
+
+// 切换活跃宠物
+function switchActivePet(petId) {
+    const pet = gameData.pets.find(p => p.id === petId);
+    if (!pet) return;
+    
+    // 保存当前宠物状态到集合
+    if (gameData.pet.selected) {
+        const currentPetIndex = gameData.pets.findIndex(p => p.isActive);
+        if (currentPetIndex >= 0) {
+            gameData.pets[currentPetIndex] = {
+                ...gameData.pets[currentPetIndex],
+                level: gameData.pet.level,
+                exp: gameData.pet.exp,
+                maxExp: gameData.pet.maxExp,
+                hunger: gameData.pet.hunger,
+                lastFeedTime: gameData.pet.lastFeedTime,
+                name: gameData.pet.name,
+                isActive: false
+            };
+        }
+    }
+    
+    // 设置新活跃宠物
+    pet.isActive = true;
+    gameData.pet = {
+        selected: true,
+        type: pet.type,
+        name: pet.name,
+        level: pet.level,
+        exp: pet.exp,
+        maxExp: pet.maxExp,
+        hunger: pet.hunger,
+        lastFeedTime: pet.lastFeedTime
+    };
+    
+    updatePetDisplay();
+    updatePetCollectionUI();
+    saveData();
+    showNotification(`切换到宠物：${pet.name}！`);
+}
+
+// 更新宠物收集UI
+function updatePetCollectionUI() {
+    const container = document.getElementById('pet-collection');
+    if (!container) return;
+    
+    container.innerHTML = gameData.pets.map(pet => {
+        const emoji = getPetEmoji(pet.type, pet.level);
+        return `
+            <div class="pet-collection-item ${pet.isActive ? 'active' : ''}" 
+                 onclick="switchActivePet(${pet.id})">
+                <div class="pet-collection-emoji">${emoji}</div>
+                <div class="pet-collection-name">${pet.name}</div>
+                <div class="pet-collection-level">Lv.${pet.level}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// 在初始化时调用
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        initPomodoro();
+        initReminders();
+        updateReminderUI();
+        updatePetCollectionUI();
+    }, 1000);
+});
 

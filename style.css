@@ -1163,6 +1163,40 @@ body:not([data-theme]) {
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+/* 修复玻璃主题下导航按钮文字显示问题 */
+[data-theme="glass"] .nav-btn:hover,
+[data-theme="glass"] .nav-btn.active {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* 修复玻璃主题下其他按钮文字显示问题 */
+[data-theme="glass"] .cyber-btn,
+[data-theme="glass"] .cyber-btn-small {
+    color: #ffffff;
+}
+
+[data-theme="glass"] .challenge-tab.active,
+[data-theme="glass"] .theme-btn.active,
+[data-theme="glass"] .map-tool-btn.active {
+    color: #ffffff;
+}
+
+/* 修复玻璃主题下所有使用 --dark-bg 作为文字颜色的元素 */
+[data-theme="glass"] .nav-btn:hover,
+[data-theme="glass"] .nav-btn.active,
+[data-theme="glass"] .cyber-btn,
+[data-theme="glass"] .cyber-btn-small,
+[data-theme="glass"] .challenge-tab.active,
+[data-theme="glass"] .challenge-tab:hover,
+[data-theme="glass"] .theme-btn.active,
+[data-theme="glass"] .map-tool-btn.active,
+[data-theme="glass"] .skill-node.active,
+[data-theme="glass"] .result-correct {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
 [data-theme="glass"] .panel {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -1177,6 +1211,62 @@ body:not([data-theme]) {
 [data-theme="glass"] .nav-btn.active {
     background: rgba(255, 255, 255, 0.3);
     color: white;
+}
+
+/* 玻璃主题 - 番茄钟和提醒样式修复 */
+[data-theme="glass"] .pomodoro-section,
+[data-theme="glass"] .reminder-section {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="glass"] .pomodoro-time {
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="glass"] .pomodoro-status.work {
+    background: rgba(255, 99, 71, 0.4);
+    color: #ffffff;
+}
+
+[data-theme="glass"] .pomodoro-status.break {
+    background: rgba(50, 205, 50, 0.4);
+    color: #ffffff;
+}
+
+[data-theme="glass"] .toggle-slider {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="glass"] .interval-input,
+[data-theme="glass"] .setting-row input[type="number"] {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+[data-theme="glass"] .pet-collection-section,
+[data-theme="glass"] .pet-evolution-info {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="glass"] .pet-collection-item {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="glass"] .pet-collection-item:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+[data-theme="glass"] .evolution-stage {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="glass"] .reminder-item {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* 草莓主题特殊样式 */
@@ -2168,6 +2258,7 @@ body:not([data-theme]) {
     color: var(--text-secondary);
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -2963,6 +3054,368 @@ body:not([data-theme]) {
     
     .vscode-title {
         font-size: 11px;
+    }
+}
+
+/* ==================== 番茄钟样式 ==================== */
+.pomodoro-section {
+    background: linear-gradient(135deg, rgba(255, 99, 71, 0.1), rgba(255, 165, 0, 0.05));
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.pomodoro-display {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.pomodoro-timer {
+    margin-bottom: 15px;
+}
+
+.pomodoro-time {
+    font-size: 3rem;
+    font-weight: bold;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: var(--neon-primary);
+    text-shadow: 0 0 20px var(--neon-primary);
+    display: block;
+}
+
+.pomodoro-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.pomodoro-status.work {
+    background: rgba(255, 99, 71, 0.3);
+    color: #ff6347;
+    border: 1px solid #ff6347;
+}
+
+.pomodoro-status.break {
+    background: rgba(50, 205, 50, 0.3);
+    color: #32cd32;
+    border: 1px solid #32cd32;
+}
+
+.pomodoro-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.pomodoro-stats {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.pomodoro-stats strong {
+    color: var(--neon-primary);
+    font-size: 1.2rem;
+}
+
+.pomodoro-settings {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.setting-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.setting-row label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.setting-row input[type="number"] {
+    padding: 8px;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* ==================== 提醒设置样式 ==================== */
+.reminder-section {
+    background: linear-gradient(135deg, rgba(100, 149, 237, 0.1), rgba(138, 43, 226, 0.05));
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.reminder-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.reminder-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-slider {
+    width: 40px;
+    height: 22px;
+    background: #555;
+    border-radius: 11px;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.toggle-slider::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.3s;
+}
+
+.toggle-label input:checked + .toggle-slider {
+    background: var(--neon-primary);
+}
+
+.toggle-label input:checked + .toggle-slider::after {
+    left: 20px;
+}
+
+.interval-input {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid var(--glass-border);
+    border-radius: 5px;
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.hint-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* ==================== 宠物进化样式 ==================== */
+.pet-stage {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.pet-stage.stage-0 {
+    background: linear-gradient(90deg, #888, #aaa);
+    color: white;
+}
+
+.pet-stage.stage-1 {
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    color: white;
+}
+
+.pet-stage.stage-2 {
+    background: linear-gradient(90deg, #2196F3, #00BCD4);
+    color: white;
+}
+
+.pet-stage.stage-3 {
+    background: linear-gradient(90deg, #FF9800, #FF5722, #E91E63);
+    color: white;
+    animation: rainbow-glow 2s infinite;
+}
+
+@keyframes rainbow-glow {
+    0%, 100% { box-shadow: 0 0 10px #FF9800; }
+    33% { box-shadow: 0 0 15px #FF5722; }
+    66% { box-shadow: 0 0 15px #E91E63; }
+}
+
+/* 进化动画 */
+.pet-emoji.evolving {
+    animation: evolve 2s ease-in-out;
+}
+
+@keyframes evolve {
+    0% { transform: scale(1); filter: brightness(1); }
+    25% { transform: scale(1.5) rotate(360deg); filter: brightness(2) hue-rotate(180deg); }
+    50% { transform: scale(0.5); filter: brightness(3) hue-rotate(360deg); }
+    75% { transform: scale(1.8) rotate(-360deg); filter: brightness(2); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* 进化信息展示 */
+.pet-evolution-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+.pet-evolution-info h4 {
+    margin-bottom: 12px;
+    color: var(--neon-primary);
+}
+
+.evolution-stages {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.evolution-stage {
+    text-align: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+}
+
+.stage-level {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.stage-name {
+    display: block;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-top: 4px;
+}
+
+/* ==================== 宠物收集样式 ==================== */
+.pet-collection-section {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+.pet-collection-section h4 {
+    margin-bottom: 12px;
+    color: var(--neon-primary);
+}
+
+.pet-collection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 60px;
+}
+
+.pet-collection-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 70px;
+    border: 2px solid transparent;
+}
+
+.pet-collection-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+}
+
+.pet-collection-item.active {
+    border-color: var(--neon-primary);
+    box-shadow: 0 0 15px var(--neon-primary);
+}
+
+.pet-collection-emoji {
+    font-size: 2rem;
+}
+
+.pet-collection-name {
+    font-size: 0.75rem;
+    color: var(--text-primary);
+    margin-top: 4px;
+}
+
+.pet-collection-level {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+}
+
+.collection-hint {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* 进化阶段样式覆盖宠物emoji */
+.pet-emoji.stage-0 { filter: none; }
+.pet-emoji.stage-1 { filter: drop-shadow(0 0 5px #4CAF50); }
+.pet-emoji.stage-2 { filter: drop-shadow(0 0 8px #2196F3); }
+.pet-emoji.stage-3 { 
+    filter: drop-shadow(0 0 12px gold);
+    animation: ultimate-glow 1.5s infinite;
+}
+
+@keyframes ultimate-glow {
+    0%, 100% { filter: drop-shadow(0 0 12px gold); }
+    50% { filter: drop-shadow(0 0 20px orange) drop-shadow(0 0 30px red); }
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+    .pomodoro-time {
+        font-size: 2.5rem;
+    }
+    
+    .pomodoro-settings {
+        grid-template-columns: 1fr;
+    }
+    
+    .evolution-stages {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .reminder-item {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 
