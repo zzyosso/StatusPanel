@@ -5,6 +5,7 @@ let gameData = {
     storage: [],
     shop: [],
     skills: [],
+    equippedSkills: [], // 装备在首页的技能ID列表（最多6个）
     skillFragments: 0,
     skillLevel: 0,
     skillExp: 0,
@@ -166,20 +167,24 @@ let literacyAnswered = 0;
 // 页面加载初始化
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
-    initTabs();
+    initBookmarkTabs();
     initChallengeTabs();
     initThemeSwitcher();
     renderStats();
     renderBackpack();
     renderStorage();
     renderShop();
-    renderSkills(); // 初始化技能树
-    renderSkillStatus(); // 初始化技能状态栏
+    renderSkills();
+    renderSkillStatus();
     updateGoldDisplay();
     addDefaultStats();
-    initPet(); // 初始化宠物系统
-    initMap(); // 初始化地图系统
-    updateDataStats(); // 更新数据统计
+    initPet();
+    initMap();
+    updateDataStats();
+    renderHomeStats();
+    renderHomeBackpack();
+    renderHomeSkills();
+    updateHeaderCurrency();
 });
 
 // 初始化主题切换器
@@ -210,7 +215,46 @@ function applyTheme(theme) {
     });
 }
 
-// 初始化标签页切换
+// 初始化标签页切换 - 书签导航
+function initBookmarkTabs() {
+    const bookmarkTabs = document.querySelectorAll('.bookmark-tab');
+    bookmarkTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            bookmarkTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            const panels = document.querySelectorAll('.panel');
+            panels.forEach(p => p.classList.remove('active'));
+            
+            const targetPanel = document.getElementById(tab.dataset.tab);
+            if (targetPanel) targetPanel.classList.add('active');
+        });
+    });
+}
+
+// 切换到指定标签页
+function switchToTab(tabName) {
+    const bookmarkTabs = document.querySelectorAll('.bookmark-tab');
+    bookmarkTabs.forEach(t => t.classList.remove('active'));
+    
+    const targetTab = document.querySelector(`.bookmark-tab[data-tab="${tabName}"]`);
+    if (targetTab) targetTab.classList.add('active');
+    
+    const panels = document.querySelectorAll('.panel');
+    panels.forEach(p => p.classList.remove('active'));
+    
+    const targetPanel = document.getElementById(tabName);
+    if (targetPanel) targetPanel.classList.add('active');
+    
+    // 如果切换到地图页面，重新绑定事件并重绘连接线
+    if (tabName === 'map') {
+        setTimeout(() => {
+            reinitMap();
+        }, 100);
+    }
+}
+
+// 旧的导航初始化函数保持兼容
 function initTabs() {
     const navBtns = document.querySelectorAll('.nav-btn');
     navBtns.forEach(btn => {
@@ -289,6 +333,7 @@ function renderStats() {
     `).join('');
     
     updateStatSelects();
+    renderHomeStats(); // 同步更新首页属性
 }
 
 // 更新属性选择下拉框
@@ -391,6 +436,7 @@ function renderBackpack() {
     const container = document.getElementById('backpack-items');
     if (gameData.backpack.length === 0) {
         container.innerHTML = '<div class="empty-message">背包空空如也</div>';
+        renderHomeBackpack(); // 同步更新首页背包
         return;
     }
     
@@ -407,6 +453,8 @@ function renderBackpack() {
             </div>
         </div>
     `).join('');
+    
+    renderHomeBackpack(); // 同步更新首页背包
 }
 
 // 渲染仓库
@@ -509,11 +557,17 @@ function useItem(source, itemId) {
     const item = sourceArray.find(i => i.id === itemId);
     
     if (item && item.quantity > 0) {
+        const itemName = item.name;
+        let effectText = '';
+        
         // 应用效果
         if (item.effectStat) {
             const stat = gameData.stats.find(s => s.id === parseInt(item.effectStat));
             if (stat) {
+                const oldValue = stat.current;
                 stat.current = Math.min(stat.max, stat.current + item.effectValue);
+                const actualGain = stat.current - oldValue;
+                effectText = ` (${stat.name} +${actualGain})`;
             }
         }
         
@@ -527,8 +581,12 @@ function useItem(source, itemId) {
         renderStats();
         renderBackpack();
         
+        // 同步更新首页显示
+        renderHomeStats();
+        renderHomeBackpack();
+        
         // 显示使用提示
-        showNotification(`使用了 ${item.name}`);
+        showNotification(`使用了 ${itemName}${effectText}`);
     }
 }
 
@@ -666,7 +724,9 @@ function editGold() {
 
 // 更新金币显示
 function updateGoldDisplay() {
-    document.getElementById('gold-amount').textContent = gameData.gold;
+    const goldEl = document.getElementById('gold-amount');
+    if (goldEl) goldEl.textContent = gameData.gold;
+    updateHeaderCurrency(); // 同步更新头部货币
 }
 
 // 生成算术题
@@ -1038,6 +1098,7 @@ function updateFoodDisplay() {
     if (foodAmountEl) {
         foodAmountEl.textContent = gameData.food;
     }
+    updateHeaderCurrency(); // 同步更新头部货币
 }
 
 // 更新饥饿度
@@ -1259,7 +1320,8 @@ let mapState = {
     connectMode: false,
     selectedNode: null,
     draggingNode: null,
-    dragOffset: { x: 0, y: 0 }
+    dragOffset: { x: 0, y: 0 },
+    initialized: false
 };
 
 // 初始化地图
@@ -1284,12 +1346,29 @@ function initMap() {
     // 渲染连接线
     renderConnections();
     
-    // 添加容器事件监听
-    container.addEventListener('mousemove', handleMapMouseMove);
-    container.addEventListener('mouseup', handleMapMouseUp);
-    container.addEventListener('touchmove', handleMapTouchMove, { passive: false });
-    container.addEventListener('touchend', handleMapMouseUp);
-    container.addEventListener('touchcancel', handleMapMouseUp);
+    // 添加容器事件监听（如果还没有添加）
+    if (!mapState.initialized) {
+        container.addEventListener('mousemove', handleMapMouseMove);
+        container.addEventListener('mouseup', handleMapMouseUp);
+        container.addEventListener('mouseleave', handleMapMouseUp);
+        container.addEventListener('touchmove', handleMapTouchMove, { passive: false });
+        container.addEventListener('touchend', handleMapMouseUp);
+        container.addEventListener('touchcancel', handleMapMouseUp);
+        
+        // 全局监听鼠标松开，以处理在容器外松开的情况
+        document.addEventListener('mouseup', handleMapMouseUp);
+        
+        mapState.initialized = true;
+    }
+}
+
+// 重新初始化地图（用于切换到地图页面时）
+function reinitMap() {
+    const container = document.getElementById('mapContainer');
+    if (!container) return;
+    
+    // 重绘连接线
+    renderConnections();
 }
 
 // 添加节点
@@ -1695,6 +1774,9 @@ function renderSkillStatus() {
             addBtn.title = "请先合成技能开启技能树";
         }
     }
+    
+    // 同步更新首页技能显示
+    renderHomeSkills();
 }
 
 // 合成技能
@@ -1870,6 +1952,7 @@ function confirmAddSkill() {
     
     closeModal('skill-modal');
     renderSkills();
+    renderHomeSkills(); // 更新首页技能显示
     saveData();
 }
 
@@ -1951,15 +2034,26 @@ function createSkillNode(skill) {
         }
     }
     
+    // 检查是否已装备
+    const isEquipped = gameData.equippedSkills && gameData.equippedSkills.includes(skill.id);
+    
     node.innerHTML = `
         <div class="skill-node-main">
             <div class="skill-icon">${skill.icon}</div>
             <div class="skill-info">
-                <div class="skill-name">${skill.name}</div>
+                <div class="skill-name">
+                    ${skill.name}
+                    ${isEquipped ? '<span class="equipped-badge">已装备</span>' : ''}
+                </div>
                 ${skill.description ? `<div class="skill-desc">${skill.description}</div>` : ''}
                 ${effectsHtml ? `<div class="skill-effects">${effectsHtml}</div>` : ''}
             </div>
             <div class="skill-actions">
+                <button class="skill-action-btn equip ${isEquipped ? 'equipped' : ''}" 
+                        onclick="toggleEquipSkill(${skill.id})" 
+                        title="${isEquipped ? '从首页卸载' : '装备到首页'}">
+                    ${isEquipped ? '★' : '☆'}
+                </button>
                 ${(skill.costStat || skill.gainStat) ? `
                     <button class="skill-action-btn use" onclick="useSkill(${skill.id})" ${canUse ? '' : 'disabled'} title="使用技能">▶</button>
                 ` : ''}
@@ -2006,6 +2100,8 @@ function useSkill(skillId) {
     const skill = findSkillById(skillId);
     if (!skill) return;
     
+    let effectText = '';
+    
     // 检查消耗
     if (skill.costStat) {
         const costStat = gameData.stats.find(s => s.id == skill.costStat);
@@ -2015,20 +2111,33 @@ function useSkill(skillId) {
         }
         // 扣除消耗
         costStat.current -= skill.costValue;
+        effectText = ` (${costStat.name} -${skill.costValue})`;
     }
     
     // 获得效果
     if (skill.gainStat) {
         const gainStat = gameData.stats.find(s => s.id == skill.gainStat);
         if (gainStat) {
+            const oldValue = gainStat.current;
             gainStat.current = Math.min(gainStat.max, gainStat.current + skill.gainValue);
+            const actualGain = gainStat.current - oldValue;
+            if (effectText) {
+                effectText += `, ${gainStat.name} +${actualGain}`;
+            } else {
+                effectText = ` (${gainStat.name} +${actualGain})`;
+            }
         }
     }
     
     renderStats();
     renderSkills();
     saveData();
-    showNotification(`使用了技能：${skill.name}`);
+    
+    // 同步更新首页显示
+    renderHomeStats();
+    renderHomeSkills();
+    
+    showNotification(`使用了技能：${skill.name}${effectText}`);
 }
 
 // 编辑技能
@@ -3160,6 +3269,520 @@ function updatePetCollectionUI() {
     }).join('');
 }
 
+// ==================== 首页渲染函数 ====================
+
+// 渲染首页属性栏
+function renderHomeStats() {
+    const container = document.getElementById('home-stats-container');
+    if (!container) return;
+    
+    if (gameData.stats.length === 0) {
+        container.innerHTML = '<div class="empty-mini">暂无属性</div>';
+        return;
+    }
+    
+    // 只显示前4个属性
+    const displayStats = gameData.stats.slice(0, 4);
+    container.innerHTML = displayStats.map(stat => `
+        <div class="mini-stat-item">
+            <div class="mini-stat-header">
+                <span class="mini-stat-name">${stat.name}</span>
+                <span class="mini-stat-value">${stat.current}/${stat.max}</span>
+            </div>
+            <div class="mini-progress-bar">
+                <div class="mini-progress-fill ${stat.color}" style="width: ${(stat.current / stat.max) * 100}%"></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 渲染首页背包快捷栏
+function renderHomeBackpack() {
+    const container = document.getElementById('home-backpack-items');
+    if (!container) return;
+    
+    if (gameData.backpack.length === 0) {
+        // 显示空槽位
+        let emptySlots = '';
+        for (let i = 0; i < 6; i++) {
+            emptySlots += `
+                <div class="quick-item empty" onclick="switchToTab('backpack')">
+                    <span class="quick-item-icon">➕</span>
+                </div>
+            `;
+        }
+        container.innerHTML = emptySlots;
+        return;
+    }
+    
+    // 显示前6个物品
+    const displayItems = gameData.backpack.slice(0, 6);
+    let html = displayItems.map(item => {
+        const effectText = item.effectStat ? `效果: ${getStatName(item.effectStat)} +${item.effectValue}` : '无使用效果';
+        const description = item.description || '暂无描述';
+        const canUse = item.effectStat ? 'usable' : '';
+        
+        return `
+            <div class="quick-item ${canUse}" 
+                 onclick="showHomeUseItemModal(${item.id})" 
+                 data-item-id="${item.id}"
+                 data-tooltip="${item.name}&#10;${effectText}&#10;${description}">
+                <span class="quick-item-icon">${getItemEmoji(item.name)}</span>
+                <span class="quick-item-name">${item.name}</span>
+                <span class="quick-item-count">×${item.quantity}</span>
+                <div class="quick-item-tooltip">
+                    <div class="tooltip-title">${item.name}</div>
+                    <div class="tooltip-effect">${effectText}</div>
+                    <div class="tooltip-desc">${description}</div>
+                    ${item.effectStat ? '<div class="tooltip-hint">点击使用</div>' : '<div class="tooltip-hint">点击查看详情</div>'}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // 填充空槽位
+    for (let i = displayItems.length; i < 6; i++) {
+        html += `
+            <div class="quick-item empty" onclick="switchToTab('backpack')">
+                <span class="quick-item-icon">➕</span>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+}
+
+// 显示首页使用物品确认弹窗
+function showHomeUseItemModal(itemId) {
+    const item = gameData.backpack.find(i => i.id === itemId);
+    if (!item) return;
+    
+    // 如果物品没有效果，跳转到背包页面
+    if (!item.effectStat) {
+        switchToTab('backpack');
+        return;
+    }
+    
+    const stat = gameData.stats.find(s => s.id === parseInt(item.effectStat));
+    const statName = stat ? stat.name : '未知属性';
+    const currentValue = stat ? stat.current : 0;
+    const maxValue = stat ? stat.max : 100;
+    const newValue = stat ? Math.min(stat.max, stat.current + item.effectValue) : item.effectValue;
+    
+    const modal = document.getElementById('home-use-item-modal');
+    const content = document.getElementById('home-use-item-content');
+    
+    content.innerHTML = `
+        <div class="use-item-preview">
+            <div class="use-item-icon">${getItemEmoji(item.name)}</div>
+            <div class="use-item-info">
+                <div class="use-item-name">${item.name}</div>
+                <div class="use-item-quantity">剩余: ${item.quantity}个</div>
+            </div>
+        </div>
+        <div class="use-item-effect">
+            <div class="effect-label">使用效果</div>
+            <div class="effect-detail">
+                <span class="effect-stat-name">${statName}</span>
+                <span class="effect-change">+${item.effectValue}</span>
+            </div>
+            <div class="effect-preview">
+                <span class="current-value">${currentValue}</span>
+                <span class="arrow">→</span>
+                <span class="new-value">${newValue}</span>
+                <span class="max-value">/ ${maxValue}</span>
+            </div>
+        </div>
+        <div class="use-item-desc">${item.description || '暂无描述'}</div>
+        <div class="use-item-actions">
+            <button class="cyber-btn confirm" onclick="confirmUseItemFromHome(${itemId})">✓ 确认使用</button>
+            <button class="cyber-btn cancel" onclick="closeModal('home-use-item-modal')">✗ 取消</button>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+}
+
+// 从首页确认使用物品
+function confirmUseItemFromHome(itemId) {
+    useItem('backpack', itemId);
+    closeModal('home-use-item-modal');
+    
+    // 更新首页所有相关显示
+    renderHomeStats();
+    renderHomeBackpack();
+}
+
+// 获取物品表情符号
+function getItemEmoji(itemName) {
+    const emojiMap = {
+        '药水': '🧪',
+        '治疗': '💊',
+        '能量': '⚡',
+        '武器': '⚔️',
+        '盾牌': '🛡️',
+        '食物': '🍖',
+        '金币': '💰',
+        '宝石': '💎',
+        '钥匙': '🔑',
+        '书': '📖',
+        '卷轴': '📜',
+        '魔法': '✨'
+    };
+    
+    for (const [key, emoji] of Object.entries(emojiMap)) {
+        if (itemName.includes(key)) return emoji;
+    }
+    return '📦';
+}
+
+// 渲染首页技能列表
+function renderHomeSkills() {
+    const container = document.getElementById('home-skills-list');
+    const levelEl = document.getElementById('home-skill-level');
+    const expFill = document.getElementById('home-skill-exp-fill');
+    
+    if (levelEl) levelEl.textContent = gameData.skillLevel || 0;
+    if (expFill) {
+        const expPercent = (gameData.skillExp / gameData.skillMaxExp) * 100;
+        expFill.style.width = expPercent + '%';
+    }
+    
+    if (!container) return;
+    
+    // 确保equippedSkills存在
+    if (!gameData.equippedSkills) {
+        gameData.equippedSkills = [];
+    }
+    
+    let html = '';
+    
+    // 渲染6个槽位
+    for (let i = 0; i < 6; i++) {
+        const skillId = gameData.equippedSkills[i];
+        
+        if (skillId) {
+            // 查找装备的技能
+            const skill = findSkillById(skillId);
+            
+            if (skill) {
+                // 构建效果文本
+                let effectText = '';
+                let effects = [];
+                if (skill.costStat) {
+                    const costStatName = gameData.stats.find(s => s.id == skill.costStat)?.name || '未知';
+                    effects.push(`消耗: ${costStatName} -${skill.costValue}`);
+                }
+                if (skill.gainStat) {
+                    const gainStatName = gameData.stats.find(s => s.id == skill.gainStat)?.name || '未知';
+                    effects.push(`获得: ${gainStatName} +${skill.gainValue}`);
+                }
+                effectText = effects.length > 0 ? effects.join('\n') : '无效果';
+                
+                // 检查是否可以使用
+                const canUse = skill.costStat || skill.gainStat;
+                const hasEnough = !skill.costStat || (gameData.stats.find(s => s.id == skill.costStat)?.current >= skill.costValue);
+                const usableClass = canUse ? 'usable' : '';
+                const disabledClass = !hasEnough ? 'disabled' : '';
+                
+                html += `
+                    <div class="home-skill-item ${usableClass} ${disabledClass}" 
+                         onclick="showHomeUseSkillModal(${skill.id})" 
+                         oncontextmenu="unequipSkillFromSlot(${i}); return false;"
+                         data-skill-id="${skill.id}">
+                        <span>${skill.icon || '⭐'}</span>
+                        <div class="home-skill-tooltip">
+                            <div class="tooltip-title">${skill.name}</div>
+                            <div class="tooltip-effect">${effectText}</div>
+                            ${skill.description ? `<div class="tooltip-desc">${skill.description}</div>` : ''}
+                            ${canUse ? `<div class="tooltip-hint">${hasEnough ? '左键使用 | 右键卸载' : '资源不足 | 右键卸载'}</div>` : '<div class="tooltip-hint">左键查看 | 右键卸载</div>'}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // 技能不存在，清理槽位
+                gameData.equippedSkills[i] = null;
+                html += `
+                    <div class="home-skill-item empty" onclick="showEquipSkillModal(${i})">
+                        <span>➕</span>
+                        <div class="home-skill-tooltip">
+                            <div class="tooltip-hint">点击装备技能</div>
+                        </div>
+                    </div>
+                `;
+            }
+        } else {
+            // 空槽位
+            html += `
+                <div class="home-skill-item empty" onclick="showEquipSkillModal(${i})">
+                    <span>➕</span>
+                    <div class="home-skill-tooltip">
+                        <div class="tooltip-hint">点击装备技能</div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    container.innerHTML = html;
+}
+
+// 显示首页使用技能确认弹窗
+function showHomeUseSkillModal(skillId) {
+    const skill = findSkillById(skillId);
+    if (!skill) return;
+    
+    // 如果技能没有效果，跳转到技能页面
+    if (!skill.costStat && !skill.gainStat) {
+        switchToTab('skills');
+        return;
+    }
+    
+    // 检查是否有足够的资源
+    let canUse = true;
+    let costStat = null;
+    let costCurrent = 0;
+    let costMax = 100;
+    let costAfter = 0;
+    
+    if (skill.costStat) {
+        costStat = gameData.stats.find(s => s.id == skill.costStat);
+        if (!costStat || costStat.current < skill.costValue) {
+            canUse = false;
+        }
+        if (costStat) {
+            costCurrent = costStat.current;
+            costMax = costStat.max;
+            costAfter = Math.max(0, costCurrent - skill.costValue);
+        }
+    }
+    
+    let gainStat = null;
+    let gainCurrent = 0;
+    let gainMax = 100;
+    let gainAfter = 0;
+    
+    if (skill.gainStat) {
+        gainStat = gameData.stats.find(s => s.id == skill.gainStat);
+        if (gainStat) {
+            gainCurrent = gainStat.current;
+            gainMax = gainStat.max;
+            gainAfter = Math.min(gainMax, gainCurrent + skill.gainValue);
+        }
+    }
+    
+    const modal = document.getElementById('home-use-skill-modal');
+    const content = document.getElementById('home-use-skill-content');
+    
+    let effectsHtml = '';
+    if (skill.costStat && costStat) {
+        effectsHtml += `
+            <div class="use-skill-effect cost">
+                <div class="effect-label">消耗</div>
+                <div class="effect-detail">
+                    <span class="effect-stat-name">${costStat.name}</span>
+                    <span class="effect-change">-${skill.costValue}</span>
+                </div>
+                <div class="effect-preview">
+                    <span class="current-value">${costCurrent}</span>
+                    <span class="arrow">→</span>
+                    <span class="new-value ${canUse ? '' : 'error'}">${costAfter}</span>
+                    <span class="max-value">/ ${costMax}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (skill.gainStat && gainStat) {
+        effectsHtml += `
+            <div class="use-skill-effect gain">
+                <div class="effect-label">获得</div>
+                <div class="effect-detail">
+                    <span class="effect-stat-name">${gainStat.name}</span>
+                    <span class="effect-change">+${skill.gainValue}</span>
+                </div>
+                <div class="effect-preview">
+                    <span class="current-value">${gainCurrent}</span>
+                    <span class="arrow">→</span>
+                    <span class="new-value">${gainAfter}</span>
+                    <span class="max-value">/ ${gainMax}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    content.innerHTML = `
+        <div class="use-skill-preview">
+            <div class="use-skill-icon">${skill.icon || '⭐'}</div>
+            <div class="use-skill-info">
+                <div class="use-skill-name">${skill.name}</div>
+            </div>
+        </div>
+        ${effectsHtml}
+        ${skill.description ? `<div class="use-skill-desc">${skill.description}</div>` : ''}
+        <div class="use-skill-actions">
+            <button class="cyber-btn confirm" onclick="confirmUseSkillFromHome(${skill.id})" ${canUse ? '' : 'disabled'}>✓ 确认使用</button>
+            <button class="cyber-btn cancel" onclick="closeModal('home-use-skill-modal')">✗ 取消</button>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+}
+
+// 从首页确认使用技能
+function confirmUseSkillFromHome(skillId) {
+    useSkill(skillId);
+    closeModal('home-use-skill-modal');
+    
+    // 更新首页所有相关显示
+    renderHomeStats();
+    renderHomeSkills();
+}
+
+// 显示装备技能选择弹窗
+function showEquipSkillModal(slotIndex) {
+    if (!gameData.skills || gameData.skills.length === 0) {
+        showNotification('还没有技能，请先创建技能', 'error');
+        switchToTab('skills');
+        return;
+    }
+    
+    const modal = document.getElementById('equip-skill-modal');
+    const content = document.getElementById('equip-skill-list');
+    
+    // 获取所有技能（包括子技能）
+    const allSkills = getAllSkills();
+    
+    // 过滤掉已装备的技能
+    const availableSkills = allSkills.filter(skill => 
+        !gameData.equippedSkills.includes(skill.id)
+    );
+    
+    if (availableSkills.length === 0) {
+        showNotification('所有技能都已装备', 'error');
+        return;
+    }
+    
+    let html = availableSkills.map(skill => {
+        let effectText = '';
+        let effects = [];
+        if (skill.costStat) {
+            const costStatName = gameData.stats.find(s => s.id == skill.costStat)?.name || '未知';
+            effects.push(`<span class="cost">-${skill.costValue} ${costStatName}</span>`);
+        }
+        if (skill.gainStat) {
+            const gainStatName = gameData.stats.find(s => s.id == skill.gainStat)?.name || '未知';
+            effects.push(`<span class="gain">+${skill.gainValue} ${gainStatName}</span>`);
+        }
+        effectText = effects.length > 0 ? effects.join(' ') : '<span class="no-effect">无效果</span>';
+        
+        return `
+            <div class="equip-skill-option" onclick="equipSkillToSlot(${slotIndex}, ${skill.id})">
+                <div class="equip-skill-icon">${skill.icon || '⭐'}</div>
+                <div class="equip-skill-info">
+                    <div class="equip-skill-name">${skill.name}</div>
+                    <div class="equip-skill-effects">${effectText}</div>
+                    ${skill.description ? `<div class="equip-skill-desc">${skill.description}</div>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    content.innerHTML = html;
+    modal.classList.add('active');
+}
+
+// 装备技能到指定槽位
+function equipSkillToSlot(slotIndex, skillId) {
+    if (!gameData.equippedSkills) {
+        gameData.equippedSkills = [];
+    }
+    
+    gameData.equippedSkills[slotIndex] = skillId;
+    saveData();
+    renderHomeSkills();
+    closeModal('equip-skill-modal');
+    showNotification('技能已装备');
+}
+
+// 从槽位卸载技能
+function unequipSkillFromSlot(slotIndex) {
+    if (gameData.equippedSkills && gameData.equippedSkills[slotIndex]) {
+        const skill = findSkillById(gameData.equippedSkills[slotIndex]);
+        gameData.equippedSkills[slotIndex] = null;
+        saveData();
+        renderHomeSkills();
+        showNotification(`已卸载技能: ${skill?.name || '未知'}`);
+    }
+}
+
+// 获取所有技能（包括子技能）
+function getAllSkills(skills = gameData.skills, result = []) {
+    for (const skill of skills) {
+        result.push(skill);
+        if (skill.children && skill.children.length > 0) {
+            getAllSkills(skill.children, result);
+        }
+    }
+    return result;
+}
+
+// 装备技能（从技能页面）
+function toggleEquipSkill(skillId) {
+    if (!gameData.equippedSkills) {
+        gameData.equippedSkills = [];
+    }
+    
+    const equippedIndex = gameData.equippedSkills.indexOf(skillId);
+    
+    if (equippedIndex !== -1) {
+        // 已装备，卸载
+        gameData.equippedSkills[equippedIndex] = null;
+        showNotification('技能已卸载');
+    } else {
+        // 未装备，找一个空槽位
+        let emptySlot = -1;
+        for (let i = 0; i < 6; i++) {
+            if (!gameData.equippedSkills[i]) {
+                emptySlot = i;
+                break;
+            }
+        }
+        
+        if (emptySlot !== -1) {
+            gameData.equippedSkills[emptySlot] = skillId;
+            showNotification('技能已装备到首页');
+        } else {
+            showNotification('装备槽已满，请先卸载其他技能', 'error');
+            return;
+        }
+    }
+    
+    saveData();
+    renderSkills();
+    renderHomeSkills();
+}
+
+// 更新头部货币显示
+function updateHeaderCurrency() {
+    const goldEl = document.getElementById('header-gold');
+    const foodEl = document.getElementById('header-food');
+    
+    if (goldEl) goldEl.textContent = gameData.gold || 0;
+    if (foodEl) foodEl.textContent = gameData.food || 0;
+}
+
+// 更新首页地图上的宠物显示
+function updateHomeMapPet() {
+    const petDisplay = document.getElementById('map-pet-display');
+    if (petDisplay && gameData.pet.selected) {
+        const petSprite = petDisplay.querySelector('.pet-sprite');
+        if (petSprite) {
+            petSprite.textContent = getPetEmoji(gameData.pet.type, gameData.pet.level);
+        }
+    }
+}
+
 // 在初始化时调用
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
@@ -3167,6 +3790,6 @@ document.addEventListener('DOMContentLoaded', function() {
         initReminders();
         updateReminderUI();
         updatePetCollectionUI();
+        updateHomeMapPet();
     }, 1000);
 });
-

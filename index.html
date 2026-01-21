@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System</title>
+    <title>奇幻世界探索</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -70,7 +70,6 @@
             
             <!-- 编辑器区域 -->
             <div class="vscode-editor">
-                <!-- 标签栏 -->
                 <div class="vscode-tabs">
                     <div class="tab active">
                         <span class="tab-icon">JS</span>
@@ -79,9 +78,7 @@
                     </div>
                 </div>
                 
-                <!-- 代码编辑区 - 左右分屏 -->
                 <div class="code-editor-split">
-                    <!-- 左侧：参考代码 -->
                     <div class="code-reference-panel">
                         <div class="panel-label">📚 参考代码</div>
                         <div class="code-editor">
@@ -91,11 +88,7 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- 分隔线 -->
                     <div class="split-divider"></div>
-                    
-                    <!-- 右侧：练习区 -->
                     <div class="code-practice-panel">
                         <div class="panel-label">✍️ 练习区 (开始打字)</div>
                         <div class="code-editor">
@@ -110,7 +103,6 @@
             </div>
         </div>
         
-        <!-- 底部状态栏 -->
         <div class="vscode-statusbar">
             <div class="statusbar-left">
                 <span class="status-item">🌿 main</span>
@@ -125,401 +117,594 @@
         </div>
     </div>
     
-    <div class="container">
-        <header class="cyber-header">
-            <h1 class="glitch" data-text="System"></h1>
-            <div class="scan-line"></div>
-        </header>
-
-        <nav class="cyber-nav">
-            <button class="nav-btn active" data-tab="status">状态栏</button>
-            <button class="nav-btn" data-tab="pet">我的宠物</button>
-            <button class="nav-btn" data-tab="backpack">背包</button>
-            <button class="nav-btn" data-tab="storage">仓库</button>
-            <button class="nav-btn" data-tab="shop">商店</button>
-            <button class="nav-btn" data-tab="skills">技能树</button>
-            <button class="nav-btn" data-tab="map">思维地图</button>
-            <button class="nav-btn" data-tab="challenge">考验</button>
-            <button class="nav-btn settings-btn" data-tab="settings">⚙️</button>
-            <div class="theme-switcher">
-                <span class="theme-label">主题:</span>
-                <button class="theme-btn active" data-theme="cyber" title="赛博朋克">🌃</button>
-                <button class="theme-btn" data-theme="strawberry" title="草莓粉">🍓</button>
-                <button class="theme-btn" data-theme="matcha" title="抹茶绿">🍵</button>
-                <button class="theme-btn" data-theme="glass" title="透明玻璃">💎</button>
+    <!-- 游戏主界面 -->
+    <div class="game-wrapper">
+        <!-- 左侧书签导航 -->
+        <nav class="bookmark-nav">
+            <div class="bookmark-tab active" data-tab="home" title="首页">
+                <span class="bookmark-icon">🏠</span>
+                <span class="bookmark-text">首页</span>
+            </div>
+            <div class="bookmark-tab" data-tab="status" title="状态栏">
+                <span class="bookmark-icon">📊</span>
+                <span class="bookmark-text">属性</span>
+            </div>
+            <div class="bookmark-tab" data-tab="pet" title="我的宠物">
+                <span class="bookmark-icon">🐾</span>
+                <span class="bookmark-text">宠物</span>
+            </div>
+            <div class="bookmark-tab" data-tab="backpack" title="背包">
+                <span class="bookmark-icon">🎒</span>
+                <span class="bookmark-text">背包</span>
+            </div>
+            <div class="bookmark-tab" data-tab="storage" title="仓库">
+                <span class="bookmark-icon">📦</span>
+                <span class="bookmark-text">仓库</span>
+            </div>
+            <div class="bookmark-tab" data-tab="shop" title="商店">
+                <span class="bookmark-icon">🛒</span>
+                <span class="bookmark-text">商店</span>
+            </div>
+            <div class="bookmark-tab" data-tab="skills" title="技能树">
+                <span class="bookmark-icon">⚡</span>
+                <span class="bookmark-text">技能</span>
+            </div>
+            <div class="bookmark-tab" data-tab="map" title="思维地图">
+                <span class="bookmark-icon">🗺️</span>
+                <span class="bookmark-text">地图</span>
+            </div>
+            <div class="bookmark-tab" data-tab="challenge" title="考验">
+                <span class="bookmark-icon">⚔️</span>
+                <span class="bookmark-text">考验</span>
+            </div>
+            <div class="bookmark-tab settings" data-tab="settings" title="设置">
+                <span class="bookmark-icon">⚙️</span>
+                <span class="bookmark-text">设置</span>
             </div>
         </nav>
 
-        <!-- 状态栏 -->
-        <section id="status" class="panel active">
-            <div class="panel-header">
-                <h2>角色状态</h2>
-                <button class="cyber-btn" onclick="addNewStat()">+ 添加属性</button>
-            </div>
-            <div id="stats-container" class="stats-container">
-                <!-- 默认属性 -->
-            </div>
-        </section>
-
-        <!-- 宠物 -->
-        <section id="pet" class="panel">
-            <div class="panel-header">
-                <h2>我的宠物</h2>
-                <div class="pet-food-display">🍖 × <span id="pet-food-amount">0</span></div>
-            </div>
-            
-            <div id="pet-select-screen" class="pet-select-screen">
-                <h3>选择你的宠物伙伴</h3>
-                <div class="pet-options">
-                    <div class="pet-option" onclick="selectPet('cat')">
-                        <div class="pet-icon">🐱</div>
-                        <div class="pet-option-name">小猫咪</div>
-                    </div>
-                    <div class="pet-option" onclick="selectPet('dog')">
-                        <div class="pet-icon">🐶</div>
-                        <div class="pet-option-name">小狗狗</div>
-                    </div>
-                    <div class="pet-option" onclick="selectPet('rabbit')">
-                        <div class="pet-icon">🐰</div>
-                        <div class="pet-option-name">小兔子</div>
-                    </div>
-                    <div class="pet-option" onclick="selectPet('bear')">
-                        <div class="pet-icon">🐻</div>
-                        <div class="pet-option-name">小熊熊</div>
-                    </div>
-                    <div class="pet-option" onclick="selectPet('panda')">
-                        <div class="pet-icon">🐼</div>
-                        <div class="pet-option-name">小熊猫</div>
-                    </div>
-                    <div class="pet-option" onclick="selectPet('fox')">
-                        <div class="pet-icon">🦊</div>
-                        <div class="pet-option-name">小狐狸</div>
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 顶部标题栏 -->
+            <header class="game-header">
+                <div class="header-left">
+                    <h1 class="game-title">🌟 奇幻世界探索</h1>
+                </div>
+                <div class="header-center">
+                    <div class="theme-switcher">
+                        <button class="theme-btn active" data-theme="cyber" title="赛博朋克">🌃</button>
+                        <button class="theme-btn" data-theme="strawberry" title="草莓粉">🍓</button>
+                        <button class="theme-btn" data-theme="matcha" title="抹茶绿">🍵</button>
+                        <button class="theme-btn" data-theme="glass" title="透明玻璃">💎</button>
                     </div>
                 </div>
-            </div>
+                <div class="header-right">
+                    <div class="currency-display">
+                        <span class="currency-item">💰 <span id="header-gold">100</span></span>
+                        <span class="currency-item">🍖 <span id="header-food">0</span></span>
+                    </div>
+                </div>
+            </header>
 
-            <div id="pet-main-screen" class="pet-main-screen" style="display:none;">
-                <div class="pet-info-bar">
-                    <div class="pet-stat">
-                        <span class="pet-stat-label">等级</span>
-                        <span class="pet-stat-value" id="pet-level">1</span>
-                    </div>
-                    <div class="pet-stat">
-                        <span class="pet-stat-label">阶段</span>
-                        <span class="pet-stage stage-0" id="pet-stage">基础形态</span>
-                    </div>
-                    <div class="pet-stat">
-                        <span class="pet-stat-label">经验</span>
-                        <div class="pet-exp-bar">
-                            <div class="pet-exp-fill" id="pet-exp-fill"></div>
-                            <span class="pet-exp-text" id="pet-exp-text">0/10</span>
+            <!-- 首页 - 游戏窗口布局 -->
+            <section id="home" class="panel active game-home">
+                <div class="home-grid">
+                    <!-- 左上角 - 角色属性 -->
+                    <div class="home-panel home-stats">
+                        <div class="home-panel-header">
+                            <span class="panel-icon">👤</span>
+                            <span class="panel-title">角色属性</span>
+                        </div>
+                        <div class="home-panel-content">
+                            <div class="mini-avatar">
+                                <div class="avatar-frame">
+                                    <span class="avatar-emoji">🧙</span>
+                                </div>
+                                <div class="avatar-info">
+                                    <span class="avatar-name">冒险者</span>
+                                    <span class="avatar-level">Lv.1</span>
+                                </div>
+                            </div>
+                            <div id="home-stats-container" class="home-stats-list">
+                            </div>
                         </div>
                     </div>
-                    <div class="pet-stat">
-                        <span class="pet-stat-label">饥饿度</span>
-                        <div class="pet-hunger-bar">
-                            <div class="pet-hunger-fill" id="pet-hunger-fill"></div>
+
+                    <!-- 左下角 - 背包快捷栏 -->
+                    <div class="home-panel home-backpack">
+                        <div class="home-panel-header">
+                            <span class="panel-icon">🎒</span>
+                            <span class="panel-title">快捷物品</span>
+                            <button class="panel-more-btn" onclick="switchToTab('backpack')">更多 →</button>
+                        </div>
+                        <div class="home-panel-content">
+                            <div id="home-backpack-items" class="quick-items-grid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 中间 - 地图窗口 -->
+                    <div class="home-panel home-map-window">
+                        <div class="home-panel-header">
+                            <span class="panel-icon">🗺️</span>
+                            <span class="panel-title">探索地图</span>
+                            <button class="panel-more-btn" onclick="switchToTab('map')">展开 →</button>
+                        </div>
+                        <div class="home-panel-content map-preview">
+                            <div class="map-scene">
+                                <div class="map-background">
+                                    <div class="floating-element cloud1">☁️</div>
+                                    <div class="floating-element cloud2">☁️</div>
+                                    <div class="floating-element bird">🦅</div>
+                                </div>
+                                <div class="map-ground">
+                                    <div class="map-element tree1">🌳</div>
+                                    <div class="map-element tree2">🌲</div>
+                                    <div class="map-element house">🏠</div>
+                                    <div class="map-element castle">🏰</div>
+                                    <div class="map-element mountain">⛰️</div>
+                                </div>
+                                <div class="map-character" id="map-character">
+                                    <span class="character-sprite">🧝</span>
+                                </div>
+                                <div class="map-pet" id="map-pet-display">
+                                    <span class="pet-sprite">🐱</span>
+                                </div>
+                            </div>
+                            <div class="map-info">
+                                <span class="location-name">✨ 新手村</span>
+                                <span class="location-desc">冒险的起点，充满希望的地方</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 中间下方 - 考验/任务 -->
+                    <div class="home-panel home-challenge">
+                        <div class="home-panel-header">
+                            <span class="panel-icon">⚔️</span>
+                            <span class="panel-title">今日考验</span>
+                            <button class="panel-more-btn" onclick="switchToTab('challenge')">全部 →</button>
+                        </div>
+                        <div class="home-panel-content">
+                            <div class="quick-challenge">
+                                <div class="challenge-card" onclick="switchToTab('challenge')">
+                                    <span class="challenge-icon">🔢</span>
+                                    <span class="challenge-name">算术挑战</span>
+                                    <span class="challenge-reward">+10 经验</span>
+                                </div>
+                                <div class="challenge-card" onclick="switchToTab('challenge');setTimeout(()=>document.querySelector('[data-challenge=literacy]').click(),100)">
+                                    <span class="challenge-icon">📖</span>
+                                    <span class="challenge-name">识字训练</span>
+                                    <span class="challenge-reward">+5 经验</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右上角 - 技能预览 -->
+                    <div class="home-panel home-skills">
+                        <div class="home-panel-header">
+                            <span class="panel-icon">⚡</span>
+                            <span class="panel-title">技能</span>
+                            <button class="panel-more-btn" onclick="switchToTab('skills')">详情 →</button>
+                        </div>
+                        <div class="home-panel-content">
+                            <div class="skill-level-display">
+                                <span class="skill-lv">Lv.<span id="home-skill-level">0</span></span>
+                                <div class="skill-exp-mini">
+                                    <div class="skill-exp-fill-mini" id="home-skill-exp-fill"></div>
+                                </div>
+                            </div>
+                            <div id="home-skills-list" class="home-skills-grid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右下角 - 快捷入口 -->
+                    <div class="home-panel home-quick-access">
+                        <div class="home-panel-header">
+                            <span class="panel-icon">🔮</span>
+                            <span class="panel-title">快捷入口</span>
+                        </div>
+                        <div class="home-panel-content">
+                            <div class="quick-access-grid">
+                                <div class="quick-access-btn" onclick="switchToTab('storage')">
+                                    <span class="quick-icon">📦</span>
+                                    <span class="quick-label">仓库</span>
+                                </div>
+                                <div class="quick-access-btn" onclick="switchToTab('shop')">
+                                    <span class="quick-icon">🛒</span>
+                                    <span class="quick-label">商店</span>
+                                </div>
+                                <div class="quick-access-btn" onclick="switchToTab('pet')">
+                                    <span class="quick-icon">🐾</span>
+                                    <span class="quick-label">宠物</span>
+                                </div>
+                                <div class="quick-access-btn" onclick="switchToTab('settings')">
+                                    <span class="quick-icon">⚙️</span>
+                                    <span class="quick-label">设置</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                <div class="pet-display-area">
-                    <div class="pet-character" id="pet-character">
-                        <div class="pet-emoji" id="pet-emoji">🐱</div>
-                        <div class="pet-name" id="pet-name-display">小猫咪</div>
-                    </div>
-                    <div class="pet-speech-bubble" id="pet-speech-bubble">
-                        欢迎来看我呀！一起学习吧~ 📚
-                    </div>
+            <!-- 状态栏 -->
+            <section id="status" class="panel">
+                <div class="panel-header">
+                    <h2>📊 角色状态</h2>
+                    <button class="cyber-btn" onclick="addNewStat()">+ 添加属性</button>
                 </div>
-
-                <div class="pet-actions">
-                    <button class="cyber-btn" onclick="feedPet()">🍖 喂食 (消耗1个食物)</button>
-                    <button class="cyber-btn" onclick="playWithPet()">🎾 互动</button>
-                    <button class="cyber-btn" onclick="renamePet()">✏️ 改名</button>
-                    <button class="cyber-btn" onclick="resetPet()" style="background: var(--neon-red);">🔄 更换宠物</button>
+                <div id="stats-container" class="stats-container">
                 </div>
+            </section>
 
-                <!-- 宠物收集展示 -->
-                <div class="pet-collection-section">
-                    <h4>📦 宠物收藏</h4>
-                    <div id="pet-collection" class="pet-collection">
-                        <!-- 动态生成的宠物收集 -->
-                    </div>
-                    <p class="collection-hint">完成番茄钟和挑战可获得新宠物！</p>
+            <!-- 宠物 -->
+            <section id="pet" class="panel">
+                <div class="panel-header">
+                    <h2>🐾 我的宠物</h2>
+                    <div class="pet-food-display">🍖 × <span id="pet-food-amount">0</span></div>
                 </div>
-
-                <div class="pet-evolution-info">
-                    <h4>🌟 进化阶段</h4>
-                    <div class="evolution-stages">
-                        <div class="evolution-stage">
-                            <span class="stage-level">Lv.1-5</span>
-                            <span class="stage-name">基础形态</span>
+                
+                <div id="pet-select-screen" class="pet-select-screen">
+                    <h3>选择你的宠物伙伴</h3>
+                    <div class="pet-options">
+                        <div class="pet-option" onclick="selectPet('cat')">
+                            <div class="pet-icon">🐱</div>
+                            <div class="pet-option-name">小猫咪</div>
                         </div>
-                        <div class="evolution-stage">
-                            <span class="stage-level">Lv.6-10</span>
-                            <span class="stage-name">成长形态</span>
+                        <div class="pet-option" onclick="selectPet('dog')">
+                            <div class="pet-icon">🐶</div>
+                            <div class="pet-option-name">小狗狗</div>
                         </div>
-                        <div class="evolution-stage">
-                            <span class="stage-level">Lv.11-20</span>
-                            <span class="stage-name">成熟形态</span>
+                        <div class="pet-option" onclick="selectPet('rabbit')">
+                            <div class="pet-icon">🐰</div>
+                            <div class="pet-option-name">小兔子</div>
                         </div>
-                        <div class="evolution-stage">
-                            <span class="stage-level">Lv.21+</span>
-                            <span class="stage-name">究极形态</span>
+                        <div class="pet-option" onclick="selectPet('bear')">
+                            <div class="pet-icon">🐻</div>
+                            <div class="pet-option-name">小熊熊</div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="pet-tips">
-                    <h4>💡 小贴士</h4>
-                    <ul>
-                        <li>完成学习任务（做题、识字）可以获得食物</li>
-                        <li>每做对5道题获得1个食物</li>
-                        <li>喂食可以增加宠物经验值</li>
-                        <li>宠物升级后会变得更大更可爱</li>
-                        <li>记得定期喂养，宠物饿了会不开心哦</li>
-                        <li>🌟 宠物达到一定等级会进化变形！</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- 背包 -->
-        <section id="backpack" class="panel">
-            <div class="panel-header">
-                <h2>背包</h2>
-                <button class="cyber-btn" onclick="showAddItemModal('backpack')">+ 添加物品</button>
-            </div>
-            <div id="backpack-items" class="items-grid">
-                <!-- 背包物品 -->
-            </div>
-        </section>
-
-        <!-- 仓库 -->
-        <section id="storage" class="panel">
-            <div class="panel-header">
-                <h2>仓库</h2>
-                <button class="cyber-btn" onclick="showAddItemModal('storage')">+ 添加物品</button>
-            </div>
-            <div id="storage-items" class="items-grid">
-                <!-- 仓库物品 -->
-            </div>
-        </section>
-
-        <!-- 商店 -->
-        <section id="shop" class="panel">
-            <div class="panel-header">
-                <h2>商店</h2>
-                <div class="gold-display">
-                    <span class="gold-icon">💰</span>
-                    <span id="gold-amount">100</span>
-                    <button class="cyber-btn-small" onclick="editGold()">编辑</button>
-                </div>
-            </div>
-            <div class="shop-controls">
-                <button class="cyber-btn" onclick="showAddShopItemModal()">+ 添加商品</button>
-            </div>
-            <div id="shop-items" class="items-grid">
-                <!-- 商店物品 -->
-            </div>
-        </section>
-
-        <!-- 思维地图 -->
-        <section id="map" class="panel">
-            <div class="panel-header">
-                <h2>思维地图</h2>
-            </div>
-            <div class="map-toolbar">
-                <button class="map-tool-btn" onclick="addMapNode()">
-                    <span class="tool-icon">➕</span>
-                    <span class="tool-text">添加</span>
-                </button>
-                <button class="map-tool-btn" id="connectModeBtn" onclick="toggleConnectMode()">
-                    <span class="tool-icon">🔗</span>
-                    <span class="tool-text">连线</span>
-                </button>
-                <button class="map-tool-btn danger" onclick="clearMap()">
-                    <span class="tool-icon">🗑️</span>
-                    <span class="tool-text">清空</span>
-                </button>
-            </div>
-            <div class="map-container" id="mapContainer">
-                <svg id="mapSvg" class="map-svg"></svg>
-                <div id="mapNodes" class="map-nodes"></div>
-            </div>
-            <div class="map-hint" id="mapHint">
-                <span>📱 提示：长按节点可拖动，点击标题展开详情</span>
-            </div>
-        </section>
-
-        <!-- 技能树 -->
-        <section id="skills" class="panel">
-            <div class="panel-header">
-                <h2>技能树</h2>
-                <button class="cyber-btn" id="add-skill-btn" onclick="showAddSkillModal()">+ 添加技能</button>
-            </div>
-            
-            <div class="skill-status-bar">
-                <div class="skill-level-info">
-                    <span class="skill-level-badge">Lv.<span id="skill-level">0</span></span>
-                    <div class="skill-exp-container">
-                        <div class="skill-exp-bar">
-                            <div class="skill-exp-fill" id="skill-exp-fill" style="width: 0%"></div>
+                        <div class="pet-option" onclick="selectPet('panda')">
+                            <div class="pet-icon">🐼</div>
+                            <div class="pet-option-name">小熊猫</div>
                         </div>
-                        <span class="skill-exp-text"><span id="skill-exp">0</span>/<span id="skill-max-exp">100</span></span>
-                    </div>
-                </div>
-                <div class="skill-fragments-display">
-                    <span class="fragment-icon">🧩</span>
-                    <span class="fragment-count">碎片: <span id="skill-fragments">0</span></span>
-                    <button class="cyber-btn-small" onclick="synthesizeSkill()">合成技能</button>
-                </div>
-            </div>
-
-            <div id="skills-container" class="skills-container">
-                <!-- 技能树内容 -->
-            </div>
-        </section>
-
-        <!-- 考验 -->
-        <section id="challenge" class="panel">
-            <div class="panel-header">
-                <h2>考验</h2>
-            </div>
-            <div class="challenge-tabs">
-                <button class="challenge-tab active" data-challenge="math">算术题</button>
-                <button class="challenge-tab" data-challenge="literacy">识字</button>
-            </div>
-
-            <!-- 算术题 -->
-            <div id="math-challenge" class="challenge-content active">
-                <button class="cyber-btn generate-btn" onclick="generateMathQuestions()">生成题目</button>
-                <div id="math-questions" class="questions-container"></div>
-                <button id="submit-math" class="cyber-btn submit-btn" style="display:none;" onclick="submitMathAnswers()">提交答案</button>
-                <div id="math-result" class="result-display"></div>
-            </div>
-
-            <!-- 识字 -->
-            <div id="literacy-challenge" class="challenge-content">
-                <button class="cyber-btn generate-btn" onclick="generateLiteracyQuestion()">生成题目</button>
-                <div id="literacy-question" class="literacy-container"></div>
-                <div id="literacy-result" class="result-display"></div>
-            </div>
-        </section>
-
-        <!-- 设置 -->
-        <section id="settings" class="panel">
-            <div class="panel-header">
-                <h2>设置</h2>
-            </div>
-            <div class="settings-container">
-                <!-- 番茄钟设置 -->
-                <div class="settings-section pomodoro-section">
-                    <h3>🍅 番茄钟</h3>
-                    <div class="pomodoro-display">
-                        <div class="pomodoro-timer">
-                            <span id="pomodoro-time" class="pomodoro-time">25:00</span>
-                            <span id="pomodoro-status" class="pomodoro-status work">专注中</span>
-                        </div>
-                        <div class="pomodoro-controls">
-                            <button id="pomodoro-toggle-btn" class="cyber-btn" onclick="togglePomodoro()">▶️ 开始</button>
-                            <button class="cyber-btn" onclick="resetPomodoro()">🔄 重置</button>
-                        </div>
-                        <div class="pomodoro-stats">
-                            <span>今日完成: <strong id="pomodoro-count">0</strong> 个番茄</span>
-                        </div>
-                    </div>
-                    <div class="pomodoro-settings">
-                        <div class="setting-row">
-                            <label>工作时间 (分钟)</label>
-                            <input type="number" id="work-time" value="25" min="1" max="60" 
-                                   onchange="gameData.pomodoro.workTime=this.value;resetPomodoro();">
-                        </div>
-                        <div class="setting-row">
-                            <label>休息时间 (分钟)</label>
-                            <input type="number" id="break-time" value="5" min="1" max="30"
-                                   onchange="gameData.pomodoro.breakTime=this.value;">
+                        <div class="pet-option" onclick="selectPet('fox')">
+                            <div class="pet-icon">🦊</div>
+                            <div class="pet-option-name">小狐狸</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 提醒设置 -->
-                <div class="settings-section reminder-section">
-                    <h3>⏰ 健康提醒</h3>
-                    <div class="reminder-list">
-                        <div class="reminder-item">
-                            <label class="toggle-label">
-                                <input type="checkbox" id="reminder-drinkWater" checked onchange="toggleReminder('drinkWater')">
-                                <span class="toggle-slider"></span>
-                                💧 喝水提醒
-                            </label>
-                            <input type="number" class="interval-input" value="30" min="5" max="120" 
-                                   onchange="setReminderInterval('drinkWater', this.value)"> 分钟
+                <div id="pet-main-screen" class="pet-main-screen" style="display:none;">
+                    <div class="pet-info-bar">
+                        <div class="pet-stat">
+                            <span class="pet-stat-label">等级</span>
+                            <span class="pet-stat-value" id="pet-level">1</span>
                         </div>
-                        <div class="reminder-item">
-                            <label class="toggle-label">
-                                <input type="checkbox" id="reminder-rest" checked onchange="toggleReminder('rest')">
-                                <span class="toggle-slider"></span>
-                                👀 休息眼睛提醒
-                            </label>
-                            <input type="number" class="interval-input" value="45" min="5" max="120"
-                                   onchange="setReminderInterval('rest', this.value)"> 分钟
+                        <div class="pet-stat">
+                            <span class="pet-stat-label">阶段</span>
+                            <span class="pet-stage stage-0" id="pet-stage">基础形态</span>
                         </div>
-                        <div class="reminder-item">
-                            <label class="toggle-label">
-                                <input type="checkbox" id="reminder-stretch" checked onchange="toggleReminder('stretch')">
-                                <span class="toggle-slider"></span>
-                                🧘 伸展活动提醒
-                            </label>
-                            <input type="number" class="interval-input" value="60" min="5" max="180"
-                                   onchange="setReminderInterval('stretch', this.value)"> 分钟
+                        <div class="pet-stat">
+                            <span class="pet-stat-label">经验</span>
+                            <div class="pet-exp-bar">
+                                <div class="pet-exp-fill" id="pet-exp-fill"></div>
+                                <span class="pet-exp-text" id="pet-exp-text">0/10</span>
+                            </div>
                         </div>
-                        <div class="reminder-item">
-                            <label class="toggle-label">
-                                <input type="checkbox" id="reminder-petHunger" checked onchange="toggleReminder('petHunger')">
-                                <span class="toggle-slider"></span>
-                                🐾 宠物饥饿提醒
-                            </label>
-                            <span class="hint-text">(饥饿度低于30%时通知)</span>
+                        <div class="pet-stat">
+                            <span class="pet-stat-label">饥饿度</span>
+                            <div class="pet-hunger-bar">
+                                <div class="pet-hunger-fill" id="pet-hunger-fill"></div>
+                            </div>
                         </div>
                     </div>
-                    <button class="cyber-btn" onclick="Notification.requestPermission().then(p=>showNotification('通知权限: '+p))">
-                        🔔 启用桌面通知
+
+                    <div class="pet-display-area">
+                        <div class="pet-character" id="pet-character">
+                            <div class="pet-emoji" id="pet-emoji">🐱</div>
+                            <div class="pet-name" id="pet-name-display">小猫咪</div>
+                        </div>
+                        <div class="pet-speech-bubble" id="pet-speech-bubble">
+                            欢迎来看我呀！一起学习吧~ 📚
+                        </div>
+                    </div>
+
+                    <div class="pet-actions">
+                        <button class="cyber-btn" onclick="feedPet()">🍖 喂食</button>
+                        <button class="cyber-btn" onclick="playWithPet()">🎾 互动</button>
+                        <button class="cyber-btn" onclick="renamePet()">✏️ 改名</button>
+                        <button class="cyber-btn" onclick="resetPet()" style="background: var(--neon-red);">🔄 更换宠物</button>
+                    </div>
+
+                    <div class="pet-collection-section">
+                        <h4>📦 宠物收藏</h4>
+                        <div id="pet-collection" class="pet-collection"></div>
+                        <p class="collection-hint">完成番茄钟和挑战可获得新宠物！</p>
+                    </div>
+
+                    <div class="pet-evolution-info">
+                        <h4>🌟 进化阶段</h4>
+                        <div class="evolution-stages">
+                            <div class="evolution-stage"><span class="stage-level">Lv.1-5</span><span class="stage-name">基础形态</span></div>
+                            <div class="evolution-stage"><span class="stage-level">Lv.6-10</span><span class="stage-name">成长形态</span></div>
+                            <div class="evolution-stage"><span class="stage-level">Lv.11-20</span><span class="stage-name">成熟形态</span></div>
+                            <div class="evolution-stage"><span class="stage-level">Lv.21+</span><span class="stage-name">究极形态</span></div>
+                        </div>
+                    </div>
+
+                    <div class="pet-tips">
+                        <h4>💡 小贴士</h4>
+                        <ul>
+                            <li>完成学习任务可获得食物</li>
+                            <li>每做对5道题获得1个食物</li>
+                            <li>喂食可增加宠物经验值</li>
+                            <li>宠物升级会变得更大更可爱</li>
+                            <li>🌟 宠物达到一定等级会进化变形！</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 背包 -->
+            <section id="backpack" class="panel">
+                <div class="panel-header">
+                    <h2>🎒 背包</h2>
+                    <button class="cyber-btn" onclick="showAddItemModal('backpack')">+ 添加物品</button>
+                </div>
+                <div id="backpack-items" class="items-grid"></div>
+            </section>
+
+            <!-- 仓库 -->
+            <section id="storage" class="panel">
+                <div class="panel-header">
+                    <h2>📦 仓库</h2>
+                    <button class="cyber-btn" onclick="showAddItemModal('storage')">+ 添加物品</button>
+                </div>
+                <div id="storage-items" class="items-grid"></div>
+            </section>
+
+            <!-- 商店 -->
+            <section id="shop" class="panel">
+                <div class="panel-header">
+                    <h2>🛒 商店</h2>
+                    <div class="gold-display">
+                        <span class="gold-icon">💰</span>
+                        <span id="gold-amount">100</span>
+                        <button class="cyber-btn-small" onclick="editGold()">编辑</button>
+                    </div>
+                </div>
+                <div class="shop-controls">
+                    <button class="cyber-btn" onclick="showAddShopItemModal()">+ 添加商品</button>
+                </div>
+                <div id="shop-items" class="items-grid"></div>
+            </section>
+
+            <!-- 思维地图 -->
+            <section id="map" class="panel">
+                <div class="panel-header">
+                    <h2>🗺️ 思维地图</h2>
+                </div>
+                <div class="map-toolbar">
+                    <button class="map-tool-btn" onclick="addMapNode()">
+                        <span class="tool-icon">➕</span>
+                        <span class="tool-text">添加</span>
+                    </button>
+                    <button class="map-tool-btn" id="connectModeBtn" onclick="toggleConnectMode()">
+                        <span class="tool-icon">🔗</span>
+                        <span class="tool-text">连线</span>
+                    </button>
+                    <button class="map-tool-btn danger" onclick="clearMap()">
+                        <span class="tool-icon">🗑️</span>
+                        <span class="tool-text">清空</span>
                     </button>
                 </div>
-
-                <div class="settings-section">
-                    <h3>🗑️ 数据管理</h3>
-                    <p class="settings-desc">清除所有本地缓存数据，重置游戏进度。此操作不可撤销！</p>
-                    <button class="cyber-btn danger-btn" onclick="showResetConfirmModal()">🔄 重置所有数据</button>
+                <div class="map-container" id="mapContainer">
+                    <svg id="mapSvg" class="map-svg"></svg>
+                    <div id="mapNodes" class="map-nodes"></div>
                 </div>
-                <div class="settings-section">
-                    <h3>📊 数据统计</h3>
-                    <div class="data-stats">
-                        <div class="data-stat-item">
-                            <span class="data-stat-label">属性数量</span>
-                            <span class="data-stat-value" id="stats-count">0</span>
+                <div class="map-hint" id="mapHint">
+                    <span>📱 提示：长按节点可拖动，点击标题展开详情</span>
+                </div>
+            </section>
+
+            <!-- 技能树 -->
+            <section id="skills" class="panel">
+                <div class="panel-header">
+                    <h2>⚡ 技能树</h2>
+                    <button class="cyber-btn" id="add-skill-btn" onclick="showAddSkillModal()">+ 添加技能</button>
+                </div>
+                
+                <div class="skill-status-bar">
+                    <div class="skill-level-info">
+                        <span class="skill-level-badge">Lv.<span id="skill-level">0</span></span>
+                        <div class="skill-exp-container">
+                            <div class="skill-exp-bar">
+                                <div class="skill-exp-fill" id="skill-exp-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="skill-exp-text"><span id="skill-exp">0</span>/<span id="skill-max-exp">100</span></span>
                         </div>
-                        <div class="data-stat-item">
-                            <span class="data-stat-label">技能数量</span>
-                            <span class="data-stat-value" id="skills-count">0</span>
+                    </div>
+                    <div class="skill-fragments-display">
+                        <span class="fragment-icon">🧩</span>
+                        <span class="fragment-count">碎片: <span id="skill-fragments">0</span></span>
+                        <button class="cyber-btn-small" onclick="synthesizeSkill()">合成技能</button>
+                    </div>
+                </div>
+
+                <div id="skills-container" class="skills-container"></div>
+            </section>
+
+            <!-- 考验 -->
+            <section id="challenge" class="panel">
+                <div class="panel-header">
+                    <h2>⚔️ 考验</h2>
+                </div>
+                <div class="challenge-tabs">
+                    <button class="challenge-tab active" data-challenge="math">算术题</button>
+                    <button class="challenge-tab" data-challenge="literacy">识字</button>
+                </div>
+
+                <div id="math-challenge" class="challenge-content active">
+                    <button class="cyber-btn generate-btn" onclick="generateMathQuestions()">生成题目</button>
+                    <div id="math-questions" class="questions-container"></div>
+                    <button id="submit-math" class="cyber-btn submit-btn" style="display:none;" onclick="submitMathAnswers()">提交答案</button>
+                    <div id="math-result" class="result-display"></div>
+                </div>
+
+                <div id="literacy-challenge" class="challenge-content">
+                    <button class="cyber-btn generate-btn" onclick="generateLiteracyQuestion()">生成题目</button>
+                    <div id="literacy-question" class="literacy-container"></div>
+                    <div id="literacy-result" class="result-display"></div>
+                </div>
+            </section>
+
+            <!-- 设置 -->
+            <section id="settings" class="panel">
+                <div class="panel-header">
+                    <h2>⚙️ 设置</h2>
+                </div>
+                <div class="settings-container">
+                    <div class="settings-section pomodoro-section">
+                        <h3>🍅 番茄钟</h3>
+                        <div class="pomodoro-display">
+                            <div class="pomodoro-timer">
+                                <span id="pomodoro-time" class="pomodoro-time">25:00</span>
+                                <span id="pomodoro-status" class="pomodoro-status work">专注中</span>
+                            </div>
+                            <div class="pomodoro-controls">
+                                <button id="pomodoro-toggle-btn" class="cyber-btn" onclick="togglePomodoro()">▶️ 开始</button>
+                                <button class="cyber-btn" onclick="resetPomodoro()">🔄 重置</button>
+                            </div>
+                            <div class="pomodoro-stats">
+                                <span>今日完成: <strong id="pomodoro-count">0</strong> 个番茄</span>
+                            </div>
                         </div>
-                        <div class="data-stat-item">
-                            <span class="data-stat-label">背包物品</span>
-                            <span class="data-stat-value" id="backpack-count">0</span>
+                        <div class="pomodoro-settings">
+                            <div class="setting-row">
+                                <label>工作时间 (分钟)</label>
+                                <input type="number" id="work-time" value="25" min="1" max="60" 
+                                       onchange="gameData.pomodoro.workTime=this.value;resetPomodoro();">
+                            </div>
+                            <div class="setting-row">
+                                <label>休息时间 (分钟)</label>
+                                <input type="number" id="break-time" value="5" min="1" max="30"
+                                       onchange="gameData.pomodoro.breakTime=this.value;">
+                            </div>
                         </div>
-                        <div class="data-stat-item">
-                            <span class="data-stat-label">地图节点</span>
-                            <span class="data-stat-value" id="map-count">0</span>
+                    </div>
+
+                    <div class="settings-section reminder-section">
+                        <h3>⏰ 健康提醒</h3>
+                        <div class="reminder-list">
+                            <div class="reminder-item">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="reminder-drinkWater" checked onchange="toggleReminder('drinkWater')">
+                                    <span class="toggle-slider"></span>
+                                    💧 喝水提醒
+                                </label>
+                                <input type="number" class="interval-input" value="30" min="5" max="120" 
+                                       onchange="setReminderInterval('drinkWater', this.value)"> 分钟
+                            </div>
+                            <div class="reminder-item">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="reminder-rest" checked onchange="toggleReminder('rest')">
+                                    <span class="toggle-slider"></span>
+                                    👀 休息眼睛提醒
+                                </label>
+                                <input type="number" class="interval-input" value="45" min="5" max="120"
+                                       onchange="setReminderInterval('rest', this.value)"> 分钟
+                            </div>
+                            <div class="reminder-item">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="reminder-stretch" checked onchange="toggleReminder('stretch')">
+                                    <span class="toggle-slider"></span>
+                                    🧘 伸展活动提醒
+                                </label>
+                                <input type="number" class="interval-input" value="60" min="5" max="180"
+                                       onchange="setReminderInterval('stretch', this.value)"> 分钟
+                            </div>
+                            <div class="reminder-item">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="reminder-petHunger" checked onchange="toggleReminder('petHunger')">
+                                    <span class="toggle-slider"></span>
+                                    🐾 宠物饥饿提醒
+                                </label>
+                                <span class="hint-text">(饥饿度低于30%时通知)</span>
+                            </div>
+                        </div>
+                        <button class="cyber-btn" onclick="Notification.requestPermission().then(p=>showNotification('通知权限: '+p))">
+                            🔔 启用桌面通知
+                        </button>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>🗑️ 数据管理</h3>
+                        <p class="settings-desc">清除所有本地缓存数据，重置游戏进度。此操作不可撤销！</p>
+                        <button class="cyber-btn danger-btn" onclick="showResetConfirmModal()">🔄 重置所有数据</button>
+                    </div>
+                    <div class="settings-section">
+                        <h3>📊 数据统计</h3>
+                        <div class="data-stats">
+                            <div class="data-stat-item">
+                                <span class="data-stat-label">属性数量</span>
+                                <span class="data-stat-value" id="stats-count">0</span>
+                            </div>
+                            <div class="data-stat-item">
+                                <span class="data-stat-label">技能数量</span>
+                                <span class="data-stat-value" id="skills-count">0</span>
+                            </div>
+                            <div class="data-stat-item">
+                                <span class="data-stat-label">背包物品</span>
+                                <span class="data-stat-value" id="backpack-count">0</span>
+                            </div>
+                            <div class="data-stat-item">
+                                <span class="data-stat-label">地图节点</span>
+                                <span class="data-stat-value" id="map-count">0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </main>
     </div>
 
-    <!-- 添加属性模态框 -->
+    <!-- 首页使用物品确认弹窗 -->
+    <div id="home-use-item-modal" class="modal">
+        <div class="modal-content cyber-modal use-item-modal">
+            <span class="close-btn" onclick="closeModal('home-use-item-modal')">&times;</span>
+            <h3>🎒 使用物品</h3>
+            <div id="home-use-item-content">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 首页使用技能确认弹窗 -->
+    <div id="home-use-skill-modal" class="modal">
+        <div class="modal-content cyber-modal use-skill-modal">
+            <span class="close-btn" onclick="closeModal('home-use-skill-modal')">&times;</span>
+            <h3>⚡ 使用技能</h3>
+            <div id="home-use-skill-content">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 装备技能选择弹窗 -->
+    <div id="equip-skill-modal" class="modal">
+        <div class="modal-content cyber-modal equip-skill-modal">
+            <span class="close-btn" onclick="closeModal('equip-skill-modal')">&times;</span>
+            <h3>⭐ 选择技能装备</h3>
+            <div id="equip-skill-list" class="equip-skill-list">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
     <div id="stat-modal" class="modal">
         <div class="modal-content cyber-modal">
             <span class="close-btn" onclick="closeModal('stat-modal')">&times;</span>
@@ -551,7 +736,6 @@
         </div>
     </div>
 
-    <!-- 添加物品模态框 -->
     <div id="item-modal" class="modal">
         <div class="modal-content cyber-modal">
             <span class="close-btn" onclick="closeModal('item-modal')">&times;</span>
@@ -567,9 +751,7 @@
             </div>
             <div class="form-group">
                 <label>效果属性（可选）</label>
-                <select id="item-effect-stat">
-                    <option value="">无效果</option>
-                </select>
+                <select id="item-effect-stat"><option value="">无效果</option></select>
             </div>
             <div class="form-group">
                 <label>效果数值</label>
@@ -583,7 +765,6 @@
         </div>
     </div>
 
-    <!-- 添加商品模态框 -->
     <div id="shop-modal" class="modal">
         <div class="modal-content cyber-modal">
             <span class="close-btn" onclick="closeModal('shop-modal')">&times;</span>
@@ -598,9 +779,7 @@
             </div>
             <div class="form-group">
                 <label>效果属性（可选）</label>
-                <select id="shop-item-effect-stat">
-                    <option value="">无效果</option>
-                </select>
+                <select id="shop-item-effect-stat"><option value="">无效果</option></select>
             </div>
             <div class="form-group">
                 <label>效果数值</label>
@@ -614,7 +793,6 @@
         </div>
     </div>
 
-    <!-- 编辑属性模态框 -->
     <div id="edit-stat-modal" class="modal">
         <div class="modal-content cyber-modal">
             <span class="close-btn" onclick="closeModal('edit-stat-modal')">&times;</span>
@@ -632,7 +810,6 @@
         </div>
     </div>
 
-    <!-- 添加技能模态框 -->
     <div id="skill-modal" class="modal">
         <div class="modal-content cyber-modal">
             <span class="close-btn" onclick="closeModal('skill-modal')">&times;</span>
@@ -648,9 +825,7 @@
             </div>
             <div class="form-group">
                 <label>父技能（可选）</label>
-                <select id="skill-parent">
-                    <option value="">无（根技能）</option>
-                </select>
+                <select id="skill-parent"><option value="">无（根技能）</option></select>
             </div>
             <div class="form-group">
                 <label>技能图标</label>
@@ -660,16 +835,12 @@
                 <h4>使用效果</h4>
                 <div class="skill-effect-row">
                     <label>消耗属性</label>
-                    <select id="skill-cost-stat">
-                        <option value="">无消耗</option>
-                    </select>
+                    <select id="skill-cost-stat"><option value="">无消耗</option></select>
                     <input type="number" id="skill-cost-value" placeholder="消耗数值" value="0">
                 </div>
                 <div class="skill-effect-row">
                     <label>获得属性</label>
-                    <select id="skill-gain-stat">
-                        <option value="">无获得</option>
-                    </select>
+                    <select id="skill-gain-stat"><option value="">无获得</option></select>
                     <input type="number" id="skill-gain-value" placeholder="获得数值" value="0">
                 </div>
             </div>
@@ -677,7 +848,6 @@
         </div>
     </div>
 
-    <!-- 重置确认模态框 -->
     <div id="reset-modal" class="modal">
         <div class="modal-content cyber-modal reset-modal">
             <span class="close-btn" onclick="closeModal('reset-modal')">&times;</span>
