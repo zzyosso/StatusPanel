@@ -244,16 +244,50 @@
                                     <div class="map-element castle">🏰</div>
                                     <div class="map-element mountain">⛰️</div>
                                 </div>
-                                <div class="map-character" id="map-character">
-                                    <span class="character-sprite">🧝</span>
+                                <!-- 像素角色 -->
+                                <div class="pixel-character-container" id="pixel-character-container" onclick="showCharacterMenu()">
+                                    <div class="pixel-character" id="pixel-character">
+                                        <div class="char-accessory" id="char-accessory"></div>
+                                        <div class="char-hair" id="char-hair"></div>
+                                        <div class="char-head" id="char-head"></div>
+                                        <div class="char-eyes" id="char-eyes"></div>
+                                        <div class="char-mouth" id="char-mouth"></div>
+                                        <div class="char-body" id="char-body"></div>
+                                        <div class="char-legs" id="char-legs"></div>
+                                    </div>
+                                    <div class="character-shadow"></div>
+                                    <div class="character-name-tag" id="character-name-tag">冒险者</div>
                                 </div>
+                                <!-- 宠物跟随 -->
                                 <div class="map-pet" id="map-pet-display">
-                                    <span class="pet-sprite">🐱</span>
+                                    <div class="pixel-pet" id="pixel-pet">
+                                        <span class="pet-sprite" id="pet-sprite-emoji">🐱</span>
+                                    </div>
+                                    <div class="pet-mood" id="pet-mood">💕</div>
+                                </div>
+                                <!-- 互动气泡 -->
+                                <div class="interaction-bubble" id="interaction-bubble" style="display: none;">
+                                    <span class="bubble-text" id="bubble-text">你好呀！</span>
                                 </div>
                             </div>
                             <div class="map-info">
                                 <span class="location-name">✨ 新手村</span>
                                 <span class="location-desc">冒险的起点，充满希望的地方</span>
+                            </div>
+                            <!-- 角色操作栏 -->
+                            <div class="character-actions">
+                                <button class="char-action-btn" onclick="event.stopPropagation();showDressUpModal()" title="换装">
+                                    <span>👔</span>
+                                </button>
+                                <button class="char-action-btn" onclick="event.stopPropagation();characterWave()" title="打招呼">
+                                    <span>👋</span>
+                                </button>
+                                <button class="char-action-btn" onclick="event.stopPropagation();characterDance()" title="跳舞">
+                                    <span>💃</span>
+                                </button>
+                                <button class="char-action-btn" onclick="event.stopPropagation();interactWithPet()" title="和宠物互动">
+                                    <span>🐾</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -586,12 +620,12 @@
                             <div class="setting-row">
                                 <label>工作时间 (分钟)</label>
                                 <input type="number" id="work-time" value="25" min="1" max="60" 
-                                       onchange="gameData.pomodoro.workTime=this.value;resetPomodoro();">
+                                       onchange="gameData.pomodoro.workTime=parseInt(this.value)||25;saveData();resetPomodoro();">
                             </div>
                             <div class="setting-row">
                                 <label>休息时间 (分钟)</label>
                                 <input type="number" id="break-time" value="5" min="1" max="30"
-                                       onchange="gameData.pomodoro.breakTime=this.value;">
+                                       onchange="gameData.pomodoro.breakTime=parseInt(this.value)||5;saveData();">
                             </div>
                         </div>
                     </div>
@@ -700,6 +734,58 @@
             <h3>⭐ 选择技能装备</h3>
             <div id="equip-skill-list" class="equip-skill-list">
                 <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 换装弹窗 -->
+    <div id="dress-up-modal" class="modal">
+        <div class="modal-content cyber-modal dress-up-modal">
+            <span class="close-btn" onclick="closeModal('dress-up-modal')">&times;</span>
+            <h3>👔 角色换装</h3>
+            <div class="dress-up-container">
+                <div class="dress-up-preview">
+                    <div class="preview-character">
+                        <div class="pixel-character preview-char" id="preview-character">
+                            <div class="char-accessory" id="preview-accessory"></div>
+                            <div class="char-hair" id="preview-hair"></div>
+                            <div class="char-head" id="preview-head"></div>
+                            <div class="char-eyes" id="preview-eyes"></div>
+                            <div class="char-mouth" id="preview-mouth"></div>
+                            <div class="char-body" id="preview-body"></div>
+                            <div class="char-legs" id="preview-legs"></div>
+                        </div>
+                    </div>
+                    <div class="preview-name">
+                        <input type="text" id="character-name-input" placeholder="角色名称" maxlength="8">
+                    </div>
+                </div>
+                <div class="dress-up-options">
+                    <div class="dress-category">
+                        <h4>🎨 肤色</h4>
+                        <div class="dress-items" id="skin-options"></div>
+                    </div>
+                    <div class="dress-category">
+                        <h4>💇 发型</h4>
+                        <div class="dress-items" id="hair-options"></div>
+                    </div>
+                    <div class="dress-category">
+                        <h4>👀 眼睛</h4>
+                        <div class="dress-items" id="eyes-options"></div>
+                    </div>
+                    <div class="dress-category">
+                        <h4>👕 服装</h4>
+                        <div class="dress-items" id="outfit-options"></div>
+                    </div>
+                    <div class="dress-category">
+                        <h4>🎀 配饰</h4>
+                        <div class="dress-items" id="accessory-options"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="dress-up-actions">
+                <button class="cyber-btn" onclick="randomizeCharacter()">🎲 随机</button>
+                <button class="cyber-btn" onclick="saveDressUp()">💾 保存</button>
             </div>
         </div>
     </div>

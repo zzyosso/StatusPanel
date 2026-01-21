@@ -23,6 +23,17 @@ let gameData = {
         lastFeedTime: Date.now()
     },
     pets: [], // 多宠物收集
+    // 角色外观数据
+    character: {
+        name: '冒险者',
+        skinColor: '#FFDAB9',
+        hairStyle: 'default',
+        hairColor: '#4a3728',
+        eyeStyle: 'default',
+        outfitStyle: 'casual',
+        outfitColor: '#4FC3F7',
+        accessory: ''
+    },
     map: {
         nodes: [],
         connections: [],
@@ -895,13 +906,18 @@ function openModal(modalId) {
 }
 
 function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+    }
 }
 
 // 点击模态框外部关闭
 document.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal')) {
         e.target.classList.remove('active');
+        e.target.style.display = 'none';
     }
 });
 
@@ -1030,6 +1046,7 @@ function selectPet(type) {
     document.getElementById('pet-main-screen').style.display = 'block';
     
     updatePetDisplay();
+    updateHomeMapPet(); // 更新首页地图上的宠物显示
     saveData();
     showNotification(`选择了${gameData.pet.name}作为你的宠物伙伴！`);
     speakPetMessage('你好！很高兴认识你！');
@@ -1138,11 +1155,15 @@ function feedPet() {
     
     // 动画效果
     const petEmoji = document.getElementById('pet-emoji');
-    petEmoji.classList.add('happy');
-    setTimeout(() => petEmoji.classList.remove('happy'), 500);
+    if (petEmoji) {
+        petEmoji.classList.add('happy');
+        setTimeout(() => petEmoji.classList.remove('happy'), 500);
+    }
     
     speakPetMessage(happyMessages[Math.floor(Math.random() * happyMessages.length)]);
     updatePetDisplay();
+    updateFoodDisplay(); // 更新食物显示
+    updateHomeMapPet(); // 更新首页宠物心情
     saveData();
 }
 
@@ -1158,10 +1179,12 @@ function levelUpPet() {
     
     // 升级动画
     const petEmoji = document.getElementById('pet-emoji');
-    petEmoji.style.animation = 'none';
-    setTimeout(() => {
-        petEmoji.style.animation = '';
-    }, 10);
+    if (petEmoji) {
+        petEmoji.style.animation = 'none';
+        setTimeout(() => {
+            petEmoji.style.animation = '';
+        }, 10);
+    }
     
     // 检查是否进化
     if (newStage > oldStage) {
@@ -1171,12 +1194,16 @@ function levelUpPet() {
         speakPetMessage(`哇！我进化了！我变得更强了！`);
         
         // 进化特效
-        petEmoji.classList.add('evolving');
-        setTimeout(() => petEmoji.classList.remove('evolving'), 2000);
+        if (petEmoji) {
+            petEmoji.classList.add('evolving');
+            setTimeout(() => petEmoji.classList.remove('evolving'), 2000);
+        }
     } else {
         showNotification(`🎉 ${gameData.pet.name}升级了！现在是${gameData.pet.level}级！`);
         speakPetMessage(`太棒了！我升到${gameData.pet.level}级了！`);
     }
+    
+    updateHomeMapPet(); // 更新首页宠物显示（进化后外观可能变化）
 }
 
 // 和宠物玩耍
@@ -1196,8 +1223,10 @@ function playWithPet() {
     }
     
     const petEmoji = document.getElementById('pet-emoji');
-    petEmoji.classList.add('happy');
-    setTimeout(() => petEmoji.classList.remove('happy'), 500);
+    if (petEmoji) {
+        petEmoji.classList.add('happy');
+        setTimeout(() => petEmoji.classList.remove('happy'), 500);
+    }
     
     const playMessages = [
         '好开心呀！',
@@ -1208,6 +1237,7 @@ function playWithPet() {
     ];
     speakPetMessage(playMessages[Math.floor(Math.random() * playMessages.length)]);
     updatePetDisplay();
+    updateHomeMapPet(); // 更新首页宠物心情
     saveData();
 }
 
@@ -1239,6 +1269,7 @@ function resetPet() {
         
         document.getElementById('pet-select-screen').style.display = 'block';
         document.getElementById('pet-main-screen').style.display = 'none';
+        updateHomeMapPet(); // 更新首页地图（隐藏宠物）
         saveData();
         showNotification('已重置宠物，请重新选择');
     }
@@ -1814,6 +1845,12 @@ function addSkillExp(amount) {
         gameData.skillLevel++;
         gameData.skillMaxExp = Math.floor((gameData.skillMaxExp || 100) * 1.2);
         showNotification(`技能树升级了！当前等级：Lv.${gameData.skillLevel}`);
+        
+        // 更新首页角色等级显示
+        const avatarLevel = document.querySelector('.avatar-level');
+        if (avatarLevel) {
+            avatarLevel.textContent = `Lv.${gameData.skillLevel}`;
+        }
     }
     
     renderSkillStatus();
@@ -2276,8 +2313,30 @@ function loadData() {
                 nodes: [],
                 connections: [],
                 nextId: 1
+            },
+            // 确保番茄钟数据完整性
+            pomodoro: {
+                ...gameData.pomodoro,
+                ...(loadedData.pomodoro || {}),
+                isRunning: false  // 重新加载时总是停止状态
+            },
+            // 确保提醒设置完整性
+            reminders: {
+                ...gameData.reminders,
+                ...(loadedData.reminders || {})
+            },
+            // 确保角色数据完整性
+            character: {
+                ...gameData.character,
+                ...(loadedData.character || {})
             }
         };
+        
+        // 修复番茄钟剩余时间
+        if (gameData.pomodoro.remainingTime <= 0) {
+            gameData.pomodoro.remainingTime = gameData.pomodoro.workTime * 60;
+            gameData.pomodoro.isBreak = false;
+        }
     }
 }
 
@@ -2942,7 +3001,22 @@ if (!document.getElementById('slideout-animation-style')) {
 
 // 初始化番茄钟
 function initPomodoro() {
+    // 确保番茄钟定时器被清除
+    if (pomodoroTimer) {
+        clearInterval(pomodoroTimer);
+        pomodoroTimer = null;
+    }
+    
+    // 确保显示正确
     updatePomodoroDisplay();
+    updatePomodoroButton();
+    
+    // 更新设置界面的输入框
+    const workTimeInput = document.getElementById('work-time');
+    const breakTimeInput = document.getElementById('break-time');
+    if (workTimeInput) workTimeInput.value = gameData.pomodoro.workTime;
+    if (breakTimeInput) breakTimeInput.value = gameData.pomodoro.breakTime;
+    
     // 请求通知权限
     if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission();
@@ -2962,6 +3036,7 @@ function togglePomodoro() {
 function startPomodoro() {
     gameData.pomodoro.isRunning = true;
     updatePomodoroButton();
+    saveData();
     
     pomodoroTimer = setInterval(() => {
         gameData.pomodoro.remainingTime--;
@@ -2981,6 +3056,7 @@ function pausePomodoro() {
     clearInterval(pomodoroTimer);
     pomodoroTimer = null;
     updatePomodoroButton();
+    saveData();
     showNotification('⏸️ 番茄钟已暂停');
 }
 
@@ -2993,6 +3069,7 @@ function resetPomodoro() {
     pomodoroTimer = null;
     updatePomodoroDisplay();
     updatePomodoroButton();
+    saveData();
 }
 
 // 番茄钟完成
@@ -3775,12 +3852,407 @@ function updateHeaderCurrency() {
 // 更新首页地图上的宠物显示
 function updateHomeMapPet() {
     const petDisplay = document.getElementById('map-pet-display');
-    if (petDisplay && gameData.pet.selected) {
-        const petSprite = petDisplay.querySelector('.pet-sprite');
-        if (petSprite) {
-            petSprite.textContent = getPetEmoji(gameData.pet.type, gameData.pet.level);
+    if (petDisplay) {
+        if (gameData.pet.selected) {
+            petDisplay.style.display = 'block';
+            const petSprite = document.getElementById('pet-sprite-emoji');
+            if (petSprite) {
+                petSprite.textContent = getPetEmoji(gameData.pet.type, gameData.pet.level);
+            }
+            // 更新宠物心情
+            const moodEl = document.getElementById('pet-mood');
+            if (moodEl) {
+                const hunger = gameData.pet.hunger || 100;
+                if (hunger > 70) moodEl.textContent = '💕';
+                else if (hunger > 40) moodEl.textContent = '😊';
+                else if (hunger > 20) moodEl.textContent = '😐';
+                else moodEl.textContent = '😢';
+            }
+        } else {
+            petDisplay.style.display = 'none';
         }
     }
+}
+
+// ==================== 像素角色系统 ====================
+
+// 角色外观配置
+const characterConfig = {
+    skins: [
+        { id: 'fair', color: '#FFDAB9', name: '白皙' },
+        { id: 'light', color: '#F5DEB3', name: '浅肤' },
+        { id: 'medium', color: '#DEB887', name: '小麦' },
+        { id: 'tan', color: '#D2691E', name: '棕褐' },
+        { id: 'dark', color: '#8B4513', name: '深棕' }
+    ],
+    hairs: [
+        { id: 'default', icon: '💇', color: '#4a3728', style: 'normal' },
+        { id: 'blonde', icon: '👱', color: '#FFD700', style: 'normal' },
+        { id: 'red', icon: '🧑‍🦰', color: '#B22222', style: 'normal' },
+        { id: 'blue', icon: '💙', color: '#4169E1', style: 'normal' },
+        { id: 'pink', icon: '💗', color: '#FF69B4', style: 'normal' },
+        { id: 'purple', icon: '💜', color: '#9932CC', style: 'normal' },
+        { id: 'green', icon: '💚', color: '#32CD32', style: 'normal' },
+        { id: 'white', icon: '🤍', color: '#F5F5F5', style: 'normal' }
+    ],
+    eyes: [
+        { id: 'default', icon: '👀', color: '#333' },
+        { id: 'blue', icon: '🔵', color: '#4169E1' },
+        { id: 'green', icon: '🟢', color: '#228B22' },
+        { id: 'brown', icon: '🟤', color: '#8B4513' },
+        { id: 'purple', icon: '🟣', color: '#9932CC' }
+    ],
+    outfits: [
+        { id: 'casual', icon: '👕', color: '#4FC3F7', name: '休闲装' },
+        { id: 'warrior', icon: '⚔️', color: '#CD853F', name: '战士装' },
+        { id: 'mage', icon: '🧙', color: '#9370DB', name: '法师袍' },
+        { id: 'ninja', icon: '🥷', color: '#2F4F4F', name: '忍者服' },
+        { id: 'royal', icon: '👑', color: '#FFD700', name: '皇家装' },
+        { id: 'sporty', icon: '🏃', color: '#FF6347', name: '运动装' },
+        { id: 'sailor', icon: '⚓', color: '#000080', name: '水手服' },
+        { id: 'forest', icon: '🌲', color: '#228B22', name: '森林装' }
+    ],
+    accessories: [
+        { id: 'none', icon: '❌', emoji: '' },
+        { id: 'crown', icon: '👑', emoji: '👑' },
+        { id: 'bow', icon: '🎀', emoji: '🎀' },
+        { id: 'hat', icon: '🎩', emoji: '🎩' },
+        { id: 'cap', icon: '🧢', emoji: '🧢' },
+        { id: 'flower', icon: '🌸', emoji: '🌸' },
+        { id: 'star', icon: '⭐', emoji: '⭐' },
+        { id: 'heart', icon: '❤️', emoji: '❤️' },
+        { id: 'glasses', icon: '👓', emoji: '👓' },
+        { id: 'wizard', icon: '🧙‍♂️', emoji: '🎭' }
+    ]
+};
+
+// 临时预览数据
+let previewCharacter = {};
+
+// 初始化角色显示
+function initCharacter() {
+    // 确保角色数据存在
+    if (!gameData.character) {
+        gameData.character = {
+            name: '冒险者',
+            skinColor: '#FFDAB9',
+            hairStyle: 'default',
+            hairColor: '#4a3728',
+            eyeStyle: 'default',
+            outfitStyle: 'casual',
+            outfitColor: '#4FC3F7',
+            accessory: ''
+        };
+    }
+    updateCharacterDisplay();
+    updateCharacterNameTag();
+    
+    // 更新首页角色属性面板中的名称
+    const avatarName = document.querySelector('.avatar-name');
+    if (avatarName && gameData.character) {
+        avatarName.textContent = gameData.character.name;
+    }
+    
+    // 更新首页角色等级（使用技能等级）
+    const avatarLevel = document.querySelector('.avatar-level');
+    if (avatarLevel) {
+        avatarLevel.textContent = `Lv.${gameData.skillLevel || 1}`;
+    }
+}
+
+// 更新角色显示
+function updateCharacterDisplay() {
+    const char = gameData.character;
+    
+    // 更新主角色
+    const head = document.getElementById('char-head');
+    const hair = document.getElementById('char-hair');
+    const body = document.getElementById('char-body');
+    const accessory = document.getElementById('char-accessory');
+    
+    if (head) head.style.background = char.skinColor;
+    if (hair) hair.style.background = char.hairColor;
+    if (body) body.style.background = `linear-gradient(180deg, ${char.outfitColor} 0%, ${adjustColor(char.outfitColor, -20)} 100%)`;
+    if (accessory) accessory.textContent = char.accessory;
+}
+
+// 更新角色名字标签
+function updateCharacterNameTag() {
+    const nameTag = document.getElementById('character-name-tag');
+    if (nameTag && gameData.character) {
+        nameTag.textContent = gameData.character.name || '冒险者';
+    }
+}
+
+// 显示换装弹窗
+function showDressUpModal() {
+    // 复制当前角色数据到预览
+    previewCharacter = { ...gameData.character };
+    
+    // 初始化选项
+    initDressUpOptions();
+    updatePreviewCharacter();
+    
+    // 设置名称输入框
+    const nameInput = document.getElementById('character-name-input');
+    if (nameInput) {
+        nameInput.value = gameData.character.name || '冒险者';
+    }
+    
+    document.getElementById('dress-up-modal').style.display = 'flex';
+}
+
+// 初始化换装选项
+function initDressUpOptions() {
+    // 肤色选项
+    const skinContainer = document.getElementById('skin-options');
+    if (skinContainer) {
+        skinContainer.innerHTML = characterConfig.skins.map(skin => `
+            <div class="dress-item ${previewCharacter.skinColor === skin.color ? 'selected' : ''}" 
+                 onclick="selectSkin('${skin.color}')" title="${skin.name}">
+                <div class="color-swatch" style="background: ${skin.color}"></div>
+            </div>
+        `).join('');
+    }
+    
+    // 发型选项
+    const hairContainer = document.getElementById('hair-options');
+    if (hairContainer) {
+        hairContainer.innerHTML = characterConfig.hairs.map(hair => `
+            <div class="dress-item ${previewCharacter.hairColor === hair.color ? 'selected' : ''}" 
+                 onclick="selectHair('${hair.color}')" title="${hair.icon}">
+                <div class="color-swatch" style="background: ${hair.color}"></div>
+            </div>
+        `).join('');
+    }
+    
+    // 眼睛选项
+    const eyesContainer = document.getElementById('eyes-options');
+    if (eyesContainer) {
+        eyesContainer.innerHTML = characterConfig.eyes.map(eye => `
+            <div class="dress-item ${previewCharacter.eyeColor === eye.color ? 'selected' : ''}" 
+                 onclick="selectEyes('${eye.color}')" title="${eye.icon}">
+                <span class="item-icon">${eye.icon}</span>
+            </div>
+        `).join('');
+    }
+    
+    // 服装选项
+    const outfitContainer = document.getElementById('outfit-options');
+    if (outfitContainer) {
+        outfitContainer.innerHTML = characterConfig.outfits.map(outfit => `
+            <div class="dress-item ${previewCharacter.outfitColor === outfit.color ? 'selected' : ''}" 
+                 onclick="selectOutfit('${outfit.color}')" title="${outfit.name}">
+                <span class="item-icon">${outfit.icon}</span>
+            </div>
+        `).join('');
+    }
+    
+    // 配饰选项
+    const accessoryContainer = document.getElementById('accessory-options');
+    if (accessoryContainer) {
+        accessoryContainer.innerHTML = characterConfig.accessories.map(acc => `
+            <div class="dress-item ${previewCharacter.accessory === acc.emoji ? 'selected' : ''}" 
+                 onclick="selectAccessory('${acc.emoji}')" title="${acc.icon}">
+                <span class="item-icon">${acc.icon}</span>
+            </div>
+        `).join('');
+    }
+}
+
+// 选择肤色
+function selectSkin(color) {
+    previewCharacter.skinColor = color;
+    updatePreviewCharacter();
+    initDressUpOptions();
+}
+
+// 选择发型
+function selectHair(color) {
+    previewCharacter.hairColor = color;
+    updatePreviewCharacter();
+    initDressUpOptions();
+}
+
+// 选择眼睛
+function selectEyes(color) {
+    previewCharacter.eyeColor = color;
+    updatePreviewCharacter();
+    initDressUpOptions();
+}
+
+// 选择服装
+function selectOutfit(color) {
+    previewCharacter.outfitColor = color;
+    updatePreviewCharacter();
+    initDressUpOptions();
+}
+
+// 选择配饰
+function selectAccessory(emoji) {
+    previewCharacter.accessory = emoji;
+    updatePreviewCharacter();
+    initDressUpOptions();
+}
+
+// 更新预览角色
+function updatePreviewCharacter() {
+    const head = document.getElementById('preview-head');
+    const hair = document.getElementById('preview-hair');
+    const body = document.getElementById('preview-body');
+    const accessory = document.getElementById('preview-accessory');
+    
+    if (head) head.style.background = previewCharacter.skinColor;
+    if (hair) hair.style.background = previewCharacter.hairColor;
+    if (body) body.style.background = `linear-gradient(180deg, ${previewCharacter.outfitColor} 0%, ${adjustColor(previewCharacter.outfitColor, -20)} 100%)`;
+    if (accessory) accessory.textContent = previewCharacter.accessory || '';
+}
+
+// 随机角色
+function randomizeCharacter() {
+    const randomFrom = arr => arr[Math.floor(Math.random() * arr.length)];
+    
+    previewCharacter.skinColor = randomFrom(characterConfig.skins).color;
+    previewCharacter.hairColor = randomFrom(characterConfig.hairs).color;
+    previewCharacter.eyeColor = randomFrom(characterConfig.eyes).color;
+    previewCharacter.outfitColor = randomFrom(characterConfig.outfits).color;
+    previewCharacter.accessory = randomFrom(characterConfig.accessories).emoji;
+    
+    updatePreviewCharacter();
+    initDressUpOptions();
+}
+
+// 保存换装
+function saveDressUp() {
+    const nameInput = document.getElementById('character-name-input');
+    if (nameInput && nameInput.value.trim()) {
+        previewCharacter.name = nameInput.value.trim();
+    }
+    
+    gameData.character = { ...previewCharacter };
+    updateCharacterDisplay();
+    updateCharacterNameTag();
+    
+    // 更新首页角色属性显示的名称
+    const avatarName = document.querySelector('.avatar-name');
+    if (avatarName) {
+        avatarName.textContent = gameData.character.name;
+    }
+    
+    saveData();
+    closeModal('dress-up-modal');
+    showNotification('💾 角色外观已保存！');
+}
+
+// 颜色调整辅助函数
+function adjustColor(hex, amount) {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const r = Math.min(255, Math.max(0, (num >> 16) + amount));
+    const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount));
+    const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount));
+    return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
+}
+
+// 角色互动 - 打招呼
+function characterWave() {
+    const charEl = document.getElementById('pixel-character');
+    if (charEl) {
+        charEl.classList.remove('waving', 'dancing');
+        void charEl.offsetWidth; // 触发重排
+        charEl.classList.add('waving');
+        
+        showInteractionBubble('👋 你好呀！');
+        
+        setTimeout(() => {
+            charEl.classList.remove('waving');
+        }, 1500);
+    }
+}
+
+// 角色互动 - 跳舞
+function characterDance() {
+    const charEl = document.getElementById('pixel-character');
+    if (charEl) {
+        charEl.classList.remove('waving', 'dancing');
+        void charEl.offsetWidth;
+        charEl.classList.add('dancing');
+        
+        const danceMessages = ['💃 跳舞真开心！', '🎵 音乐响起来~', '✨ 转圈圈~', '🌟 耶！'];
+        showInteractionBubble(danceMessages[Math.floor(Math.random() * danceMessages.length)]);
+        
+        setTimeout(() => {
+            charEl.classList.remove('dancing');
+        }, 1800);
+    }
+}
+
+// 和宠物互动
+function interactWithPet() {
+    if (!gameData.pet.selected) {
+        showInteractionBubble('🐾 还没有宠物呢~');
+        return;
+    }
+    
+    const petMessages = [
+        `💕 ${gameData.pet.name}真可爱！`,
+        `🎾 和${gameData.pet.name}玩耍~`,
+        `✨ ${gameData.pet.name}好开心！`,
+        `🌟 摸摸${gameData.pet.name}的头~`
+    ];
+    
+    showInteractionBubble(petMessages[Math.floor(Math.random() * petMessages.length)]);
+    
+    // 宠物反应
+    const petEl = document.getElementById('map-pet-display');
+    if (petEl) {
+        petEl.style.animation = 'none';
+        void petEl.offsetWidth;
+        petEl.style.animation = 'pet-happy 0.5s ease-in-out 3';
+        
+        setTimeout(() => {
+            petEl.style.animation = 'pet-follow 1.2s ease-in-out infinite';
+        }, 1500);
+    }
+    
+    // 增加少量经验
+    if (gameData.pet.exp !== undefined) {
+        gameData.pet.exp += 1;
+        checkPetLevelUp();
+        saveData();
+    }
+}
+
+// 显示互动气泡
+function showInteractionBubble(text) {
+    const bubble = document.getElementById('interaction-bubble');
+    const bubbleText = document.getElementById('bubble-text');
+    
+    if (bubble && bubbleText) {
+        bubbleText.textContent = text;
+        bubble.style.display = 'block';
+        
+        // 重置动画
+        bubble.style.animation = 'none';
+        void bubble.offsetWidth;
+        bubble.style.animation = 'bubble-appear 0.3s ease-out';
+        
+        // 3秒后隐藏
+        setTimeout(() => {
+            bubble.style.display = 'none';
+        }, 3000);
+    }
+}
+
+// 点击角色显示菜单（可选）
+function showCharacterMenu() {
+    const messages = [
+        '✨ 今天也要加油哦！',
+        '🌟 想换个造型吗？',
+        '💪 冒险等着我们！',
+        '🎮 来挑战一下吧！',
+        '📚 一起学习新技能~'
+    ];
+    showInteractionBubble(messages[Math.floor(Math.random() * messages.length)]);
 }
 
 // 在初始化时调用
@@ -3790,6 +4262,22 @@ document.addEventListener('DOMContentLoaded', function() {
         initReminders();
         updateReminderUI();
         updatePetCollectionUI();
+        initCharacter();
         updateHomeMapPet();
     }, 1000);
 });
+
+// 添加宠物开心动画
+if (!document.getElementById('pet-happy-style')) {
+    const petHappyStyle = document.createElement('style');
+    petHappyStyle.id = 'pet-happy-style';
+    petHappyStyle.textContent = `
+        @keyframes pet-happy {
+            0%, 100% { transform: translateY(0) scale(1); }
+            25% { transform: translateY(-10px) scale(1.1); }
+            50% { transform: translateY(0) scale(1); }
+            75% { transform: translateY(-10px) scale(1.1); }
+        }
+    `;
+    document.head.appendChild(petHappyStyle);
+}
