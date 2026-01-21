@@ -720,119 +720,276 @@ body {
     animation: none;
 }
 
-/* 角色部件 */
+/* 角色部件 - 可爱小女孩风格 */
 .char-head {
     position: absolute;
-    width: 24px;
-    height: 24px;
-    background: #FFDAB9;
-    border-radius: 6px;
-    top: 8px;
+    width: 26px;
+    height: 26px;
+    background: #FFE4D0;
+    border-radius: 50%;
+    top: 6px;
     left: 50%;
     transform: translateX(-50%);
-    box-shadow: inset -2px -2px 0 rgba(0,0,0,0.1);
+    box-shadow: inset -2px -2px 0 rgba(0,0,0,0.08);
+}
+
+/* 腮红 */
+.char-head::before,
+.char-head::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 4px;
+    background: #FFB6C1;
+    border-radius: 50%;
+    top: 14px;
+    opacity: 0.7;
+}
+
+.char-head::before {
+    left: 2px;
+}
+
+.char-head::after {
+    right: 2px;
 }
 
 .preview-char .char-head {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    top: 16px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    top: 12px;
 }
 
+.preview-char .char-head::before,
+.preview-char .char-head::after {
+    width: 12px;
+    height: 8px;
+    top: 28px;
+}
+
+.preview-char .char-head::before {
+    left: 4px;
+}
+
+.preview-char .char-head::after {
+    right: 4px;
+}
+
+/* 双马尾发型优化 */
 .char-hair {
     position: absolute;
-    width: 28px;
-    height: 14px;
-    background: #4a3728;
-    border-radius: 8px 8px 0 0;
-    top: 4px;
+    width: 32px;
+    height: 18px;
+    background: #5D3A1A;
+    border-radius: 16px 16px 4px 4px;
+    top: 2px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1;
+    /* 简单的刘海效果 */
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1); 
+}
+
+/* 左边马尾 */
+.char-hair::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 20px;
+    background: inherit;
+    border-radius: 50% 50% 20% 50%;
+    top: 8px;
+    left: -8px;
+    transform: rotate(15deg);
+    transform-origin: top right;
+}
+
+/* 右边马尾 */
+.char-hair::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 20px;
+    background: inherit;
+    border-radius: 50% 50% 50% 20%;
+    top: 8px;
+    right: -8px;
+    transform: rotate(-15deg);
+    transform-origin: top left;
 }
 
 .preview-char .char-hair {
-    width: 56px;
-    height: 28px;
-    border-radius: 16px 16px 0 0;
-    top: 8px;
+    width: 64px;
+    height: 36px;
+    border-radius: 32px 32px 8px 8px;
+    top: 4px;
 }
 
+.preview-char .char-hair::before {
+    width: 20px;
+    height: 40px;
+    top: 16px;
+    left: -16px;
+}
+
+.preview-char .char-hair::after {
+    width: 20px;
+    height: 40px;
+    top: 16px;
+    right: -16px;
+}
+
+/* 可爱大眼睛 */
 .char-eyes {
     position: absolute;
-    top: 16px;
+    top: 14px;
     left: 50%;
     transform: translateX(-50%);
-    width: 16px;
-    height: 6px;
+    width: 18px;
+    height: 8px;
     display: flex;
     justify-content: space-between;
+    z-index: 2; /* 防止被头发遮挡 */
 }
 
 .char-eyes::before,
 .char-eyes::after {
     content: '';
-    width: 5px;
-    height: 5px;
-    background: #333;
+    width: 7px;
+    height: 7px;
+    background: radial-gradient(circle at 30% 30%, #fff 15%, #2D1B0E 35%, #2D1B0E 100%);
     border-radius: 50%;
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,0.3);
 }
 
 .preview-char .char-eyes {
-    top: 32px;
-    width: 32px;
-    height: 12px;
+    top: 28px;
+    width: 36px;
+    height: 16px;
 }
 
 .preview-char .char-eyes::before,
 .preview-char .char-eyes::after {
-    width: 10px;
-    height: 10px;
+    width: 14px;
+    height: 14px;
 }
 
+/* 可爱微笑嘴巴 */
 .char-mouth {
     position: absolute;
-    top: 24px;
+    top: 22px;
     left: 50%;
     transform: translateX(-50%);
     width: 6px;
     height: 3px;
-    background: #e57373;
-    border-radius: 0 0 3px 3px;
+    background: transparent;
+    border: 2px solid #FF9999;
+    border-top: none;
+    border-radius: 0 0 50% 50%;
+    z-index: 2;
 }
 
 .preview-char .char-mouth {
-    top: 48px;
+    top: 44px;
     width: 12px;
     height: 6px;
-    border-radius: 0 0 6px 6px;
+    border-width: 3px;
+    border-radius: 0 0 50% 50%;
 }
 
+/* 可爱裙子 */
 .char-body {
     position: absolute;
-    width: 20px;
-    height: 20px;
-    background: linear-gradient(180deg, #4FC3F7 0%, #29B6F6 100%);
-    border-radius: 4px;
-    top: 32px;
+    width: 22px;
+    height: 18px;
+    background: linear-gradient(180deg, #FFB6C1 0%, #FF69B4 100%);
+    border-radius: 4px 4px 0 0;
+    top: 30px;
     left: 50%;
     transform: translateX(-50%);
-    box-shadow: inset -2px -2px 0 rgba(0,0,0,0.15);
+    box-shadow: inset -2px -2px 0 rgba(0,0,0,0.1);
+}
+
+/* 裙摆 */
+.char-body::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: -3px;
+    width: 28px;
+    height: 8px;
+    background: linear-gradient(180deg, #FF69B4 0%, #FF1493 100%);
+    border-radius: 0 0 50% 50%;
+    clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
 }
 
 .preview-char .char-body {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
+    width: 44px;
+    height: 36px;
+    border-radius: 8px 8px 0 0;
+    top: 60px;
+}
+
+.preview-char .char-body::after {
+    bottom: -12px;
+    left: -6px;
+    width: 56px;
+    height: 16px;
+}
+
+/* 可爱手臂 */
+.char-arms {
+    position: absolute;
+    width: 34px;
+    height: 12px;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.char-arms::before,
+.char-arms::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 14px;
+    background: var(--outfit-color, #FFB6C1);
+    border-radius: 4px;
+    top: 0;
+}
+
+.char-arms::before {
+    left: 0;
+    transform: rotate(20deg);
+}
+
+.char-arms::after {
+    right: 0;
+    transform: rotate(-20deg);
+}
+
+.preview-char .char-arms {
+    width: 68px;
+    height: 24px;
     top: 64px;
 }
 
+.preview-char .char-arms::before,
+.preview-char .char-arms::after {
+    width: 16px;
+    height: 28px;
+    border-radius: 8px;
+}
+
+/* 可爱小腿和鞋子 */
 .char-legs {
     position: absolute;
-    width: 18px;
-    height: 14px;
-    top: 50px;
+    width: 16px;
+    height: 16px;
+    top: 52px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -842,37 +999,43 @@ body {
 .char-legs::before,
 .char-legs::after {
     content: '';
-    width: 7px;
-    height: 14px;
-    background: linear-gradient(180deg, #5D4037 0%, #4E342E 100%);
+    width: 6px;
+    height: 16px;
+    background: linear-gradient(180deg, #FFE4D0 0%, #FFE4D0 60%, #FF69B4 60%, #FF1493 100%);
     border-radius: 0 0 3px 3px;
 }
 
 .preview-char .char-legs {
-    width: 36px;
-    height: 28px;
-    top: 100px;
+    width: 32px;
+    height: 32px;
+    top: 104px;
 }
 
 .preview-char .char-legs::before,
 .preview-char .char-legs::after {
-    width: 14px;
-    height: 28px;
+    width: 12px;
+    height: 32px;
     border-radius: 0 0 6px 6px;
 }
 
+/* 头顶配饰（默认蝴蝶结） */
 .char-accessory {
     position: absolute;
-    top: -2px;
+    top: -4px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 14px;
+    font-size: 16px;
     z-index: 5;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}
+
+.char-accessory:empty::before {
+    content: '🎀';
 }
 
 .preview-char .char-accessory {
-    top: -4px;
-    font-size: 28px;
+    top: -8px;
+    font-size: 32px;
 }
 
 /* 角色阴影 */
@@ -3647,4 +3810,87 @@ input[type="checkbox"] {
 
 .skill-effect-row input {
     width: 80px;
+}
+
+/* ==================== 服装样式差异化 ==================== */
+
+/* 战士装：肩甲和直筒裙甲 */
+.outfit-warrior {
+    border-radius: 2px 2px 0 0 !important;
+}
+.outfit-warrior::after {
+    clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 10% 100%) !important;
+    border-radius: 2px !important;
+    bottom: -5px !important;
+}
+
+/* 法师袍：长款宽松 */
+.outfit-mage {
+    border-radius: 6px 6px 0 0 !important;
+}
+.outfit-mage::after {
+    height: 12px !important;
+    bottom: -10px !important;
+    width: 32px !important;
+    left: -5px !important;
+    clip-path: none !important;
+    border-radius: 0 0 10px 10px !important;
+}
+.preview-char .outfit-mage::after {
+    height: 24px !important;
+    bottom: -20px !important;
+    width: 64px !important;
+    left: -10px !important;
+}
+
+/* 忍者服：紧身 */
+.outfit-ninja {
+    width: 20px !important;
+}
+.outfit-ninja::after {
+    width: 20px !important;
+    left: 0 !important;
+    clip-path: none !important;
+    border-radius: 0 !important;
+    height: 10px !important;
+    bottom: -8px !important;
+    background: inherit !important; /* 裤子效果 */
+}
+.preview-char .outfit-ninja {
+    width: 40px !important;
+}
+.preview-char .outfit-ninja::after {
+    width: 40px !important;
+    height: 20px !important;
+    bottom: -16px !important;
+}
+
+/* 皇家装：蓬松 */
+.outfit-royal::after {
+    width: 34px !important;
+    left: -6px !important;
+    border-radius: 0 0 50% 50% !important;
+    clip-path: ellipse(50% 100% at 50% 0%) !important; 
+}
+.preview-char .outfit-royal::after {
+    width: 68px !important;
+    left: -12px !important;
+}
+
+/* 水手服：百褶裙效果 (用条纹渐变模拟) */
+.outfit-sailor::after {
+    background: repeating-linear-gradient(
+      90deg,
+      inherit 0%,
+      inherit 10%,
+      rgba(0,0,0,0.2) 10%,
+      rgba(0,0,0,0.2) 20%
+    ) !important;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%) !important;
+}
+
+/* 森林装：叶子边缘 */
+.outfit-forest::after {
+    clip-path: polygon(0% 0%, 100% 0%, 90% 80%, 80% 100%, 70% 80%, 60% 100%, 50% 80%, 40% 100%, 30% 80%, 20% 100%, 10% 80%) !important;
+    border-radius: 0 !important;
 }

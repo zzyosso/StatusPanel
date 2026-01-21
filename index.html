@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>奇幻世界探索</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <!-- 伪装模式开关提示 (仅桌面端) -->
     <div class="boss-key-hint" id="boss-key-hint">按 Ctrl+B 切换伪装模式</div>
-    
+
     <!-- VSCode 风格伪装界面 -->
     <div id="disguise-mode" class="vscode-container" style="display: none;">
         <!-- 顶部菜单栏 -->
         <div class="vscode-menubar">
             <div class="vscode-logo">
                 <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M95 25L70 5L30 40L10 25L5 30L30 55L5 80L10 85L30 70L70 105L95 85V25Z" fill="#007ACC"/>
+                    <path d="M95 25L70 5L30 40L10 25L5 30L30 55L5 80L10 85L30 70L70 105L95 85V25Z" fill="#007ACC" />
                 </svg>
             </div>
             <div class="vscode-menu">
@@ -36,7 +38,7 @@
                 <span>✕</span>
             </div>
         </div>
-        
+
         <!-- 主内容区 -->
         <div class="vscode-main">
             <!-- 侧边栏 -->
@@ -67,7 +69,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- 编辑器区域 -->
             <div class="vscode-editor">
                 <div class="vscode-tabs">
@@ -77,7 +79,7 @@
                         <span class="tab-close">×</span>
                     </div>
                 </div>
-                
+
                 <div class="code-editor-split">
                     <div class="code-reference-panel">
                         <div class="panel-label">📚 参考代码</div>
@@ -102,7 +104,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="vscode-statusbar">
             <div class="statusbar-left">
                 <span class="status-item">🌿 main</span>
@@ -116,7 +118,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 游戏主界面 -->
     <div class="game-wrapper">
         <!-- 左侧书签导航 -->
@@ -198,10 +200,10 @@
                         <div class="home-panel-content">
                             <div class="mini-avatar">
                                 <div class="avatar-frame">
-                                    <span class="avatar-emoji">🧙</span>
+                                    <span class="avatar-emoji">👧</span>
                                 </div>
                                 <div class="avatar-info">
-                                    <span class="avatar-name">冒险者</span>
+                                    <span class="avatar-name">小可爱</span>
                                     <span class="avatar-level">Lv.1</span>
                                 </div>
                             </div>
@@ -245,7 +247,8 @@
                                     <div class="map-element mountain">⛰️</div>
                                 </div>
                                 <!-- 像素角色 -->
-                                <div class="pixel-character-container" id="pixel-character-container" onclick="showCharacterMenu()">
+                                <div class="pixel-character-container" id="pixel-character-container"
+                                    onclick="showCharacterMenu()">
                                     <div class="pixel-character" id="pixel-character">
                                         <div class="char-accessory" id="char-accessory"></div>
                                         <div class="char-hair" id="char-hair"></div>
@@ -253,10 +256,11 @@
                                         <div class="char-eyes" id="char-eyes"></div>
                                         <div class="char-mouth" id="char-mouth"></div>
                                         <div class="char-body" id="char-body"></div>
+                                        <div class="char-arms" id="char-arms"></div>
                                         <div class="char-legs" id="char-legs"></div>
                                     </div>
                                     <div class="character-shadow"></div>
-                                    <div class="character-name-tag" id="character-name-tag">冒险者</div>
+                                    <div class="character-name-tag" id="character-name-tag">小可爱</div>
                                 </div>
                                 <!-- 宠物跟随 -->
                                 <div class="map-pet" id="map-pet-display">
@@ -276,16 +280,20 @@
                             </div>
                             <!-- 角色操作栏 -->
                             <div class="character-actions">
-                                <button class="char-action-btn" onclick="event.stopPropagation();showDressUpModal()" title="换装">
+                                <button class="char-action-btn" onclick="event.stopPropagation();showDressUpModal()"
+                                    title="换装">
                                     <span>👔</span>
                                 </button>
-                                <button class="char-action-btn" onclick="event.stopPropagation();characterWave()" title="打招呼">
+                                <button class="char-action-btn" onclick="event.stopPropagation();characterWave()"
+                                    title="打招呼">
                                     <span>👋</span>
                                 </button>
-                                <button class="char-action-btn" onclick="event.stopPropagation();characterDance()" title="跳舞">
+                                <button class="char-action-btn" onclick="event.stopPropagation();characterDance()"
+                                    title="跳舞">
                                     <span>💃</span>
                                 </button>
-                                <button class="char-action-btn" onclick="event.stopPropagation();interactWithPet()" title="和宠物互动">
+                                <button class="char-action-btn" onclick="event.stopPropagation();interactWithPet()"
+                                    title="和宠物互动">
                                     <span>🐾</span>
                                 </button>
                             </div>
@@ -306,7 +314,8 @@
                                     <span class="challenge-name">算术挑战</span>
                                     <span class="challenge-reward">+10 经验</span>
                                 </div>
-                                <div class="challenge-card" onclick="switchToTab('challenge');setTimeout(()=>document.querySelector('[data-challenge=literacy]').click(),100)">
+                                <div class="challenge-card"
+                                    onclick="switchToTab('challenge');setTimeout(()=>document.querySelector('[data-challenge=literacy]').click(),100)">
                                     <span class="challenge-icon">📖</span>
                                     <span class="challenge-name">识字训练</span>
                                     <span class="challenge-reward">+5 经验</span>
@@ -380,7 +389,7 @@
                     <h2>🐾 我的宠物</h2>
                     <div class="pet-food-display">🍖 × <span id="pet-food-amount">0</span></div>
                 </div>
-                
+
                 <div id="pet-select-screen" class="pet-select-screen">
                     <h3>选择你的宠物伙伴</h3>
                     <div class="pet-options">
@@ -450,7 +459,8 @@
                         <button class="cyber-btn" onclick="feedPet()">🍖 喂食</button>
                         <button class="cyber-btn" onclick="playWithPet()">🎾 互动</button>
                         <button class="cyber-btn" onclick="renamePet()">✏️ 改名</button>
-                        <button class="cyber-btn" onclick="resetPet()" style="background: var(--neon-red);">🔄 更换宠物</button>
+                        <button class="cyber-btn" onclick="resetPet()" style="background: var(--neon-red);">🔄
+                            更换宠物</button>
                     </div>
 
                     <div class="pet-collection-section">
@@ -462,10 +472,14 @@
                     <div class="pet-evolution-info">
                         <h4>🌟 进化阶段</h4>
                         <div class="evolution-stages">
-                            <div class="evolution-stage"><span class="stage-level">Lv.1-5</span><span class="stage-name">基础形态</span></div>
-                            <div class="evolution-stage"><span class="stage-level">Lv.6-10</span><span class="stage-name">成长形态</span></div>
-                            <div class="evolution-stage"><span class="stage-level">Lv.11-20</span><span class="stage-name">成熟形态</span></div>
-                            <div class="evolution-stage"><span class="stage-level">Lv.21+</span><span class="stage-name">究极形态</span></div>
+                            <div class="evolution-stage"><span class="stage-level">Lv.1-5</span><span
+                                    class="stage-name">基础形态</span></div>
+                            <div class="evolution-stage"><span class="stage-level">Lv.6-10</span><span
+                                    class="stage-name">成长形态</span></div>
+                            <div class="evolution-stage"><span class="stage-level">Lv.11-20</span><span
+                                    class="stage-name">成熟形态</span></div>
+                            <div class="evolution-stage"><span class="stage-level">Lv.21+</span><span
+                                    class="stage-name">究极形态</span></div>
                         </div>
                     </div>
 
@@ -550,7 +564,7 @@
                     <h2>⚡ 技能树</h2>
                     <button class="cyber-btn" id="add-skill-btn" onclick="showAddSkillModal()">+ 添加技能</button>
                 </div>
-                
+
                 <div class="skill-status-bar">
                     <div class="skill-level-info">
                         <span class="skill-level-badge">Lv.<span id="skill-level">0</span></span>
@@ -558,7 +572,8 @@
                             <div class="skill-exp-bar">
                                 <div class="skill-exp-fill" id="skill-exp-fill" style="width: 0%"></div>
                             </div>
-                            <span class="skill-exp-text"><span id="skill-exp">0</span>/<span id="skill-max-exp">100</span></span>
+                            <span class="skill-exp-text"><span id="skill-exp">0</span>/<span
+                                    id="skill-max-exp">100</span></span>
                         </div>
                     </div>
                     <div class="skill-fragments-display">
@@ -584,7 +599,8 @@
                 <div id="math-challenge" class="challenge-content active">
                     <button class="cyber-btn generate-btn" onclick="generateMathQuestions()">生成题目</button>
                     <div id="math-questions" class="questions-container"></div>
-                    <button id="submit-math" class="cyber-btn submit-btn" style="display:none;" onclick="submitMathAnswers()">提交答案</button>
+                    <button id="submit-math" class="cyber-btn submit-btn" style="display:none;"
+                        onclick="submitMathAnswers()">提交答案</button>
                     <div id="math-result" class="result-display"></div>
                 </div>
 
@@ -609,7 +625,8 @@
                                 <span id="pomodoro-status" class="pomodoro-status work">专注中</span>
                             </div>
                             <div class="pomodoro-controls">
-                                <button id="pomodoro-toggle-btn" class="cyber-btn" onclick="togglePomodoro()">▶️ 开始</button>
+                                <button id="pomodoro-toggle-btn" class="cyber-btn" onclick="togglePomodoro()">▶️
+                                    开始</button>
                                 <button class="cyber-btn" onclick="resetPomodoro()">🔄 重置</button>
                             </div>
                             <div class="pomodoro-stats">
@@ -619,13 +636,13 @@
                         <div class="pomodoro-settings">
                             <div class="setting-row">
                                 <label>工作时间 (分钟)</label>
-                                <input type="number" id="work-time" value="25" min="1" max="60" 
-                                       onchange="gameData.pomodoro.workTime=parseInt(this.value)||25;saveData();resetPomodoro();">
+                                <input type="number" id="work-time" value="25" min="1" max="60"
+                                    onchange="gameData.pomodoro.workTime=parseInt(this.value)||25;saveData();resetPomodoro();">
                             </div>
                             <div class="setting-row">
                                 <label>休息时间 (分钟)</label>
                                 <input type="number" id="break-time" value="5" min="1" max="30"
-                                       onchange="gameData.pomodoro.breakTime=parseInt(this.value)||5;saveData();">
+                                    onchange="gameData.pomodoro.breakTime=parseInt(this.value)||5;saveData();">
                             </div>
                         </div>
                     </div>
@@ -635,12 +652,13 @@
                         <div class="reminder-list">
                             <div class="reminder-item">
                                 <label class="toggle-label">
-                                    <input type="checkbox" id="reminder-drinkWater" checked onchange="toggleReminder('drinkWater')">
+                                    <input type="checkbox" id="reminder-drinkWater" checked
+                                        onchange="toggleReminder('drinkWater')">
                                     <span class="toggle-slider"></span>
                                     💧 喝水提醒
                                 </label>
-                                <input type="number" class="interval-input" value="30" min="5" max="120" 
-                                       onchange="setReminderInterval('drinkWater', this.value)"> 分钟
+                                <input type="number" class="interval-input" value="30" min="5" max="120"
+                                    onchange="setReminderInterval('drinkWater', this.value)"> 分钟
                             </div>
                             <div class="reminder-item">
                                 <label class="toggle-label">
@@ -649,27 +667,30 @@
                                     👀 休息眼睛提醒
                                 </label>
                                 <input type="number" class="interval-input" value="45" min="5" max="120"
-                                       onchange="setReminderInterval('rest', this.value)"> 分钟
+                                    onchange="setReminderInterval('rest', this.value)"> 分钟
                             </div>
                             <div class="reminder-item">
                                 <label class="toggle-label">
-                                    <input type="checkbox" id="reminder-stretch" checked onchange="toggleReminder('stretch')">
+                                    <input type="checkbox" id="reminder-stretch" checked
+                                        onchange="toggleReminder('stretch')">
                                     <span class="toggle-slider"></span>
                                     🧘 伸展活动提醒
                                 </label>
                                 <input type="number" class="interval-input" value="60" min="5" max="180"
-                                       onchange="setReminderInterval('stretch', this.value)"> 分钟
+                                    onchange="setReminderInterval('stretch', this.value)"> 分钟
                             </div>
                             <div class="reminder-item">
                                 <label class="toggle-label">
-                                    <input type="checkbox" id="reminder-petHunger" checked onchange="toggleReminder('petHunger')">
+                                    <input type="checkbox" id="reminder-petHunger" checked
+                                        onchange="toggleReminder('petHunger')">
                                     <span class="toggle-slider"></span>
                                     🐾 宠物饥饿提醒
                                 </label>
                                 <span class="hint-text">(饥饿度低于30%时通知)</span>
                             </div>
                         </div>
-                        <button class="cyber-btn" onclick="Notification.requestPermission().then(p=>showNotification('通知权限: '+p))">
+                        <button class="cyber-btn"
+                            onclick="Notification.requestPermission().then(p=>showNotification('通知权限: '+p))">
                             🔔 启用桌面通知
                         </button>
                     </div>
@@ -837,7 +858,9 @@
             </div>
             <div class="form-group">
                 <label>效果属性（可选）</label>
-                <select id="item-effect-stat"><option value="">无效果</option></select>
+                <select id="item-effect-stat">
+                    <option value="">无效果</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>效果数值</label>
@@ -865,7 +888,9 @@
             </div>
             <div class="form-group">
                 <label>效果属性（可选）</label>
-                <select id="shop-item-effect-stat"><option value="">无效果</option></select>
+                <select id="shop-item-effect-stat">
+                    <option value="">无效果</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>效果数值</label>
@@ -911,7 +936,9 @@
             </div>
             <div class="form-group">
                 <label>父技能（可选）</label>
-                <select id="skill-parent"><option value="">无（根技能）</option></select>
+                <select id="skill-parent">
+                    <option value="">无（根技能）</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>技能图标</label>
@@ -921,12 +948,16 @@
                 <h4>使用效果</h4>
                 <div class="skill-effect-row">
                     <label>消耗属性</label>
-                    <select id="skill-cost-stat"><option value="">无消耗</option></select>
+                    <select id="skill-cost-stat">
+                        <option value="">无消耗</option>
+                    </select>
                     <input type="number" id="skill-cost-value" placeholder="消耗数值" value="0">
                 </div>
                 <div class="skill-effect-row">
                     <label>获得属性</label>
-                    <select id="skill-gain-stat"><option value="">无获得</option></select>
+                    <select id="skill-gain-stat">
+                        <option value="">无获得</option>
+                    </select>
                     <input type="number" id="skill-gain-value" placeholder="获得数值" value="0">
                 </div>
             </div>
@@ -961,4 +992,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

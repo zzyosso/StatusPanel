@@ -203,7 +203,7 @@ function initThemeSwitcher() {
     // 加载保存的主题
     const savedTheme = localStorage.getItem('selectedTheme') || 'cyber';
     applyTheme(savedTheme);
-    
+
     // 绑定主题按钮事件
     const themeBtns = document.querySelectorAll('.theme-btn');
     themeBtns.forEach(btn => {
@@ -218,7 +218,7 @@ function initThemeSwitcher() {
 // 应用主题
 function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    
+
     // 更新按钮状态
     const themeBtns = document.querySelectorAll('.theme-btn');
     themeBtns.forEach(btn => {
@@ -233,10 +233,10 @@ function initBookmarkTabs() {
         tab.addEventListener('click', () => {
             bookmarkTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
-            
+
             const panels = document.querySelectorAll('.panel');
             panels.forEach(p => p.classList.remove('active'));
-            
+
             const targetPanel = document.getElementById(tab.dataset.tab);
             if (targetPanel) targetPanel.classList.add('active');
         });
@@ -247,16 +247,16 @@ function initBookmarkTabs() {
 function switchToTab(tabName) {
     const bookmarkTabs = document.querySelectorAll('.bookmark-tab');
     bookmarkTabs.forEach(t => t.classList.remove('active'));
-    
+
     const targetTab = document.querySelector(`.bookmark-tab[data-tab="${tabName}"]`);
     if (targetTab) targetTab.classList.add('active');
-    
+
     const panels = document.querySelectorAll('.panel');
     panels.forEach(p => p.classList.remove('active'));
-    
+
     const targetPanel = document.getElementById(tabName);
     if (targetPanel) targetPanel.classList.add('active');
-    
+
     // 如果切换到地图页面，重新绑定事件并重绘连接线
     if (tabName === 'map') {
         setTimeout(() => {
@@ -272,10 +272,10 @@ function initTabs() {
         btn.addEventListener('click', () => {
             navBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
+
             const panels = document.querySelectorAll('.panel');
             panels.forEach(p => p.classList.remove('active'));
-            
+
             const targetPanel = document.getElementById(btn.dataset.tab);
             if (targetPanel) targetPanel.classList.add('active');
         });
@@ -289,10 +289,10 @@ function initChallengeTabs() {
         tab.addEventListener('click', () => {
             tabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
-            
+
             const contents = document.querySelectorAll('.challenge-content');
             contents.forEach(c => c.classList.remove('active'));
-            
+
             const target = document.getElementById(tab.dataset.challenge + '-challenge');
             if (target) target.classList.add('active');
         });
@@ -319,7 +319,7 @@ function renderStats() {
         container.innerHTML = '<div class="empty-message">暂无属性，点击上方按钮添加</div>';
         return;
     }
-    
+
     container.innerHTML = gameData.stats.map(stat => `
         <div class="stat-item ${stat.color}">
             <div class="stat-header">
@@ -342,7 +342,7 @@ function renderStats() {
             </div>
         </div>
     `).join('');
-    
+
     updateStatSelects();
     renderHomeStats(); // 同步更新首页属性
 }
@@ -354,7 +354,7 @@ function updateStatSelects() {
         const select = document.getElementById(selectId);
         if (select) {
             const currentValue = select.value;
-            select.innerHTML = '<option value="">无效果</option>' + 
+            select.innerHTML = '<option value="">无效果</option>' +
                 gameData.stats.map(stat => `<option value="${stat.id}">${stat.name}</option>`).join('');
             select.value = currentValue;
         }
@@ -387,7 +387,7 @@ function confirmEditStat() {
     const id = parseInt(document.getElementById('edit-stat-id').value);
     const current = parseInt(document.getElementById('edit-stat-current').value);
     const max = parseInt(document.getElementById('edit-stat-max').value);
-    
+
     const stat = gameData.stats.find(s => s.id === id);
     if (stat) {
         stat.max = max;
@@ -422,12 +422,12 @@ function confirmAddStat() {
     const current = parseInt(document.getElementById('stat-current').value);
     const max = parseInt(document.getElementById('stat-max').value);
     const color = document.getElementById('stat-color').value;
-    
+
     if (!name) {
         alert('请输入属性名称');
         return;
     }
-    
+
     const newId = gameData.stats.length > 0 ? Math.max(...gameData.stats.map(s => s.id)) + 1 : 1;
     gameData.stats.push({
         id: newId,
@@ -436,7 +436,7 @@ function confirmAddStat() {
         max,
         color
     });
-    
+
     saveData();
     renderStats();
     closeModal('stat-modal');
@@ -450,7 +450,7 @@ function renderBackpack() {
         renderHomeBackpack(); // 同步更新首页背包
         return;
     }
-    
+
     container.innerHTML = gameData.backpack.map(item => `
         <div class="item-card">
             <div class="item-name">${item.name}</div>
@@ -464,7 +464,7 @@ function renderBackpack() {
             </div>
         </div>
     `).join('');
-    
+
     renderHomeBackpack(); // 同步更新首页背包
 }
 
@@ -475,7 +475,7 @@ function renderStorage() {
         container.innerHTML = '<div class="empty-message">仓库空空如也</div>';
         return;
     }
-    
+
     container.innerHTML = gameData.storage.map(item => `
         <div class="item-card">
             <div class="item-name">${item.name}</div>
@@ -497,7 +497,7 @@ function renderShop() {
         container.innerHTML = '<div class="empty-message">商店暂无商品</div>';
         return;
     }
-    
+
     container.innerHTML = gameData.shop.map(item => `
         <div class="item-card shop-item-card">
             <div class="item-name">${item.name}</div>
@@ -538,15 +538,15 @@ function confirmAddItem() {
     const effectStat = document.getElementById('item-effect-stat').value;
     const effectValue = parseInt(document.getElementById('item-effect-value').value);
     const description = document.getElementById('item-description').value.trim();
-    
+
     if (!name) {
         alert('请输入物品名称');
         return;
     }
-    
+
     const targetArray = gameData[target];
     const newId = targetArray.length > 0 ? Math.max(...targetArray.map(i => i.id)) + 1 : 1;
-    
+
     targetArray.push({
         id: newId,
         name,
@@ -555,7 +555,7 @@ function confirmAddItem() {
         effectValue: effectValue || 0,
         description
     });
-    
+
     saveData();
     if (target === 'backpack') renderBackpack();
     else if (target === 'storage') renderStorage();
@@ -566,11 +566,11 @@ function confirmAddItem() {
 function useItem(source, itemId) {
     const sourceArray = gameData[source];
     const item = sourceArray.find(i => i.id === itemId);
-    
+
     if (item && item.quantity > 0) {
         const itemName = item.name;
         let effectText = '';
-        
+
         // 应用效果
         if (item.effectStat) {
             const stat = gameData.stats.find(s => s.id === parseInt(item.effectStat));
@@ -581,21 +581,21 @@ function useItem(source, itemId) {
                 effectText = ` (${stat.name} +${actualGain})`;
             }
         }
-        
+
         // 减少数量
         item.quantity--;
         if (item.quantity <= 0) {
             gameData[source] = sourceArray.filter(i => i.id !== itemId);
         }
-        
+
         saveData();
         renderStats();
         renderBackpack();
-        
+
         // 同步更新首页显示
         renderHomeStats();
         renderHomeBackpack();
-        
+
         // 显示使用提示
         showNotification(`使用了 ${itemName}${effectText}`);
     }
@@ -606,7 +606,7 @@ function transferItem(from, to, itemId) {
     const fromArray = gameData[from];
     const toArray = gameData[to];
     const item = fromArray.find(i => i.id === itemId);
-    
+
     if (item) {
         // 检查目标是否已有同名物品
         const existingItem = toArray.find(i => i.name === item.name);
@@ -616,10 +616,10 @@ function transferItem(from, to, itemId) {
             const newId = toArray.length > 0 ? Math.max(...toArray.map(i => i.id)) + 1 : 1;
             toArray.push({ ...item, id: newId });
         }
-        
+
         // 从原位置删除
         gameData[from] = fromArray.filter(i => i.id !== itemId);
-        
+
         saveData();
         renderBackpack();
         renderStorage();
@@ -654,14 +654,14 @@ function confirmAddShopItem() {
     const effectStat = document.getElementById('shop-item-effect-stat').value;
     const effectValue = parseInt(document.getElementById('shop-item-effect-value').value);
     const description = document.getElementById('shop-item-description').value.trim();
-    
+
     if (!name) {
         alert('请输入商品名称');
         return;
     }
-    
+
     const newId = gameData.shop.length > 0 ? Math.max(...gameData.shop.map(i => i.id)) + 1 : 1;
-    
+
     gameData.shop.push({
         id: newId,
         name,
@@ -670,7 +670,7 @@ function confirmAddShopItem() {
         effectValue: effectValue || 0,
         description
     });
-    
+
     saveData();
     renderShop();
     closeModal('shop-modal');
@@ -679,16 +679,16 @@ function confirmAddShopItem() {
 // 购买物品
 function buyItem(itemId) {
     const item = gameData.shop.find(i => i.id === itemId);
-    
+
     if (!item) return;
-    
+
     if (gameData.gold < item.price) {
         alert('金币不足！');
         return;
     }
-    
+
     gameData.gold -= item.price;
-    
+
     // 添加到背包
     const existingItem = gameData.backpack.find(i => i.name === item.name);
     if (existingItem) {
@@ -704,7 +704,7 @@ function buyItem(itemId) {
             description: item.description
         });
     }
-    
+
     saveData();
     updateGoldDisplay();
     renderBackpack();
@@ -745,14 +745,14 @@ function generateMathQuestions() {
     const container = document.getElementById('math-questions');
     const submitBtn = document.getElementById('submit-math');
     const resultDiv = document.getElementById('math-result');
-    
+
     currentMathAnswers = [];
     let questionsHtml = '';
-    
+
     for (let i = 1; i <= 10; i++) {
         const isAddition = Math.random() > 0.5;
         let num1, num2, answer;
-        
+
         if (isAddition) {
             num1 = Math.floor(Math.random() * 20) + 1;
             num2 = Math.floor(Math.random() * (20 - num1)) + 1;
@@ -762,9 +762,9 @@ function generateMathQuestions() {
             num2 = Math.floor(Math.random() * num1) + 1;
             answer = num1 - num2;
         }
-        
+
         currentMathAnswers.push(answer);
-        
+
         const operator = isAddition ? '+' : '-';
         questionsHtml += `
             <div class="question-item">
@@ -775,7 +775,7 @@ function generateMathQuestions() {
             </div>
         `;
     }
-    
+
     container.innerHTML = questionsHtml;
     submitBtn.style.display = 'block';
     resultDiv.innerHTML = '';
@@ -785,12 +785,12 @@ function generateMathQuestions() {
 // 提交算术答案
 function submitMathAnswers() {
     let correct = 0;
-    
+
     for (let i = 1; i <= 10; i++) {
         const input = document.getElementById(`math-answer-${i}`);
         const result = document.getElementById(`math-result-${i}`);
         const userAnswer = parseInt(input.value);
-        
+
         if (userAnswer === currentMathAnswers[i - 1]) {
             result.textContent = '✓';
             result.style.color = '#00ff41';
@@ -800,18 +800,18 @@ function submitMathAnswers() {
             result.style.color = '#ff0040';
         }
     }
-    
+
     const resultDiv = document.getElementById('math-result');
     const percentage = (correct / 10) * 100;
     resultDiv.innerHTML = `得分: ${correct}/10 (${percentage}%)`;
     resultDiv.className = 'result-display ' + (correct >= 6 ? 'success' : 'fail');
-    
+
     // 奖励食物：每5题对的奖励1个食物
     const foodReward = Math.floor(correct / 5);
     if (foodReward > 0) {
         rewardFood(foodReward);
     }
-    
+
     // 奖励技能经验和碎片
     if (correct >= 6) {
         addSkillExp(correct * 2); // 每题2点经验
@@ -823,32 +823,32 @@ function submitMathAnswers() {
 function generateLiteracyQuestion() {
     const container = document.getElementById('literacy-question');
     const resultDiv = document.getElementById('literacy-result');
-    
+
     // 随机选择2个不同的汉字
     const shuffled = [...chineseCharacters].sort(() => Math.random() - 0.5);
     currentLiteracyData = shuffled.slice(0, 2);
     literacyScore = 0;
     literacyAnswered = 0;
-    
+
     let html = '<div class="character-display">';
-    
+
     currentLiteracyData.forEach((charData, index) => {
         // 生成选项（包含正确答案和3个干扰项）
         const options = [charData.pinyin];
         const otherPinyins = chineseCharacters
             .filter(c => c.pinyin !== charData.pinyin)
             .map(c => c.pinyin);
-        
+
         while (options.length < 4) {
             const randomPinyin = otherPinyins[Math.floor(Math.random() * otherPinyins.length)];
             if (!options.includes(randomPinyin)) {
                 options.push(randomPinyin);
             }
         }
-        
+
         // 打乱选项顺序
         options.sort(() => Math.random() - 0.5);
-        
+
         html += `
             <div class="character-card">
                 <div class="character">${charData.char}</div>
@@ -860,7 +860,7 @@ function generateLiteracyQuestion() {
             </div>
         `;
     });
-    
+
     html += '</div>';
     container.innerHTML = html;
     resultDiv.innerHTML = '';
@@ -871,7 +871,7 @@ function generateLiteracyQuestion() {
 function checkPinyin(index, selected, correct) {
     const optionsContainer = document.getElementById(`pinyin-options-${index}`);
     const buttons = optionsContainer.querySelectorAll('.pinyin-btn');
-    
+
     buttons.forEach(btn => {
         btn.classList.add('disabled');
         if (btn.textContent === correct) {
@@ -880,18 +880,18 @@ function checkPinyin(index, selected, correct) {
             btn.classList.add('wrong');
         }
     });
-    
+
     if (selected === correct) {
         literacyScore++;
     }
     literacyAnswered++;
-    
+
     // 如果两道题都答完了，显示结果并奖励食物
     if (literacyAnswered === 2) {
         const resultDiv = document.getElementById('literacy-result');
         resultDiv.innerHTML = `得分: ${literacyScore}/2 (${(literacyScore / 2) * 100}%)`;
         resultDiv.className = 'result-display ' + (literacyScore === 2 ? 'success' : 'fail');
-        
+
         if (literacyScore === 2) {
             rewardFood(1);
             addSkillExp(20); // 全对奖励20经验
@@ -902,7 +902,11 @@ function checkPinyin(index, selected, correct) {
 
 // 模态框操作
 function openModal(modalId) {
-    document.getElementById(modalId).classList.add('active');
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+    }
 }
 
 function closeModal(modalId) {
@@ -938,7 +942,7 @@ function showNotification(message) {
     `;
     notification.textContent = message;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'fadeOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
@@ -1041,10 +1045,10 @@ function selectPet(type) {
     gameData.pet.type = type;
     gameData.pet.name = getPetDefaultName(type);
     gameData.pet.lastFeedTime = Date.now();
-    
+
     document.getElementById('pet-select-screen').style.display = 'none';
     document.getElementById('pet-main-screen').style.display = 'block';
-    
+
     updatePetDisplay();
     updateHomeMapPet(); // 更新首页地图上的宠物显示
     saveData();
@@ -1067,15 +1071,15 @@ function getPetDefaultName(type) {
 // 更新宠物显示
 function updatePetDisplay() {
     if (!gameData.pet.selected) return;
-    
+
     // 获取进化阶段的emoji
     const currentStage = getEvolutionStage(gameData.pet.level);
     const petEmojiChar = getPetEmoji(gameData.pet.type, gameData.pet.level);
-    
+
     // 更新宠物emoji和名字
     document.getElementById('pet-emoji').textContent = petEmojiChar;
     document.getElementById('pet-name-display').textContent = gameData.pet.name;
-    
+
     // 更新进化阶段显示
     const stageNames = ['基础形态', '成长形态', '成熟形态', '究极形态'];
     const stageEl = document.getElementById('pet-stage');
@@ -1083,28 +1087,28 @@ function updatePetDisplay() {
         stageEl.textContent = stageNames[currentStage];
         stageEl.className = 'pet-stage stage-' + currentStage;
     }
-    
+
     // 更新等级和经验
     document.getElementById('pet-level').textContent = gameData.pet.level;
     const expPercent = (gameData.pet.exp / gameData.pet.maxExp) * 100;
     document.getElementById('pet-exp-fill').style.width = expPercent + '%';
     document.getElementById('pet-exp-text').textContent = `${gameData.pet.exp}/${gameData.pet.maxExp}`;
-    
+
     // 更新饥饿度
     updateHunger();
     document.getElementById('pet-hunger-fill').style.width = gameData.pet.hunger + '%';
-    
+
     // 更新等级样式
     const petEmojiEl = document.getElementById('pet-emoji');
     petEmojiEl.className = 'pet-emoji level-' + gameData.pet.level + ' stage-' + currentStage;
-    
+
     // 根据饥饿度更新表情
     if (gameData.pet.hunger < 30) {
         petEmojiEl.classList.add('hungry');
     } else {
         petEmojiEl.classList.remove('hungry');
     }
-    
+
     // 更新食物显示
     updateFoodDisplay();
 }
@@ -1123,12 +1127,12 @@ function updateHunger() {
     const now = Date.now();
     const timePassed = now - gameData.pet.lastFeedTime;
     const hoursPassed = timePassed / (1000 * 60 * 60);
-    
+
     // 每小时减少5点饥饿度
     const hungerDecrease = Math.floor(hoursPassed * 5);
     gameData.pet.hunger = Math.max(0, 100 - hungerDecrease);
     gameData.pet.lastFeedTime = now;
-    
+
     // 如果太饿了，说话
     if (gameData.pet.hunger < 30 && Math.random() < 0.3) {
         speakPetMessage(hungryMessages[Math.floor(Math.random() * hungryMessages.length)]);
@@ -1142,24 +1146,24 @@ function feedPet() {
         speakPetMessage('完成题目就有食物啦！');
         return;
     }
-    
+
     gameData.food--;
     gameData.pet.hunger = Math.min(100, gameData.pet.hunger + 20);
     gameData.pet.exp += 10;
     gameData.pet.lastFeedTime = Date.now();
-    
+
     // 检查升级
     if (gameData.pet.exp >= gameData.pet.maxExp) {
         levelUpPet();
     }
-    
+
     // 动画效果
     const petEmoji = document.getElementById('pet-emoji');
     if (petEmoji) {
         petEmoji.classList.add('happy');
         setTimeout(() => petEmoji.classList.remove('happy'), 500);
     }
-    
+
     speakPetMessage(happyMessages[Math.floor(Math.random() * happyMessages.length)]);
     updatePetDisplay();
     updateFoodDisplay(); // 更新食物显示
@@ -1170,13 +1174,13 @@ function feedPet() {
 // 宠物升级
 function levelUpPet() {
     const oldStage = getEvolutionStage(gameData.pet.level);
-    
+
     gameData.pet.level++;
     gameData.pet.exp = 0;
     gameData.pet.maxExp = Math.floor(gameData.pet.maxExp * 1.5);
-    
+
     const newStage = getEvolutionStage(gameData.pet.level);
-    
+
     // 升级动画
     const petEmoji = document.getElementById('pet-emoji');
     if (petEmoji) {
@@ -1185,14 +1189,14 @@ function levelUpPet() {
             petEmoji.style.animation = '';
         }, 10);
     }
-    
+
     // 检查是否进化
     if (newStage > oldStage) {
         const stageNames = ['基础形态', '成长形态', '成熟形态', '究极形态'];
         const newEmoji = getPetEmoji(gameData.pet.type, gameData.pet.level);
         showNotification(`🌟 ${gameData.pet.name}进化了！变成了${stageNames[newStage]}！${newEmoji}`);
         speakPetMessage(`哇！我进化了！我变得更强了！`);
-        
+
         // 进化特效
         if (petEmoji) {
             petEmoji.classList.add('evolving');
@@ -1202,7 +1206,7 @@ function levelUpPet() {
         showNotification(`🎉 ${gameData.pet.name}升级了！现在是${gameData.pet.level}级！`);
         speakPetMessage(`太棒了！我升到${gameData.pet.level}级了！`);
     }
-    
+
     updateHomeMapPet(); // 更新首页宠物显示（进化后外观可能变化）
 }
 
@@ -1213,21 +1217,21 @@ function playWithPet() {
         showNotification('宠物太饿了，先喂食吧');
         return;
     }
-    
+
     gameData.pet.hunger = Math.max(0, gameData.pet.hunger - 5);
     gameData.pet.exp += 5;
-    
+
     // 检查升级
     if (gameData.pet.exp >= gameData.pet.maxExp) {
         levelUpPet();
     }
-    
+
     const petEmoji = document.getElementById('pet-emoji');
     if (petEmoji) {
         petEmoji.classList.add('happy');
         setTimeout(() => petEmoji.classList.remove('happy'), 500);
     }
-    
+
     const playMessages = [
         '好开心呀！',
         '和你玩真有趣！',
@@ -1266,7 +1270,7 @@ function resetPet() {
             hunger: 100,
             lastFeedTime: Date.now()
         };
-        
+
         document.getElementById('pet-select-screen').style.display = 'block';
         document.getElementById('pet-main-screen').style.display = 'none';
         updateHomeMapPet(); // 更新首页地图（隐藏宠物）
@@ -1289,16 +1293,16 @@ function speakPetMessage(message) {
 function rewardFood(amount) {
     gameData.food += amount;
     updateFoodDisplay();
-    
+
     // 显示食物获得动画
     const foodIcon = document.createElement('div');
     foodIcon.className = 'food-reward-animation';
     foodIcon.textContent = '🍖';
     document.body.appendChild(foodIcon);
     setTimeout(() => foodIcon.remove(), 1000);
-    
+
     showNotification(`获得${amount}个食物！`);
-    
+
     // 宠物鼓励
     if (gameData.pet.selected) {
         speakPetMessage(encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)]);
@@ -1309,12 +1313,12 @@ function rewardFood(amount) {
 function initPet() {
     // 更新食物显示
     updateFoodDisplay();
-    
+
     if (gameData.pet.selected) {
         document.getElementById('pet-select-screen').style.display = 'none';
         document.getElementById('pet-main-screen').style.display = 'block';
         updatePetDisplay();
-        
+
         // 随机说一句鼓励的话
         if (Math.random() < 0.5) {
             setTimeout(() => {
@@ -1326,13 +1330,13 @@ function initPet() {
         document.getElementById('pet-select-screen').style.display = 'block';
         document.getElementById('pet-main-screen').style.display = 'none';
     }
-    
+
     // 定时更新饥饿度
     setInterval(() => {
         if (gameData.pet.selected) {
             updateHunger();
             document.getElementById('pet-hunger-fill').style.width = gameData.pet.hunger + '%';
-            
+
             // 如果宠物太饿，显示hungry状态
             const petEmojiEl = document.getElementById('pet-emoji');
             if (gameData.pet.hunger < 30) {
@@ -1340,7 +1344,7 @@ function initPet() {
             } else {
                 petEmojiEl.classList.remove('hungry');
             }
-            
+
             saveData();
         }
     }, 60000); // 每分钟检查一次
@@ -1359,7 +1363,7 @@ let mapState = {
 function initMap() {
     const container = document.getElementById('mapContainer');
     if (!container) return; // 容器不存在则返回
-    
+
     // 确保gameData.map存在
     if (!gameData.map) {
         gameData.map = {
@@ -1368,15 +1372,15 @@ function initMap() {
             nextId: 1
         };
     }
-    
+
     // 渲染已保存的节点
     gameData.map.nodes.forEach(node => {
         createNodeElement(node);
     });
-    
+
     // 渲染连接线
     renderConnections();
-    
+
     // 添加容器事件监听（如果还没有添加）
     if (!mapState.initialized) {
         container.addEventListener('mousemove', handleMapMouseMove);
@@ -1385,10 +1389,10 @@ function initMap() {
         container.addEventListener('touchmove', handleMapTouchMove, { passive: false });
         container.addEventListener('touchend', handleMapMouseUp);
         container.addEventListener('touchcancel', handleMapMouseUp);
-        
+
         // 全局监听鼠标松开，以处理在容器外松开的情况
         document.addEventListener('mouseup', handleMapMouseUp);
-        
+
         mapState.initialized = true;
     }
 }
@@ -1397,7 +1401,7 @@ function initMap() {
 function reinitMap() {
     const container = document.getElementById('mapContainer');
     if (!container) return;
-    
+
     // 重绘连接线
     renderConnections();
 }
@@ -1411,7 +1415,7 @@ function addMapNode() {
         x: Math.random() * 400 + 100,
         y: Math.random() * 300 + 100
     };
-    
+
     gameData.map.nodes.push(node);
     createNodeElement(node);
     saveData();
@@ -1422,14 +1426,14 @@ function addMapNode() {
 function createNodeElement(node) {
     const nodesContainer = document.getElementById('mapNodes');
     if (!nodesContainer) return;
-    
+
     const nodeEl = document.createElement('div');
     nodeEl.className = 'map-node';
     nodeEl.id = `map-node-${node.id}`;
     nodeEl.style.left = node.x + 'px';
     nodeEl.style.top = node.y + 'px';
     nodeEl.dataset.nodeId = node.id;
-    
+
     nodeEl.innerHTML = `
         <div class="map-node-header">
             <div class="map-node-title">${node.title}</div>
@@ -1444,7 +1448,7 @@ function createNodeElement(node) {
         </div>
         <div class="expand-indicator">▼ 点击标题展开</div>
     `;
-    
+
     // 获取元素引用
     const titleEl = nodeEl.querySelector('.map-node-title');
     const moveBtn = nodeEl.querySelector('.map-node-btn.move');
@@ -1452,7 +1456,7 @@ function createNodeElement(node) {
     const deleteBtn = nodeEl.querySelector('.map-node-btn.delete');
     const contentEl = nodeEl.querySelector('.map-node-content');
     const indicatorEl = nodeEl.querySelector('.expand-indicator');
-    
+
     // 点击标题展开/折叠内容
     titleEl.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1461,19 +1465,19 @@ function createNodeElement(node) {
             indicatorEl.textContent = contentEl.classList.contains('expanded') ? '▲ 点击标题收起' : '▼ 点击标题展开';
         }
     });
-    
+
     // 编辑按钮
     editBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         editMapNode(node.id);
     });
-    
+
     // 删除按钮
     deleteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         deleteMapNode(node.id);
     });
-    
+
     // 点击节点（连接模式）
     nodeEl.addEventListener('click', (e) => {
         if (mapState.connectMode && !e.target.closest('.map-node-actions')) {
@@ -1481,14 +1485,14 @@ function createNodeElement(node) {
             handleNodeClickForConnection(node.id);
         }
     });
-    
+
     // 桌面端拖拽 - 鼠标事件绑定到移动按钮
     moveBtn.addEventListener('mousedown', (e) => {
         e.preventDefault();
         e.stopPropagation();
         startDragging(node.id, e);
     });
-    
+
     // 移动端拖拽 - 触摸事件
     moveBtn.addEventListener('touchstart', (e) => {
         e.preventDefault();
@@ -1496,10 +1500,10 @@ function createNodeElement(node) {
         const touch = e.touches[0];
         startDragging(node.id, touch);
     }, { passive: false });
-    
+
     // 阻止按钮上的菜单
     moveBtn.addEventListener('contextmenu', (e) => e.preventDefault());
-    
+
     // 整个节点也可以长按拖动（移动端备选方案）
     let longPressTimer = null;
     nodeEl.addEventListener('touchstart', (e) => {
@@ -1510,15 +1514,15 @@ function createNodeElement(node) {
             nodeEl.classList.add('dragging');
         }, 500);
     }, { passive: true });
-    
+
     nodeEl.addEventListener('touchend', () => {
         if (longPressTimer) clearTimeout(longPressTimer);
     });
-    
+
     nodeEl.addEventListener('touchmove', () => {
         if (longPressTimer) clearTimeout(longPressTimer);
     }, { passive: true });
-    
+
     nodesContainer.appendChild(nodeEl);
 }
 
@@ -1526,17 +1530,17 @@ function createNodeElement(node) {
 function startDragging(nodeId, e) {
     const node = gameData.map.nodes.find(n => n.id === nodeId);
     if (!node) return;
-    
+
     const nodeEl = document.getElementById(`map-node-${nodeId}`);
     const container = document.getElementById('mapContainer');
     const rect = container.getBoundingClientRect();
-    
+
     mapState.draggingNode = nodeId;
     mapState.dragOffset = {
         x: e.clientX - rect.left + container.scrollLeft - node.x,
         y: e.clientY - rect.top + container.scrollTop - node.y
     };
-    
+
     nodeEl.classList.add('dragging');
     e.preventDefault();
 }
@@ -1546,27 +1550,27 @@ function handleMapMouseMove(e) {
     if (mapState.draggingNode) {
         const container = document.getElementById('mapContainer');
         const rect = container.getBoundingClientRect();
-        
+
         const node = gameData.map.nodes.find(n => n.id === mapState.draggingNode);
         if (!node) return;
-        
+
         const nodeEl = document.getElementById(`map-node-${mapState.draggingNode}`);
         if (!nodeEl) return;
-        
+
         // 计算新位置，考虑滚动
         let newX = e.clientX - rect.left + container.scrollLeft - mapState.dragOffset.x;
         let newY = e.clientY - rect.top + container.scrollTop - mapState.dragOffset.y;
-        
+
         // 确保不为负数
         newX = Math.max(10, newX);
         newY = Math.max(10, newY);
-        
+
         node.x = newX;
         node.y = newY;
-        
+
         nodeEl.style.left = newX + 'px';
         nodeEl.style.top = newY + 'px';
-        
+
         renderConnections();
     }
 }
@@ -1594,12 +1598,12 @@ function handleMapMouseUp() {
 function toggleNodeContent(nodeId) {
     const nodeEl = document.getElementById(`map-node-${nodeId}`);
     if (!nodeEl) return;
-    
+
     const contentEl = nodeEl.querySelector('.map-node-content');
     const indicator = nodeEl.querySelector('.expand-indicator');
-    
+
     contentEl.classList.toggle('expanded');
-    
+
     if (contentEl.classList.contains('expanded')) {
         indicator.textContent = '▲ 收起';
     } else {
@@ -1611,25 +1615,25 @@ function toggleNodeContent(nodeId) {
 function editMapNode(nodeId) {
     const node = gameData.map.nodes.find(n => n.id === nodeId);
     if (!node) return;
-    
+
     const newTitle = prompt('节点标题:', node.title);
     if (newTitle !== null && newTitle.trim()) {
         node.title = newTitle.trim();
     }
-    
+
     const newContent = prompt('节点内容:', node.content);
     if (newContent !== null) {
         node.content = newContent.trim();
     }
-    
+
     // 更新显示
     const nodeEl = document.getElementById(`map-node-${nodeId}`);
     const titleEl = nodeEl.querySelector('.map-node-title');
     const contentTextEl = nodeEl.querySelector('.map-node-content-text');
-    
+
     titleEl.textContent = node.title;
     contentTextEl.textContent = node.content || '点击展开查看详情';
-    
+
     saveData();
     showNotification('节点已更新');
 }
@@ -1637,19 +1641,19 @@ function editMapNode(nodeId) {
 // 删除节点
 function deleteMapNode(nodeId) {
     if (!confirm('确定要删除这个节点吗？相关连接也会被删除。')) return;
-    
+
     // 删除节点
     gameData.map.nodes = gameData.map.nodes.filter(n => n.id !== nodeId);
-    
+
     // 删除相关连接
     gameData.map.connections = gameData.map.connections.filter(
         c => c.from !== nodeId && c.to !== nodeId
     );
-    
+
     // 删除DOM元素
     const nodeEl = document.getElementById(`map-node-${nodeId}`);
     if (nodeEl) nodeEl.remove();
-    
+
     renderConnections();
     saveData();
     showNotification('节点已删除');
@@ -1659,13 +1663,13 @@ function deleteMapNode(nodeId) {
 function toggleConnectMode() {
     mapState.connectMode = !mapState.connectMode;
     mapState.selectedNode = null;
-    
+
     const btn = document.getElementById('connectModeBtn');
-    
+
     if (mapState.connectMode) {
         btn.classList.add('active');
         btn.querySelector('span').textContent = '连接中...';
-        
+
         // 给所有节点添加连接模式样式
         document.querySelectorAll('.map-node').forEach(el => {
             el.classList.add('connect-mode');
@@ -1673,7 +1677,7 @@ function toggleConnectMode() {
     } else {
         btn.classList.remove('active');
         btn.querySelector('span').textContent = '连接';
-        
+
         // 移除连接模式样式
         document.querySelectorAll('.map-node').forEach(el => {
             el.classList.remove('connect-mode', 'selected');
@@ -1695,12 +1699,12 @@ function handleNodeClickForConnection(nodeId) {
         // 创建连接
         const from = mapState.selectedNode;
         const to = nodeId;
-        
+
         // 检查连接是否已存在
         const exists = gameData.map.connections.some(
             c => (c.from === from && c.to === to) || (c.from === to && c.to === from)
         );
-        
+
         if (!exists) {
             gameData.map.connections.push({ from, to });
             renderConnections();
@@ -1709,7 +1713,7 @@ function handleNodeClickForConnection(nodeId) {
         } else {
             showNotification('连接已存在');
         }
-        
+
         // 重置选择
         document.getElementById(`map-node-${mapState.selectedNode}`).classList.remove('selected');
         mapState.selectedNode = null;
@@ -1720,23 +1724,23 @@ function handleNodeClickForConnection(nodeId) {
 function renderConnections() {
     const svg = document.getElementById('mapSvg');
     svg.innerHTML = '';
-    
+
     gameData.map.connections.forEach((conn, index) => {
         const fromNode = gameData.map.nodes.find(n => n.id === conn.from);
         const toNode = gameData.map.nodes.find(n => n.id === conn.to);
-        
+
         if (!fromNode || !toNode) return;
-        
+
         const fromEl = document.getElementById(`map-node-${conn.from}`);
         const toEl = document.getElementById(`map-node-${conn.to}`);
-        
+
         if (!fromEl || !toEl) return;
-        
+
         const x1 = fromNode.x + fromEl.offsetWidth / 2;
         const y1 = fromNode.y + fromEl.offsetHeight / 2;
         const x2 = toNode.x + toEl.offsetWidth / 2;
         const y2 = toNode.y + toEl.offsetHeight / 2;
-        
+
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', x1);
         line.setAttribute('y1', y1);
@@ -1744,7 +1748,7 @@ function renderConnections() {
         line.setAttribute('y2', y2);
         line.setAttribute('class', 'map-connection');
         line.style.pointerEvents = 'all';
-        
+
         // 点击删除连接
         line.addEventListener('click', () => {
             if (confirm('删除这条连接？')) {
@@ -1753,7 +1757,7 @@ function renderConnections() {
                 saveData();
             }
         });
-        
+
         svg.appendChild(line);
     });
 }
@@ -1761,14 +1765,14 @@ function renderConnections() {
 // 清空地图
 function clearMap() {
     if (!confirm('确定要清空整个地图吗？所有节点和连接都会被删除。')) return;
-    
+
     gameData.map.nodes = [];
     gameData.map.connections = [];
     gameData.map.nextId = 1;
-    
+
     document.getElementById('mapNodes').innerHTML = '';
     document.getElementById('mapSvg').innerHTML = '';
-    
+
     saveData();
     showNotification('地图已清空');
 }
@@ -1783,17 +1787,17 @@ function renderSkillStatus() {
     const expFillEl = document.getElementById('skill-exp-fill');
     const fragmentsEl = document.getElementById('skill-fragments');
     const addBtn = document.getElementById('add-skill-btn');
-    
+
     if (levelEl) levelEl.textContent = gameData.skillLevel || 0;
     if (expEl) expEl.textContent = gameData.skillExp || 0;
     if (maxExpEl) maxExpEl.textContent = gameData.skillMaxExp || 100;
     if (fragmentsEl) fragmentsEl.textContent = gameData.skillFragments || 0;
-    
+
     if (expFillEl) {
         const percentage = Math.min(100, ((gameData.skillExp || 0) / (gameData.skillMaxExp || 100)) * 100);
         expFillEl.style.width = `${percentage}%`;
     }
-    
+
     // 只有拥有至少一个技能或者等级大于0时，才允许添加技能
     // 或者有足够的碎片合成第一个技能
     if (addBtn) {
@@ -1805,7 +1809,7 @@ function renderSkillStatus() {
             addBtn.title = "请先合成技能开启技能树";
         }
     }
-    
+
     // 同步更新首页技能显示
     renderHomeSkills();
 }
@@ -1813,14 +1817,14 @@ function renderSkillStatus() {
 // 合成技能
 function synthesizeSkill() {
     const cost = 3; // 3个碎片合成一个技能点/开启技能树
-    
+
     if ((gameData.skillFragments || 0) < cost) {
         showNotification(`碎片不足！需要${cost}个碎片合成。`, 'error');
         return;
     }
-    
+
     gameData.skillFragments -= cost;
-    
+
     // 如果是第一次合成，开启技能树（升到1级）
     if (gameData.skillLevel === 0) {
         gameData.skillLevel = 1;
@@ -1830,7 +1834,7 @@ function synthesizeSkill() {
         addSkillExp(50);
         showNotification('合成成功！获得50点技能经验。');
     }
-    
+
     renderSkillStatus();
     saveData();
 }
@@ -1838,21 +1842,21 @@ function synthesizeSkill() {
 // 增加技能经验
 function addSkillExp(amount) {
     gameData.skillExp = (gameData.skillExp || 0) + amount;
-    
+
     // 升级逻辑
     while (gameData.skillExp >= (gameData.skillMaxExp || 100)) {
         gameData.skillExp -= (gameData.skillMaxExp || 100);
         gameData.skillLevel++;
         gameData.skillMaxExp = Math.floor((gameData.skillMaxExp || 100) * 1.2);
         showNotification(`技能树升级了！当前等级：Lv.${gameData.skillLevel}`);
-        
+
         // 更新首页角色等级显示
         const avatarLevel = document.querySelector('.avatar-level');
         if (avatarLevel) {
             avatarLevel.textContent = `Lv.${gameData.skillLevel}`;
         }
     }
-    
+
     renderSkillStatus();
     saveData();
 }
@@ -1884,16 +1888,16 @@ function showAddSkillModal(parentId = null) {
     document.getElementById('skill-icon').value = '⭐';
     document.getElementById('skill-cost-value').value = '0';
     document.getElementById('skill-gain-value').value = '0';
-    
+
     // 更新父技能选项
     updateSkillParentOptions(parentId);
-    
+
     // 更新属性选项
     updateSkillStatOptions();
-    
+
     // 确保父技能选择器可见（编辑时会隐藏）
     document.getElementById('skill-parent').parentElement.style.display = '';
-    
+
     openModal('skill-modal');
 }
 
@@ -1901,7 +1905,7 @@ function showAddSkillModal(parentId = null) {
 function updateSkillParentOptions(preselectedId = null) {
     const select = document.getElementById('skill-parent');
     select.innerHTML = '<option value="">无（根技能）</option>';
-    
+
     function addSkillOptions(skills, prefix = '') {
         skills.forEach(skill => {
             const option = document.createElement('option');
@@ -1911,13 +1915,13 @@ function updateSkillParentOptions(preselectedId = null) {
                 option.selected = true;
             }
             select.appendChild(option);
-            
+
             if (skill.children && skill.children.length > 0) {
                 addSkillOptions(skill.children, prefix + '　');
             }
         });
     }
-    
+
     addSkillOptions(gameData.skills);
 }
 
@@ -1925,10 +1929,10 @@ function updateSkillParentOptions(preselectedId = null) {
 function updateSkillStatOptions() {
     const costSelect = document.getElementById('skill-cost-stat');
     const gainSelect = document.getElementById('skill-gain-stat');
-    
+
     costSelect.innerHTML = '<option value="">无消耗</option>';
     gainSelect.innerHTML = '<option value="">无获得</option>';
-    
+
     gameData.stats.forEach(stat => {
         costSelect.innerHTML += `<option value="${stat.id}">${stat.name}</option>`;
         gainSelect.innerHTML += `<option value="${stat.id}">${stat.name}</option>`;
@@ -1946,12 +1950,12 @@ function confirmAddSkill() {
     const costValue = parseInt(document.getElementById('skill-cost-value').value) || 0;
     const gainStat = document.getElementById('skill-gain-stat').value;
     const gainValue = parseInt(document.getElementById('skill-gain-value').value) || 0;
-    
+
     if (!name) {
         showNotification('请输入技能名称', 'error');
         return;
     }
-    
+
     const skillData = {
         name,
         description,
@@ -1962,7 +1966,7 @@ function confirmAddSkill() {
         gainValue,
         children: []
     };
-    
+
     if (editId) {
         // 编辑模式
         const skill = findSkillById(parseInt(editId));
@@ -1974,7 +1978,7 @@ function confirmAddSkill() {
     } else {
         // 添加模式
         skillData.id = gameData.skillNextId++;
-        
+
         if (parentId) {
             const parent = findSkillById(parseInt(parentId));
             if (parent) {
@@ -1986,7 +1990,7 @@ function confirmAddSkill() {
         }
         showNotification('技能已添加');
     }
-    
+
     closeModal('skill-modal');
     renderSkills();
     renderHomeSkills(); // 更新首页技能显示
@@ -2023,7 +2027,7 @@ function removeSkillById(id, skills = gameData.skills) {
 function renderSkills() {
     const container = document.getElementById('skills-container');
     if (!container) return;
-    
+
     if (!gameData.skills || gameData.skills.length === 0) {
         container.innerHTML = `
             <div class="skills-empty">
@@ -2034,14 +2038,14 @@ function renderSkills() {
         `;
         return;
     }
-    
+
     container.innerHTML = '<div class="skill-tree-root"></div>';
     const root = container.querySelector('.skill-tree-root');
-    
+
     gameData.skills.forEach(skill => {
         root.appendChild(createSkillNode(skill));
     });
-    
+
     updateDataStats();
 }
 
@@ -2050,7 +2054,7 @@ function createSkillNode(skill) {
     const node = document.createElement('div');
     node.className = 'skill-node';
     node.dataset.skillId = skill.id;
-    
+
     // 构建效果标签
     let effectsHtml = '';
     if (skill.costStat) {
@@ -2061,7 +2065,7 @@ function createSkillNode(skill) {
         const gainStatName = gameData.stats.find(s => s.id == skill.gainStat)?.name || '未知';
         effectsHtml += `<span class="skill-effect-tag gain">+${skill.gainValue} ${gainStatName}</span>`;
     }
-    
+
     // 检查是否可以使用（消耗足够）
     let canUse = true;
     if (skill.costStat) {
@@ -2070,10 +2074,10 @@ function createSkillNode(skill) {
             canUse = false;
         }
     }
-    
+
     // 检查是否已装备
     const isEquipped = gameData.equippedSkills && gameData.equippedSkills.includes(skill.id);
-    
+
     node.innerHTML = `
         <div class="skill-node-main">
             <div class="skill-icon">${skill.icon}</div>
@@ -2099,23 +2103,23 @@ function createSkillNode(skill) {
             </div>
         </div>
     `;
-    
+
     // 添加子技能
     if (skill.children && skill.children.length > 0) {
         const childrenContainer = document.createElement('div');
         childrenContainer.className = 'skill-children';
-        
+
         skill.children.forEach(child => {
             childrenContainer.appendChild(createSkillNode(child));
         });
-        
+
         // 添加"添加子技能"按钮
         const addChildBtn = document.createElement('div');
         addChildBtn.className = 'skill-add-child-btn';
         addChildBtn.innerHTML = '+ 添加子技能';
         addChildBtn.onclick = () => showAddSkillModal(skill.id);
         childrenContainer.appendChild(addChildBtn);
-        
+
         node.appendChild(childrenContainer);
     } else {
         // 无子技能时也显示添加按钮
@@ -2128,7 +2132,7 @@ function createSkillNode(skill) {
         addChildContainer.appendChild(addChildBtn);
         node.appendChild(addChildContainer);
     }
-    
+
     return node;
 }
 
@@ -2136,9 +2140,9 @@ function createSkillNode(skill) {
 function useSkill(skillId) {
     const skill = findSkillById(skillId);
     if (!skill) return;
-    
+
     let effectText = '';
-    
+
     // 检查消耗
     if (skill.costStat) {
         const costStat = gameData.stats.find(s => s.id == skill.costStat);
@@ -2150,7 +2154,7 @@ function useSkill(skillId) {
         costStat.current -= skill.costValue;
         effectText = ` (${costStat.name} -${skill.costValue})`;
     }
-    
+
     // 获得效果
     if (skill.gainStat) {
         const gainStat = gameData.stats.find(s => s.id == skill.gainStat);
@@ -2165,15 +2169,15 @@ function useSkill(skillId) {
             }
         }
     }
-    
+
     renderStats();
     renderSkills();
     saveData();
-    
+
     // 同步更新首页显示
     renderHomeStats();
     renderHomeSkills();
-    
+
     showNotification(`使用了技能：${skill.name}${effectText}`);
 }
 
@@ -2181,16 +2185,16 @@ function useSkill(skillId) {
 function editSkill(skillId) {
     const skill = findSkillById(skillId);
     if (!skill) return;
-    
+
     document.getElementById('skill-modal-title').textContent = '编辑技能';
     document.getElementById('skill-edit-id').value = skill.id;
     document.getElementById('skill-name').value = skill.name;
     document.getElementById('skill-description').value = skill.description || '';
     document.getElementById('skill-icon').value = skill.icon || '⭐';
-    
+
     // 更新属性选项
     updateSkillStatOptions();
-    
+
     // 设置消耗和获得
     setTimeout(() => {
         document.getElementById('skill-cost-stat').value = skill.costStat || '';
@@ -2198,17 +2202,17 @@ function editSkill(skillId) {
         document.getElementById('skill-gain-stat').value = skill.gainStat || '';
         document.getElementById('skill-gain-value').value = skill.gainValue || 0;
     }, 50);
-    
+
     // 隐藏父技能选择（编辑时不能改变层级）
     document.getElementById('skill-parent').parentElement.style.display = 'none';
-    
+
     openModal('skill-modal');
 }
 
 // 删除技能
 function deleteSkill(skillId) {
     if (!confirm('确定要删除这个技能吗？子技能也会被删除。')) return;
-    
+
     removeSkillById(skillId);
     renderSkills();
     saveData();
@@ -2226,7 +2230,7 @@ function showResetConfirmModal() {
 function confirmReset() {
     // 清除localStorage
     localStorage.removeItem('cyberGameData');
-    
+
     // 重置gameData
     gameData = {
         stats: [],
@@ -2257,10 +2261,10 @@ function confirmReset() {
         },
         skillNextId: 1
     };
-    
+
     closeModal('reset-modal');
     showNotification('所有数据已重置');
-    
+
     // 刷新页面
     setTimeout(() => {
         location.reload();
@@ -2273,7 +2277,7 @@ function updateDataStats() {
     const skillsCount = document.getElementById('skills-count');
     const backpackCount = document.getElementById('backpack-count');
     const mapCount = document.getElementById('map-count');
-    
+
     if (statsCount) statsCount.textContent = gameData.stats.length;
     if (skillsCount) {
         let count = 0;
@@ -2331,7 +2335,7 @@ function loadData() {
                 ...(loadedData.character || {})
             }
         };
-        
+
         // 修复番茄钟剩余时间
         if (gameData.pomodoro.remainingTime <= 0) {
             gameData.pomodoro.remainingTime = gameData.pomodoro.workTime * 60;
@@ -2652,21 +2656,21 @@ function isDesktop() {
 }
 
 // 只在桌面端显示老板键提示
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     const hint = document.getElementById('boss-key-hint');
     if (hint && !isDesktop()) {
         hint.style.display = 'none';
     }
-    
+
     // 确保快捷键可以工作 - 添加到window和document上
     console.log('Boss key listener ready. Press Ctrl+B to toggle disguise mode.');
 });
 
 // 监听老板键 Ctrl+B (仅桌面端) - 在 document 上
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
     // 使用 keyCode 66 (B) 或 key 属性进行兼容性检测
     const isBKey = e.keyCode === 66 || e.key === 'b' || e.key === 'B';
-    
+
     // Ctrl+B 切换伪装模式
     if (e.ctrlKey && isBKey && isDesktop()) {
         e.preventDefault();
@@ -2678,14 +2682,14 @@ document.addEventListener('keydown', function(e) {
         }
         return;
     }
-    
+
     // ESC键退出伪装模式
     if (e.key === 'Escape' && disguiseMode) {
         e.preventDefault();
         toggleDisguiseMode();
         return;
     }
-    
+
     // 在伪装模式下处理打字
     if (disguiseMode && isDesktop() && !e.ctrlKey && !e.altKey && !e.metaKey) {
         handleTyping(e);
@@ -2693,7 +2697,7 @@ document.addEventListener('keydown', function(e) {
 }, true); // 使用捕获阶段
 
 // 备用方案：在 window 上也添加监听器
-window.addEventListener('keydown', function(e) {
+window.addEventListener('keydown', function (e) {
     const isBKey = e.keyCode === 66 || e.key === 'b' || e.key === 'B';
     if (e.ctrlKey && isBKey && isDesktop() && !isToggling) {
         e.preventDefault();
@@ -2707,7 +2711,7 @@ function toggleDisguiseMode() {
     disguiseMode = !disguiseMode;
     const disguiseContainer = document.getElementById('disguise-mode');
     const mainContainer = document.querySelector('.container');
-    
+
     if (disguiseMode) {
         disguiseContainer.style.display = 'flex';
         mainContainer.style.display = 'none';
@@ -2731,13 +2735,13 @@ function startDisguiseMode() {
         refPanel: document.querySelector('.code-reference-panel .code-editor'),
         practicePanel: document.querySelector('.code-practice-panel .code-editor')
     };
-    
+
     // 初始化代码显示
     codeLines = sampleCode.split('\n');
     currentLine = 0;
     currentCol = 0;
     userTypedCode = '';
-    
+
     // 重置统计
     typingStats = {
         startTime: null,
@@ -2745,15 +2749,15 @@ function startDisguiseMode() {
         correctChars: 0,
         errors: 0
     };
-    
+
     // 显示参考代码（左侧）
     updateReferenceCode();
-    
+
     // 初始化练习区（右侧）
     updatePracticeCode();
     updatePracticeLineNumbers();
     updateCursorPosition();
-    
+
     // 添加同步滚动
     setupSyncScroll();
 }
@@ -2761,7 +2765,7 @@ function startDisguiseMode() {
 function stopDisguiseMode() {
     // 清理缓存
     cachedElements = {};
-    
+
     // 输出统计信息（可选）
     if (typingStats.totalChars > 0) {
         const accuracy = Math.round((typingStats.correctChars / typingStats.totalChars) * 100);
@@ -2774,11 +2778,11 @@ function updateReferenceCode() {
     const refCode = cachedElements.refCode || document.getElementById('reference-code');
     const refLineNumbers = cachedElements.refLineNumbers || document.getElementById('ref-line-numbers');
     if (!refCode || !refLineNumbers) return;
-    
+
     // 使用数组join优化字符串拼接
     const displayLines = codeLines.map(line => highlightCodeAdvanced(line));
     refCode.innerHTML = displayLines.join('\n');
-    
+
     // 行号
     const lineNums = [];
     for (let i = 1; i <= codeLines.length; i++) {
@@ -2791,12 +2795,12 @@ function updateReferenceCode() {
 function updatePracticeCode() {
     const practiceCode = cachedElements.practiceCode || document.getElementById('practice-code');
     if (!practiceCode) return;
-    
+
     if (userTypedCode === '') {
         practiceCode.innerHTML = '';
         return;
     }
-    
+
     // 使用数组优化拼接
     const inputLines = userTypedCode.split('\n');
     const displayLines = inputLines.map(line => highlightCodeAdvanced(line));
@@ -2807,7 +2811,7 @@ function updatePracticeCode() {
 function updatePracticeLineNumbers() {
     const lineNumbers = cachedElements.practiceLineNumbers || document.getElementById('practice-line-numbers');
     if (!lineNumbers) return;
-    
+
     const lineCount = Math.max(userTypedCode.split('\n').length, 1);
     const nums = [];
     for (let i = 1; i <= lineCount; i++) {
@@ -2819,38 +2823,38 @@ function updatePracticeLineNumbers() {
 // 增强版语法高亮
 function highlightCodeAdvanced(code) {
     if (!code) return '';
-    
+
     let result = escapeHtml(code);
-    
+
     // 注释（最高优先级，先处理）
     result = result.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="comment">$1</span>');
     result = result.replace(/(\/\/.*$)/gm, '<span class="comment">$1</span>');
-    
+
     // 字符串
     result = result.replace(/(&quot;(?:[^&quot;\\]|\\.)*&quot;)/g, '<span class="string">$1</span>');
     result = result.replace(/(&#39;(?:[^&#39;\\]|\\.)*&#39;)/g, '<span class="string">$1</span>');
     result = result.replace(/(`(?:[^`\\]|\\.)*`)/g, '<span class="string">$1</span>');
-    
+
     // 数字
     result = result.replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>');
-    
+
     // 类名（大写开头）
     result = result.replace(/\b([A-Z][a-zA-Z0-9]*)\b/g, '<span class="class-name">$1</span>');
-    
+
     // 关键字
     const keywords = 'const|let|var|function|async|await|if|else|for|while|return|try|catch|new|import|require|export|class|extends|this|super|static|typeof|instanceof|delete|in|of|break|continue|switch|case|default|throw|finally';
     result = result.replace(new RegExp(`\\b(${keywords})\\b`, 'g'), '<span class="keyword">$1</span>');
-    
+
     // 布尔值和null
     result = result.replace(/\b(true|false)\b/g, '<span class="boolean">$1</span>');
     result = result.replace(/\b(null|undefined)\b/g, '<span class="null-keyword">$1</span>');
-    
+
     // 函数名（后面跟着括号）
     result = result.replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g, '<span class="function">$1</span>(');
-    
+
     // 对象属性和方法
     result = result.replace(/\.([a-zA-Z_$][a-zA-Z0-9_$]*)/g, '.<span class="property">$1</span>');
-    
+
     return result;
 }
 
@@ -2877,18 +2881,18 @@ function updateLineNumbers() {
 function updateCursorPosition() {
     const cursor = cachedElements.cursor || document.getElementById('cursor');
     if (!cursor) return;
-    
+
     // 计算光标位置
     const lines = userTypedCode.split('\n');
     const lineNumber = lines.length;
     const colNumber = lines[lines.length - 1].length;
-    
+
     // 更新状态栏
     const posDisplay = cachedElements.cursorPosition || document.getElementById('cursor-position');
     if (posDisplay) {
         posDisplay.textContent = `Ln ${lineNumber}, Col ${colNumber + 1}`;
     }
-    
+
     // 定位光标
     cursor.style.top = ((lineNumber - 1) * 20 + 10) + 'px';
     cursor.style.left = (colNumber * 8.4 + 10) + 'px';
@@ -2898,17 +2902,17 @@ function handleTyping(e) {
     // 忽略功能键
     const ignoredKeys = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Escape', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'Insert', 'Home', 'End', 'PageUp', 'PageDown', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
     if (ignoredKeys.includes(e.key)) return;
-    
+
     // 阻止默认行为
     if (e.key.length === 1 || e.key === 'Enter' || e.key === 'Backspace' || e.key === 'Tab') {
         e.preventDefault();
     }
-    
+
     // 开始计时
     if (!typingStats.startTime && e.key.length === 1) {
         typingStats.startTime = Date.now();
     }
-    
+
     if (e.key === 'Enter') {
         userTypedCode += '\n';
         typingStats.totalChars++;
@@ -2924,7 +2928,7 @@ function handleTyping(e) {
     } else if (e.key.length === 1) {
         userTypedCode += e.key;
         typingStats.totalChars++;
-        
+
         // 检查是否与参考代码匹配
         const expectedChar = sampleCode[userTypedCode.length - 1];
         if (e.key === expectedChar) {
@@ -2933,7 +2937,7 @@ function handleTyping(e) {
             typingStats.errors++;
         }
     }
-    
+
     updatePracticeCode();
     updatePracticeLineNumbers();
     updateCursorPosition();
@@ -2944,13 +2948,13 @@ function handleTyping(e) {
 function setupSyncScroll() {
     const refPanel = cachedElements.refPanel;
     const practicePanel = cachedElements.practicePanel;
-    
+
     if (refPanel && practicePanel) {
-        refPanel.addEventListener('scroll', function() {
+        refPanel.addEventListener('scroll', function () {
             practicePanel.scrollTop = refPanel.scrollTop;
         });
-        
-        practicePanel.addEventListener('scroll', function() {
+
+        practicePanel.addEventListener('scroll', function () {
             refPanel.scrollTop = practicePanel.scrollTop;
         });
     }
@@ -2960,13 +2964,13 @@ function setupSyncScroll() {
 function updateTypingStats() {
     const posDisplay = cachedElements.cursorPosition || document.getElementById('cursor-position');
     if (!posDisplay) return;
-    
+
     const lines = userTypedCode.split('\n');
     const lineNumber = lines.length;
     const colNumber = lines[lines.length - 1].length;
-    
+
     let statsText = `Ln ${lineNumber}, Col ${colNumber + 1}`;
-    
+
     // 显示打字速度和准确率
     if (typingStats.startTime && typingStats.totalChars > 10) {
         const elapsedMinutes = (Date.now() - typingStats.startTime) / 60000;
@@ -2974,7 +2978,7 @@ function updateTypingStats() {
         const accuracy = Math.round((typingStats.correctChars / typingStats.totalChars) * 100);
         statsText += ` | ${wpm} WPM | ${accuracy}%`;
     }
-    
+
     posDisplay.textContent = statsText;
 }
 
@@ -3006,17 +3010,17 @@ function initPomodoro() {
         clearInterval(pomodoroTimer);
         pomodoroTimer = null;
     }
-    
+
     // 确保显示正确
     updatePomodoroDisplay();
     updatePomodoroButton();
-    
+
     // 更新设置界面的输入框
     const workTimeInput = document.getElementById('work-time');
     const breakTimeInput = document.getElementById('break-time');
     if (workTimeInput) workTimeInput.value = gameData.pomodoro.workTime;
     if (breakTimeInput) breakTimeInput.value = gameData.pomodoro.breakTime;
-    
+
     // 请求通知权限
     if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission();
@@ -3037,16 +3041,16 @@ function startPomodoro() {
     gameData.pomodoro.isRunning = true;
     updatePomodoroButton();
     saveData();
-    
+
     pomodoroTimer = setInterval(() => {
         gameData.pomodoro.remainingTime--;
         updatePomodoroDisplay();
-        
+
         if (gameData.pomodoro.remainingTime <= 0) {
             pomodoroComplete();
         }
     }, 1000);
-    
+
     showNotification(gameData.pomodoro.isBreak ? '🌴 休息开始！' : '🍅 番茄钟开始！专注工作！');
 }
 
@@ -3077,7 +3081,7 @@ function pomodoroComplete() {
     clearInterval(pomodoroTimer);
     pomodoroTimer = null;
     gameData.pomodoro.isRunning = false;
-    
+
     if (gameData.pomodoro.isBreak) {
         // 休息结束，开始新的工作
         gameData.pomodoro.isBreak = false;
@@ -3088,25 +3092,25 @@ function pomodoroComplete() {
         // 工作结束，奖励并开始休息
         gameData.pomodoro.sessions++;
         gameData.pomodoro.isBreak = true;
-        
+
         // 每4个番茄一个长休息
-        const breakTime = gameData.pomodoro.sessions % 4 === 0 
-            ? gameData.pomodoro.longBreakTime 
+        const breakTime = gameData.pomodoro.sessions % 4 === 0
+            ? gameData.pomodoro.longBreakTime
             : gameData.pomodoro.breakTime;
         gameData.pomodoro.remainingTime = breakTime * 60;
-        
+
         // 奖励食物
         gameData.food += 2;
         updateFoodDisplay();
-        
+
         showNotification(`🎉 完成一个番茄！获得2个食物！已完成${gameData.pomodoro.sessions}个番茄`);
         sendDesktopNotification('番茄钟完成！', `太棒了！完成第${gameData.pomodoro.sessions}个番茄，休息一下吧！`);
-        
+
         if (gameData.pet.selected) {
             speakPetMessage('主人好厉害！休息一下吧~');
         }
     }
-    
+
     updatePomodoroDisplay();
     updatePomodoroButton();
     saveData();
@@ -3116,18 +3120,18 @@ function pomodoroComplete() {
 function updatePomodoroDisplay() {
     const display = document.getElementById('pomodoro-time');
     if (!display) return;
-    
+
     const minutes = Math.floor(gameData.pomodoro.remainingTime / 60);
     const seconds = gameData.pomodoro.remainingTime % 60;
     display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
+
     // 更新状态标签
     const statusEl = document.getElementById('pomodoro-status');
     if (statusEl) {
         statusEl.textContent = gameData.pomodoro.isBreak ? '休息中' : '专注中';
         statusEl.className = 'pomodoro-status ' + (gameData.pomodoro.isBreak ? 'break' : 'work');
     }
-    
+
     // 更新完成数
     const countEl = document.getElementById('pomodoro-count');
     if (countEl) {
@@ -3153,21 +3157,21 @@ function initReminders() {
             showReminder('💧', '该喝水啦！', '保持水分摄入，身体更健康！');
         }, gameData.reminders.drinkWater.interval * 60 * 1000);
     }
-    
+
     // 休息提醒
     if (gameData.reminders.rest.enabled) {
         reminderTimers.rest = setInterval(() => {
             showReminder('👀', '该休息眼睛啦！', '看看远处，让眼睛放松一下~');
         }, gameData.reminders.rest.interval * 60 * 1000);
     }
-    
+
     // 伸展提醒
     if (gameData.reminders.stretch.enabled) {
         reminderTimers.stretch = setInterval(() => {
             showReminder('🧘', '该活动一下啦！', '站起来伸展一下，活动筋骨！');
         }, gameData.reminders.stretch.interval * 60 * 1000);
     }
-    
+
     // 宠物饥饿检测
     if (gameData.reminders.petHunger.enabled) {
         reminderTimers.petHunger = setInterval(() => {
@@ -3180,7 +3184,7 @@ function initReminders() {
 function showReminder(emoji, title, message) {
     showNotification(`${emoji} ${title} - ${message}`);
     sendDesktopNotification(title, message);
-    
+
     if (gameData.pet.selected) {
         speakPetMessage(`${emoji} ${title}`);
     }
@@ -3189,9 +3193,9 @@ function showReminder(emoji, title, message) {
 // 检查宠物饥饿
 function checkPetHunger() {
     if (!gameData.pet.selected) return;
-    
+
     updateHunger();
-    
+
     if (gameData.pet.hunger < 30 && gameData.reminders.petHunger.enabled) {
         sendDesktopNotification(
             `${gameData.pet.name}饿了！`,
@@ -3204,7 +3208,7 @@ function checkPetHunger() {
 // 发送桌面通知
 function sendDesktopNotification(title, body) {
     if (!('Notification' in window)) return;
-    
+
     if (Notification.permission === 'granted') {
         new Notification(title, {
             body: body,
@@ -3224,17 +3228,17 @@ function sendDesktopNotification(title, body) {
 function toggleReminder(type) {
     if (gameData.reminders[type]) {
         gameData.reminders[type].enabled = !gameData.reminders[type].enabled;
-        
+
         // 清除或重启计时器
         if (reminderTimers[type]) {
             clearInterval(reminderTimers[type]);
             reminderTimers[type] = null;
         }
-        
+
         if (gameData.reminders[type].enabled) {
             initReminders();
         }
-        
+
         updateReminderUI();
         saveData();
     }
@@ -3255,7 +3259,7 @@ function updateReminderUI() {
 function setReminderInterval(type, minutes) {
     if (gameData.reminders[type]) {
         gameData.reminders[type].interval = parseInt(minutes);
-        
+
         // 重启计时器
         if (reminderTimers[type]) {
             clearInterval(reminderTimers[type]);
@@ -3280,7 +3284,7 @@ function addPetToCollection(type) {
         lastFeedTime: Date.now(),
         isActive: false
     };
-    
+
     gameData.pets.push(newPet);
     saveData();
     updatePetCollectionUI();
@@ -3291,7 +3295,7 @@ function addPetToCollection(type) {
 function switchActivePet(petId) {
     const pet = gameData.pets.find(p => p.id === petId);
     if (!pet) return;
-    
+
     // 保存当前宠物状态到集合
     if (gameData.pet.selected) {
         const currentPetIndex = gameData.pets.findIndex(p => p.isActive);
@@ -3308,7 +3312,7 @@ function switchActivePet(petId) {
             };
         }
     }
-    
+
     // 设置新活跃宠物
     pet.isActive = true;
     gameData.pet = {
@@ -3321,7 +3325,7 @@ function switchActivePet(petId) {
         hunger: pet.hunger,
         lastFeedTime: pet.lastFeedTime
     };
-    
+
     updatePetDisplay();
     updatePetCollectionUI();
     saveData();
@@ -3332,7 +3336,7 @@ function switchActivePet(petId) {
 function updatePetCollectionUI() {
     const container = document.getElementById('pet-collection');
     if (!container) return;
-    
+
     container.innerHTML = gameData.pets.map(pet => {
         const emoji = getPetEmoji(pet.type, pet.level);
         return `
@@ -3352,14 +3356,14 @@ function updatePetCollectionUI() {
 function renderHomeStats() {
     const container = document.getElementById('home-stats-container');
     if (!container) return;
-    
+
     if (gameData.stats.length === 0) {
         container.innerHTML = '<div class="empty-mini">暂无属性</div>';
         return;
     }
-    
-    // 只显示前4个属性
-    const displayStats = gameData.stats.slice(0, 4);
+
+    // 显示所有属性
+    const displayStats = gameData.stats;
     container.innerHTML = displayStats.map(stat => `
         <div class="mini-stat-item">
             <div class="mini-stat-header">
@@ -3377,7 +3381,7 @@ function renderHomeStats() {
 function renderHomeBackpack() {
     const container = document.getElementById('home-backpack-items');
     if (!container) return;
-    
+
     if (gameData.backpack.length === 0) {
         // 显示空槽位
         let emptySlots = '';
@@ -3391,14 +3395,14 @@ function renderHomeBackpack() {
         container.innerHTML = emptySlots;
         return;
     }
-    
+
     // 显示前6个物品
     const displayItems = gameData.backpack.slice(0, 6);
     let html = displayItems.map(item => {
         const effectText = item.effectStat ? `效果: ${getStatName(item.effectStat)} +${item.effectValue}` : '无使用效果';
         const description = item.description || '暂无描述';
         const canUse = item.effectStat ? 'usable' : '';
-        
+
         return `
             <div class="quick-item ${canUse}" 
                  onclick="showHomeUseItemModal(${item.id})" 
@@ -3416,7 +3420,7 @@ function renderHomeBackpack() {
             </div>
         `;
     }).join('');
-    
+
     // 填充空槽位
     for (let i = displayItems.length; i < 6; i++) {
         html += `
@@ -3425,7 +3429,7 @@ function renderHomeBackpack() {
             </div>
         `;
     }
-    
+
     container.innerHTML = html;
 }
 
@@ -3433,22 +3437,22 @@ function renderHomeBackpack() {
 function showHomeUseItemModal(itemId) {
     const item = gameData.backpack.find(i => i.id === itemId);
     if (!item) return;
-    
+
     // 如果物品没有效果，跳转到背包页面
     if (!item.effectStat) {
         switchToTab('backpack');
         return;
     }
-    
+
     const stat = gameData.stats.find(s => s.id === parseInt(item.effectStat));
     const statName = stat ? stat.name : '未知属性';
     const currentValue = stat ? stat.current : 0;
     const maxValue = stat ? stat.max : 100;
     const newValue = stat ? Math.min(stat.max, stat.current + item.effectValue) : item.effectValue;
-    
+
     const modal = document.getElementById('home-use-item-modal');
     const content = document.getElementById('home-use-item-content');
-    
+
     content.innerHTML = `
         <div class="use-item-preview">
             <div class="use-item-icon">${getItemEmoji(item.name)}</div>
@@ -3476,7 +3480,7 @@ function showHomeUseItemModal(itemId) {
             <button class="cyber-btn cancel" onclick="closeModal('home-use-item-modal')">✗ 取消</button>
         </div>
     `;
-    
+
     modal.classList.add('active');
 }
 
@@ -3484,7 +3488,7 @@ function showHomeUseItemModal(itemId) {
 function confirmUseItemFromHome(itemId) {
     useItem('backpack', itemId);
     closeModal('home-use-item-modal');
-    
+
     // 更新首页所有相关显示
     renderHomeStats();
     renderHomeBackpack();
@@ -3506,7 +3510,7 @@ function getItemEmoji(itemName) {
         '卷轴': '📜',
         '魔法': '✨'
     };
-    
+
     for (const [key, emoji] of Object.entries(emojiMap)) {
         if (itemName.includes(key)) return emoji;
     }
@@ -3518,30 +3522,30 @@ function renderHomeSkills() {
     const container = document.getElementById('home-skills-list');
     const levelEl = document.getElementById('home-skill-level');
     const expFill = document.getElementById('home-skill-exp-fill');
-    
+
     if (levelEl) levelEl.textContent = gameData.skillLevel || 0;
     if (expFill) {
         const expPercent = (gameData.skillExp / gameData.skillMaxExp) * 100;
         expFill.style.width = expPercent + '%';
     }
-    
+
     if (!container) return;
-    
+
     // 确保equippedSkills存在
     if (!gameData.equippedSkills) {
         gameData.equippedSkills = [];
     }
-    
+
     let html = '';
-    
+
     // 渲染6个槽位
     for (let i = 0; i < 6; i++) {
         const skillId = gameData.equippedSkills[i];
-        
+
         if (skillId) {
             // 查找装备的技能
             const skill = findSkillById(skillId);
-            
+
             if (skill) {
                 // 构建效果文本
                 let effectText = '';
@@ -3555,13 +3559,13 @@ function renderHomeSkills() {
                     effects.push(`获得: ${gainStatName} +${skill.gainValue}`);
                 }
                 effectText = effects.length > 0 ? effects.join('\n') : '无效果';
-                
+
                 // 检查是否可以使用
                 const canUse = skill.costStat || skill.gainStat;
                 const hasEnough = !skill.costStat || (gameData.stats.find(s => s.id == skill.costStat)?.current >= skill.costValue);
                 const usableClass = canUse ? 'usable' : '';
                 const disabledClass = !hasEnough ? 'disabled' : '';
-                
+
                 html += `
                     <div class="home-skill-item ${usableClass} ${disabledClass}" 
                          onclick="showHomeUseSkillModal(${skill.id})" 
@@ -3600,7 +3604,7 @@ function renderHomeSkills() {
             `;
         }
     }
-    
+
     container.innerHTML = html;
 }
 
@@ -3608,20 +3612,20 @@ function renderHomeSkills() {
 function showHomeUseSkillModal(skillId) {
     const skill = findSkillById(skillId);
     if (!skill) return;
-    
+
     // 如果技能没有效果，跳转到技能页面
     if (!skill.costStat && !skill.gainStat) {
         switchToTab('skills');
         return;
     }
-    
+
     // 检查是否有足够的资源
     let canUse = true;
     let costStat = null;
     let costCurrent = 0;
     let costMax = 100;
     let costAfter = 0;
-    
+
     if (skill.costStat) {
         costStat = gameData.stats.find(s => s.id == skill.costStat);
         if (!costStat || costStat.current < skill.costValue) {
@@ -3633,12 +3637,12 @@ function showHomeUseSkillModal(skillId) {
             costAfter = Math.max(0, costCurrent - skill.costValue);
         }
     }
-    
+
     let gainStat = null;
     let gainCurrent = 0;
     let gainMax = 100;
     let gainAfter = 0;
-    
+
     if (skill.gainStat) {
         gainStat = gameData.stats.find(s => s.id == skill.gainStat);
         if (gainStat) {
@@ -3647,10 +3651,10 @@ function showHomeUseSkillModal(skillId) {
             gainAfter = Math.min(gainMax, gainCurrent + skill.gainValue);
         }
     }
-    
+
     const modal = document.getElementById('home-use-skill-modal');
     const content = document.getElementById('home-use-skill-content');
-    
+
     let effectsHtml = '';
     if (skill.costStat && costStat) {
         effectsHtml += `
@@ -3669,7 +3673,7 @@ function showHomeUseSkillModal(skillId) {
             </div>
         `;
     }
-    
+
     if (skill.gainStat && gainStat) {
         effectsHtml += `
             <div class="use-skill-effect gain">
@@ -3687,7 +3691,7 @@ function showHomeUseSkillModal(skillId) {
             </div>
         `;
     }
-    
+
     content.innerHTML = `
         <div class="use-skill-preview">
             <div class="use-skill-icon">${skill.icon || '⭐'}</div>
@@ -3702,7 +3706,7 @@ function showHomeUseSkillModal(skillId) {
             <button class="cyber-btn cancel" onclick="closeModal('home-use-skill-modal')">✗ 取消</button>
         </div>
     `;
-    
+
     modal.classList.add('active');
 }
 
@@ -3710,7 +3714,7 @@ function showHomeUseSkillModal(skillId) {
 function confirmUseSkillFromHome(skillId) {
     useSkill(skillId);
     closeModal('home-use-skill-modal');
-    
+
     // 更新首页所有相关显示
     renderHomeStats();
     renderHomeSkills();
@@ -3723,23 +3727,23 @@ function showEquipSkillModal(slotIndex) {
         switchToTab('skills');
         return;
     }
-    
+
     const modal = document.getElementById('equip-skill-modal');
     const content = document.getElementById('equip-skill-list');
-    
+
     // 获取所有技能（包括子技能）
     const allSkills = getAllSkills();
-    
+
     // 过滤掉已装备的技能
-    const availableSkills = allSkills.filter(skill => 
+    const availableSkills = allSkills.filter(skill =>
         !gameData.equippedSkills.includes(skill.id)
     );
-    
+
     if (availableSkills.length === 0) {
         showNotification('所有技能都已装备', 'error');
         return;
     }
-    
+
     let html = availableSkills.map(skill => {
         let effectText = '';
         let effects = [];
@@ -3752,7 +3756,7 @@ function showEquipSkillModal(slotIndex) {
             effects.push(`<span class="gain">+${skill.gainValue} ${gainStatName}</span>`);
         }
         effectText = effects.length > 0 ? effects.join(' ') : '<span class="no-effect">无效果</span>';
-        
+
         return `
             <div class="equip-skill-option" onclick="equipSkillToSlot(${slotIndex}, ${skill.id})">
                 <div class="equip-skill-icon">${skill.icon || '⭐'}</div>
@@ -3764,7 +3768,7 @@ function showEquipSkillModal(slotIndex) {
             </div>
         `;
     }).join('');
-    
+
     content.innerHTML = html;
     modal.classList.add('active');
 }
@@ -3774,7 +3778,7 @@ function equipSkillToSlot(slotIndex, skillId) {
     if (!gameData.equippedSkills) {
         gameData.equippedSkills = [];
     }
-    
+
     gameData.equippedSkills[slotIndex] = skillId;
     saveData();
     renderHomeSkills();
@@ -3809,9 +3813,9 @@ function toggleEquipSkill(skillId) {
     if (!gameData.equippedSkills) {
         gameData.equippedSkills = [];
     }
-    
+
     const equippedIndex = gameData.equippedSkills.indexOf(skillId);
-    
+
     if (equippedIndex !== -1) {
         // 已装备，卸载
         gameData.equippedSkills[equippedIndex] = null;
@@ -3825,7 +3829,7 @@ function toggleEquipSkill(skillId) {
                 break;
             }
         }
-        
+
         if (emptySlot !== -1) {
             gameData.equippedSkills[emptySlot] = skillId;
             showNotification('技能已装备到首页');
@@ -3834,7 +3838,7 @@ function toggleEquipSkill(skillId) {
             return;
         }
     }
-    
+
     saveData();
     renderSkills();
     renderHomeSkills();
@@ -3844,7 +3848,7 @@ function toggleEquipSkill(skillId) {
 function updateHeaderCurrency() {
     const goldEl = document.getElementById('header-gold');
     const foodEl = document.getElementById('header-food');
-    
+
     if (goldEl) goldEl.textContent = gameData.gold || 0;
     if (foodEl) foodEl.textContent = gameData.food || 0;
 }
@@ -3934,25 +3938,25 @@ function initCharacter() {
     // 确保角色数据存在
     if (!gameData.character) {
         gameData.character = {
-            name: '冒险者',
-            skinColor: '#FFDAB9',
+            name: '小可爱',
+            skinColor: '#FFE4D0',
             hairStyle: 'default',
-            hairColor: '#4a3728',
+            hairColor: '#5D3A1A',
             eyeStyle: 'default',
             outfitStyle: 'casual',
-            outfitColor: '#4FC3F7',
-            accessory: ''
+            outfitColor: '#FFB6C1',
+            accessory: '🎀'
         };
     }
     updateCharacterDisplay();
     updateCharacterNameTag();
-    
+
     // 更新首页角色属性面板中的名称
     const avatarName = document.querySelector('.avatar-name');
     if (avatarName && gameData.character) {
         avatarName.textContent = gameData.character.name;
     }
-    
+
     // 更新首页角色等级（使用技能等级）
     const avatarLevel = document.querySelector('.avatar-level');
     if (avatarLevel) {
@@ -3963,17 +3967,25 @@ function initCharacter() {
 // 更新角色显示
 function updateCharacterDisplay() {
     const char = gameData.character;
-    
+
     // 更新主角色
     const head = document.getElementById('char-head');
     const hair = document.getElementById('char-hair');
     const body = document.getElementById('char-body');
     const accessory = document.getElementById('char-accessory');
-    
+
     if (head) head.style.background = char.skinColor;
     if (hair) hair.style.background = char.hairColor;
-    if (body) body.style.background = `linear-gradient(180deg, ${char.outfitColor} 0%, ${adjustColor(char.outfitColor, -20)} 100%)`;
+    if (body) {
+        body.style.background = `linear-gradient(180deg, ${char.outfitColor} 0%, ${adjustColor(char.outfitColor, -20)} 100%)`;
+        body.className = 'char-body';
+        if (char.outfitStyle) body.classList.add(`outfit-${char.outfitStyle}`);
+    }
     if (accessory) accessory.textContent = char.accessory;
+    
+    // 更新手臂颜色
+    const charEl = document.getElementById('pixel-character');
+    if (charEl) charEl.style.setProperty('--outfit-color', char.outfitColor);
 }
 
 // 更新角色名字标签
@@ -3988,17 +4000,17 @@ function updateCharacterNameTag() {
 function showDressUpModal() {
     // 复制当前角色数据到预览
     previewCharacter = { ...gameData.character };
-    
+
     // 初始化选项
     initDressUpOptions();
     updatePreviewCharacter();
-    
+
     // 设置名称输入框
     const nameInput = document.getElementById('character-name-input');
     if (nameInput) {
         nameInput.value = gameData.character.name || '冒险者';
     }
-    
+
     document.getElementById('dress-up-modal').style.display = 'flex';
 }
 
@@ -4014,7 +4026,7 @@ function initDressUpOptions() {
             </div>
         `).join('');
     }
-    
+
     // 发型选项
     const hairContainer = document.getElementById('hair-options');
     if (hairContainer) {
@@ -4025,7 +4037,7 @@ function initDressUpOptions() {
             </div>
         `).join('');
     }
-    
+
     // 眼睛选项
     const eyesContainer = document.getElementById('eyes-options');
     if (eyesContainer) {
@@ -4036,18 +4048,18 @@ function initDressUpOptions() {
             </div>
         `).join('');
     }
-    
+
     // 服装选项
     const outfitContainer = document.getElementById('outfit-options');
     if (outfitContainer) {
         outfitContainer.innerHTML = characterConfig.outfits.map(outfit => `
             <div class="dress-item ${previewCharacter.outfitColor === outfit.color ? 'selected' : ''}" 
-                 onclick="selectOutfit('${outfit.color}')" title="${outfit.name}">
+                 onclick="selectOutfit('${outfit.id}', '${outfit.color}')" title="${outfit.name}">
                 <span class="item-icon">${outfit.icon}</span>
             </div>
         `).join('');
     }
-    
+
     // 配饰选项
     const accessoryContainer = document.getElementById('accessory-options');
     if (accessoryContainer) {
@@ -4082,7 +4094,8 @@ function selectEyes(color) {
 }
 
 // 选择服装
-function selectOutfit(color) {
+function selectOutfit(style, color) {
+    previewCharacter.outfitStyle = style;
     previewCharacter.outfitColor = color;
     updatePreviewCharacter();
     initDressUpOptions();
@@ -4101,23 +4114,31 @@ function updatePreviewCharacter() {
     const hair = document.getElementById('preview-hair');
     const body = document.getElementById('preview-body');
     const accessory = document.getElementById('preview-accessory');
-    
+
     if (head) head.style.background = previewCharacter.skinColor;
     if (hair) hair.style.background = previewCharacter.hairColor;
-    if (body) body.style.background = `linear-gradient(180deg, ${previewCharacter.outfitColor} 0%, ${adjustColor(previewCharacter.outfitColor, -20)} 100%)`;
+    if (body) {
+        body.style.background = `linear-gradient(180deg, ${previewCharacter.outfitColor} 0%, ${adjustColor(previewCharacter.outfitColor, -20)} 100%)`;
+        body.className = 'char-body';
+        if (previewCharacter.outfitStyle) body.classList.add(`outfit-${previewCharacter.outfitStyle}`);
+    }
     if (accessory) accessory.textContent = previewCharacter.accessory || '';
+
+    // 更新预览手臂颜色
+    const previewEl = document.getElementById('preview-character');
+    if (previewEl) previewEl.style.setProperty('--outfit-color', previewCharacter.outfitColor);
 }
 
 // 随机角色
 function randomizeCharacter() {
     const randomFrom = arr => arr[Math.floor(Math.random() * arr.length)];
-    
+
     previewCharacter.skinColor = randomFrom(characterConfig.skins).color;
     previewCharacter.hairColor = randomFrom(characterConfig.hairs).color;
     previewCharacter.eyeColor = randomFrom(characterConfig.eyes).color;
     previewCharacter.outfitColor = randomFrom(characterConfig.outfits).color;
     previewCharacter.accessory = randomFrom(characterConfig.accessories).emoji;
-    
+
     updatePreviewCharacter();
     initDressUpOptions();
 }
@@ -4128,17 +4149,17 @@ function saveDressUp() {
     if (nameInput && nameInput.value.trim()) {
         previewCharacter.name = nameInput.value.trim();
     }
-    
+
     gameData.character = { ...previewCharacter };
     updateCharacterDisplay();
     updateCharacterNameTag();
-    
+
     // 更新首页角色属性显示的名称
     const avatarName = document.querySelector('.avatar-name');
     if (avatarName) {
         avatarName.textContent = gameData.character.name;
     }
-    
+
     saveData();
     closeModal('dress-up-modal');
     showNotification('💾 角色外观已保存！');
@@ -4160,9 +4181,9 @@ function characterWave() {
         charEl.classList.remove('waving', 'dancing');
         void charEl.offsetWidth; // 触发重排
         charEl.classList.add('waving');
-        
+
         showInteractionBubble('👋 你好呀！');
-        
+
         setTimeout(() => {
             charEl.classList.remove('waving');
         }, 1500);
@@ -4176,10 +4197,10 @@ function characterDance() {
         charEl.classList.remove('waving', 'dancing');
         void charEl.offsetWidth;
         charEl.classList.add('dancing');
-        
+
         const danceMessages = ['💃 跳舞真开心！', '🎵 音乐响起来~', '✨ 转圈圈~', '🌟 耶！'];
         showInteractionBubble(danceMessages[Math.floor(Math.random() * danceMessages.length)]);
-        
+
         setTimeout(() => {
             charEl.classList.remove('dancing');
         }, 1800);
@@ -4192,28 +4213,28 @@ function interactWithPet() {
         showInteractionBubble('🐾 还没有宠物呢~');
         return;
     }
-    
+
     const petMessages = [
         `💕 ${gameData.pet.name}真可爱！`,
         `🎾 和${gameData.pet.name}玩耍~`,
         `✨ ${gameData.pet.name}好开心！`,
         `🌟 摸摸${gameData.pet.name}的头~`
     ];
-    
+
     showInteractionBubble(petMessages[Math.floor(Math.random() * petMessages.length)]);
-    
+
     // 宠物反应
     const petEl = document.getElementById('map-pet-display');
     if (petEl) {
         petEl.style.animation = 'none';
         void petEl.offsetWidth;
         petEl.style.animation = 'pet-happy 0.5s ease-in-out 3';
-        
+
         setTimeout(() => {
             petEl.style.animation = 'pet-follow 1.2s ease-in-out infinite';
         }, 1500);
     }
-    
+
     // 增加少量经验
     if (gameData.pet.exp !== undefined) {
         gameData.pet.exp += 1;
@@ -4226,16 +4247,16 @@ function interactWithPet() {
 function showInteractionBubble(text) {
     const bubble = document.getElementById('interaction-bubble');
     const bubbleText = document.getElementById('bubble-text');
-    
+
     if (bubble && bubbleText) {
         bubbleText.textContent = text;
         bubble.style.display = 'block';
-        
+
         // 重置动画
         bubble.style.animation = 'none';
         void bubble.offsetWidth;
         bubble.style.animation = 'bubble-appear 0.3s ease-out';
-        
+
         // 3秒后隐藏
         setTimeout(() => {
             bubble.style.display = 'none';
@@ -4256,7 +4277,7 @@ function showCharacterMenu() {
 }
 
 // 在初始化时调用
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     setTimeout(() => {
         initPomodoro();
         initReminders();
@@ -4264,10 +4285,125 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePetCollectionUI();
         initCharacter();
         updateHomeMapPet();
+        initCharacterDrag(); // 初始化角色拖拽
     }, 1000);
 });
 
-// 添加宠物开心动画
+// ==================== 角色拖拽系统 ====================
+let isDraggingChar = false;
+let charDragStartX, charDragStartY;
+let charStartLeft, charStartBottom;
+
+function initCharacterDrag() {
+    const charContainer = document.getElementById('pixel-character-container');
+    const mapScene = document.querySelector('.map-scene');
+
+    if (!charContainer || !mapScene) return;
+
+    // 移除原有的 onclick 事件，避免冲突，改为在 stopDragChar 中判断是否是点击
+    // charContainer.onclick = null; 
+
+    charContainer.addEventListener('mousedown', startDragChar);
+    document.addEventListener('mousemove', dragChar);
+    document.addEventListener('mouseup', stopDragChar);
+    
+    // 触摸支持
+    charContainer.addEventListener('touchstart', startDragChar, {passive: false});
+    document.addEventListener('touchmove', dragChar, {passive: false});
+    document.addEventListener('touchend', stopDragChar);
+}
+
+function startDragChar(e) {
+    // 如果点击的是操作按钮，不触发拖拽
+    if (e.target.closest('.char-action-btn')) return;
+    
+    isDraggingChar = true;
+    const charContainer = document.getElementById('pixel-character-container');
+    const parentRect = charContainer.parentElement.getBoundingClientRect();
+    
+    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+    
+    charDragStartX = clientX;
+    charDragStartY = clientY;
+    
+    // 获取当前的像素位置
+    charStartLeft = charContainer.offsetLeft;
+    // 计算bottom的像素值
+    charStartBottom = parentRect.height - (charContainer.offsetTop + charContainer.offsetHeight);
+    
+    charContainer.style.cursor = 'grabbing';
+    charContainer.style.transition = 'none'; // 拖拽时禁用过渡效果
+    
+    // 暂停动画
+    const char = document.getElementById('pixel-character');
+    if(char) char.style.animation = 'none';
+}
+
+function dragChar(e) {
+    if (!isDraggingChar) return;
+    e.preventDefault(); // 防止滚动
+    
+    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+    
+    const deltaX = clientX - charDragStartX;
+    const deltaY = clientY - charDragStartY; // 向下移动，deltaY为正
+    
+    const charContainer = document.getElementById('pixel-character-container');
+    const parentRect = charContainer.parentElement.getBoundingClientRect();
+    
+    let newLeft = charStartLeft + deltaX;
+    // bottom calculation: moving down (positive deltaY) means less bottom
+    let newBottom = charStartBottom - deltaY; 
+    
+    // 边界限制
+    newLeft = Math.max(0, Math.min(newLeft, parentRect.width - charContainer.offsetWidth));
+    newBottom = Math.max(0, Math.min(newBottom, parentRect.height - charContainer.offsetHeight));
+    
+    charContainer.style.left = newLeft + 'px';
+    charContainer.style.bottom = newBottom + 'px';
+    
+    // 宠物跟随
+    updatePetPosition(newLeft, newBottom);
+}
+
+function stopDragChar(e) {
+    if (!isDraggingChar) return;
+    
+    const clientX = e.type.includes('touch') && e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    const clientY = e.type.includes('touch') && e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+    
+    // 判断是否是点击操作（移动距离很小）
+    if (Math.abs(clientX - charDragStartX) < 5 && Math.abs(clientY - charDragStartY) < 5) {
+        showCharacterMenu();
+    }
+
+    isDraggingChar = false;
+    
+    const charContainer = document.getElementById('pixel-character-container');
+    charContainer.style.cursor = 'pointer';
+    charContainer.style.transition = 'transform 0.3s ease';
+    
+    // 恢复动画
+    const char = document.getElementById('pixel-character');
+    if(char) char.style.animation = 'char-idle 0.8s ease-in-out infinite';
+}
+
+function updatePetPosition(charLeft, charBottom) {
+    const pet = document.getElementById('map-pet-display');
+    if (!pet) return;
+    
+    // 宠物在角色右后方
+    const petLeft = charLeft + 50; 
+    const petBottom = charBottom + 5;
+    
+    pet.style.left = petLeft + 'px';
+    pet.style.bottom = petBottom + 'px';
+    // 确保宠物也有跟随动画
+    pet.style.transition = 'left 0.2s ease-out, bottom 0.2s ease-out';
+}
+
 if (!document.getElementById('pet-happy-style')) {
     const petHappyStyle = document.createElement('style');
     petHappyStyle.id = 'pet-happy-style';
